@@ -11,7 +11,7 @@ Crichton.NET aspires follow ideas set out by Bob Martin in [Clean Code](http://w
 As such, the following are some guidelines to think about as you code:
 
 ### Code should follow S.O.L.I.D principles
-* See [SOLID (object-oriented_design)](http://en.wikipedia.org/wiki/SOLID_%28object-oriented_design%29)
+* See [SOLID (object-oriented design)](http://en.wikipedia.org/wiki/SOLID_%28object-oriented_design%29)
 
 ### Every file should be easy to read.
 * Use pronounceable, meaningful names that reveal intentions.
