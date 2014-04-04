@@ -3,7 +3,7 @@
 Crichton is a library to simplify generating and consuming Hypermedia API responses. It has the knowledge of Hypermedia
 from the Ancients.
 
-This is a .NET/C# port of the Ruby library at [http://www.github.com/mdsol/crichton].
+This is a .NET/C# port of the Ruby library at http://www.github.com/mdsol/crichton.
 
 NOTE: THIS IS UNDER HEAVY DEV AND IS NOT READY TO BE USED YET
 
