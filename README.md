@@ -14,5 +14,4 @@ See [CONTRIBUTING][] for details.
 Copyright (c) 2014 Medidata Solutions Worldwide. Licensed under MIT. See [LICENSE][] for details.
 
 [CONTRIBUTING]: CONTRIBUTING.md
-[Documentation]: http://rubydoc.info/github/mdsol/crichton-dotnet
 [LICENSE]: LICENSE.md
