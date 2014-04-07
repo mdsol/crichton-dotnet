@@ -1,1 +1,9 @@
 .idea/
+Crichton.sln.DotSettings.user
+Crichton.suo
+Crichton.v12.suo
+src/*/Debug/*
+src/*/bin/Debug/*
+src/*/obj/Debug/*
+tests/*/bin/Debug/*
+tests/*/obj/Debug/*
