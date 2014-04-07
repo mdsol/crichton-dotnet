@@ -1,21 +1,21 @@
 <?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
-    <id>AutoFixture.Xunit</id>
+    <id>AutoFixture.NUnit2</id>
     <version>3.18.1</version>
-    <title>AutoFixture with xUnit.net data theories</title>
-    <authors>Mark Seemann</authors>
-    <owners>Mark Seemann</owners>
+    <title>AutoFixture with NUnit</title>
+    <authors>Gert Jansen van Rensburg</authors>
+    <owners>Gert Jansen van Rensburg</owners>
     <licenseUrl>https://github.com/AutoFixture/AutoFixture/blob/master/LICENCE.txt</licenseUrl>
     <projectUrl>https://github.com/AutoFixture/AutoFixture</projectUrl>
     <iconUrl>http://i3.codeplex.com/Download?ProjectName=autofixture&amp;DownloadId=278049</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>By leveraging the data theory feature of xUnit.net, this extension turns AutoFixture into a declarative framework for writing unit tests. In many ways it becomes a unit testing DSL (Domain Specific Language).</description>
-    <summary>Extension to AutoFixture that integrates it with xUnit.net.</summary>
+    <description>By leveraging the some features of NUnit, this extension turns AutoFixture into a declarative framework for writing unit tests. In many ways it becomes a unit testing DSL (Domain Specific Language).</description>
+    <summary>Extension to AutoFixture that integrates it with NUnit.</summary>
     <language>en-US</language>
     <dependencies>
       <dependency id="autofixture" version="3.18.1" />
-      <dependency id="xunit.extensions" version="1.8.0.1549" />
+      <dependency id="nunit" version="2.6.2" />
     </dependencies>
   </metadata>
 </package>

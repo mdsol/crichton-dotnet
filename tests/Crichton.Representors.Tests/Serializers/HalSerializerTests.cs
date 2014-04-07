@@ -5,30 +5,30 @@ using System.Text;
 using System.Threading.Tasks;
 using Crichton.Representors.Serializers;
 using Newtonsoft.Json.Linq;
-using Ploeh.AutoFixture.Xunit;
-using Xunit;
-using Xunit.Extensions;
+using NUnit.Framework;
+using Ploeh.AutoFixture.NUnit2;
 
 namespace Crichton.Representors.Tests.Serializers
 {
-    public class HalSerializerTests : TestBase, IUseFixture<HalSerializer>
+    public class HalSerializerTests : TestBase
     {
         private HalSerializer sut;
 
-        public void SetFixture(HalSerializer data)
+        [TestFixtureSetUp]
+        public void Init()
         {
-            sut = data;
+            sut = new HalSerializer();
         }
 
-        [Theory, AutoData]
+        [Test, AutoData]
         public void SelfLinkIsSet(CrichtonRepresentor representor)
         {
             var result = JObject.Parse(sut.Serialize(representor));
 
-            Assert.Equal(result["_links"]["self"].Value<string>("href"), representor.SelfLink);
+            Assert.AreEqual(result["_links"]["self"].Value<string>("href"), representor.SelfLink);
         }
 
-        [Theory, AutoData]
+        [Test, AutoData]
         public void ThrowsExceptionIfNoSelfLinkSet(CrichtonRepresentor representor)
         {
             representor.SelfLink = null;
