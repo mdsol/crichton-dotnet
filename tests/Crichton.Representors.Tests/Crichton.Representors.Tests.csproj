@@ -41,7 +41,8 @@
     <Reference Include="nunit.core.interfaces">
       <HintPath>..\..\packages\NUnit.Runners.2.6.3\tools\lib\nunit.core.interfaces.dll</HintPath>
     </Reference>
-    <Reference Include="nunit.framework">
+    <Reference Include="nunit.framework, Version=2.6.3.13283, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="Ploeh.AutoFixture">
@@ -49,12 +50,6 @@
     </Reference>
     <Reference Include="Ploeh.AutoFixture.AutoRhinoMock">
       <HintPath>..\..\packages\AutoFixture.AutoRhinoMocks.3.18.1\lib\net40\Ploeh.AutoFixture.AutoRhinoMock.dll</HintPath>
-    </Reference>
-    <Reference Include="Ploeh.AutoFixture.NUnit2">
-      <HintPath>..\..\packages\AutoFixture.NUnit2.3.18.1\lib\net40\Ploeh.AutoFixture.NUnit2.dll</HintPath>
-    </Reference>
-    <Reference Include="Ploeh.AutoFixture.NUnit2.Addins">
-      <HintPath>..\..\packages\AutoFixture.NUnit2.3.18.1\lib\net40\Ploeh.AutoFixture.NUnit2.Addins.dll</HintPath>
     </Reference>
     <Reference Include="Rhino.Mocks">
       <HintPath>..\..\packages\RhinoMocks.3.6.1\lib\net\Rhino.Mocks.dll</HintPath>
@@ -70,7 +65,6 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
-    <Compile Include="LocalAddin.cs" />
     <Compile Include="Serializers\HalSerializerTests.cs" />
     <Compile Include="TestBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
