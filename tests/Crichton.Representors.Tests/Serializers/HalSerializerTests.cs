@@ -40,6 +40,5 @@ namespace Crichton.Representors.Tests.Serializers
             Assert.Throws<InvalidOperationException>(() => sut.Serialize(representor));
         }
 
-
     }
 }
