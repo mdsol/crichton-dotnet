@@ -11,18 +11,17 @@ using Rhino.Mocks.Constraints;
 
 namespace Crichton.Representors.Tests.Serializers
 {
-    public class HalSerializerTests : TestBase
+    public class HalSerializerTests : TestWithFixture
     {
         private HalSerializer sut;
-        private CrichtonRepresentor<ExampleDataObject> representor;
-        private IFixture fixture;
+        private CrichtonRepresentor representor;
 
         [TestFixtureSetUp]
         public void Init()
         {
             sut = new HalSerializer();
-            fixture = GetFixture();
-            representor = fixture.Create<CrichtonRepresentor<ExampleDataObject>>();
+            Fixture = GetFixture();
+            representor = Fixture.Create<CrichtonRepresentor>();
         }
 
         [Test]
@@ -42,9 +41,10 @@ namespace Crichton.Representors.Tests.Serializers
         }
 
         [Test]
-        public void Serialize_AddsPropertiesToRootForEachDataObjectProperty()
+        public void Serialize_AddsPropertiesToRootForEachAttributeInRepresentor()
         {
-            var dataJobject = JObject.FromObject(representor.Data);
+            var dataJobject = JObject.FromObject(Fixture.Create<ExampleDataObject>());
+            representor.Attributes = dataJobject;
 
             var result = JObject.Parse(sut.Serialize(representor));
 
@@ -57,7 +57,7 @@ namespace Crichton.Representors.Tests.Serializers
         [Test]
         public void Deserialize_SetsSelfLink()
         {
-            var href = fixture.Create<string>();
+            var href = Fixture.Create<string>();
             var json = @"
             {{
                 ""_links"": {{
@@ -69,7 +69,7 @@ namespace Crichton.Representors.Tests.Serializers
 
             json = String.Format(json, href);
 
-            var result = sut.Deserialize<ExampleDataObject>(json);
+            var result = sut.Deserialize(json);
 
             Assert.AreEqual(href, result.SelfLink);
 
@@ -78,9 +78,9 @@ namespace Crichton.Representors.Tests.Serializers
         [Test]
         public void Deserialize_DeserializesObjectCorrectly()
         {
-            var href = fixture.Create<string>();
-            var id = fixture.Create<string>();
-            var intId = fixture.Create<int>();
+            var href = Fixture.Create<string>();
+            var id = Fixture.Create<string>();
+            var intId = Fixture.Create<int>();
             var json = @"
             {{
                 ""_links"": {{
@@ -94,35 +94,34 @@ namespace Crichton.Representors.Tests.Serializers
 
             json = String.Format(json, href, id, intId);
 
-            var result = sut.Deserialize<ExampleDataObject>(json);
+            var result = sut.Deserialize(json);
 
-            Assert.AreEqual(id, result.Data.Id);
-            Assert.AreEqual(intId, result.Data.IntegerId);
+            Assert.AreEqual(id, result.Attributes["id"].Value<string>());
+            Assert.AreEqual(intId, result.Attributes["int_id"].Value<int>());
         }
 
         [Test]
         public void Deserialize_ThrowsExceptionWhenNoLinksSet()
         {
-            var json = @"{ }";
+            const string json = @"{ }";
 
-            Assert.Throws<InvalidOperationException>(() => sut.Deserialize<ExampleDataObject>(json));
+            Assert.Throws<InvalidOperationException>(() => sut.Deserialize(json));
         }
 
         [Test]
         public void Deserialize_ThrowsExceptionWhenNoSelfLinkSet()
         {
-            var json = @"{ ""_links"" : { ""not-self"" : {""href"" : ""not-self"" }}}";
+            const string json = @"{ ""_links"" : { ""not-self"" : {""href"" : ""not-self"" }}}";
 
-            Assert.Throws<InvalidOperationException>(() => sut.Deserialize<ExampleDataObject>(json));
+            Assert.Throws<InvalidOperationException>(() => sut.Deserialize(json));
         }
 
         [Test]
         public void Deserialize_ThrowsExceptionWhenHrefInSelfLinkIsBlank()
         {
-            var json = @"{ ""_links"" : { ""self"" : {""not-href"" : """" }}}";
+            const string json = @"{ ""_links"" : { ""self"" : {""not-href"" : """" }}}";
 
-            Assert.Throws<InvalidOperationException>(() => sut.Deserialize<ExampleDataObject>(json));
+            Assert.Throws<InvalidOperationException>(() => sut.Deserialize(json));
         }
-
     }
 }

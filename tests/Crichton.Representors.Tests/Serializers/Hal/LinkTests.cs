@@ -9,15 +9,14 @@ using Ploeh.AutoFixture;
 
 namespace Crichton.Representors.Tests.Serializers.Hal
 {
-    public class LinkTests : TestBase
+    public class LinkTests : TestWithFixture
     {
-        private IFixture fixture;
         private Link sut;
 
         [TestFixtureSetUp]
         public void Init()
         {
-            fixture = GetFixture();
+            Fixture = GetFixture();
             sut = new Link();
         }
 
@@ -30,7 +29,7 @@ namespace Crichton.Representors.Tests.Serializers.Hal
         [Test]
         public void CTOR_WithHrefSetsHref()
         {
-            var href = fixture.Create<string>();
+            var href = Fixture.Create<string>();
             sut = new Link(href);
             Assert.AreEqual(href, sut.Href);
         }

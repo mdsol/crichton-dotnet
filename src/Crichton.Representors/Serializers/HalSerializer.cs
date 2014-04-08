@@ -10,7 +10,7 @@ namespace Crichton.Representors.Serializers
 {
     public class HalSerializer
     {
-        public string Serialize<T>(CrichtonRepresentor<T> representor)
+        public string Serialize(CrichtonRepresentor representor)
         {
             var document = new HalDocument();
             
@@ -22,7 +22,7 @@ namespace Crichton.Representors.Serializers
             var jObject = JObject.FromObject(document);
 
             // add a root property for each property on data
-            var dataJobject = JObject.FromObject(representor.Data);
+            var dataJobject = JObject.FromObject(representor.Attributes);
             foreach (var property in dataJobject.Properties())
             {
                 jObject.Add(property.Name, property.Value);
@@ -31,9 +31,9 @@ namespace Crichton.Representors.Serializers
             return jObject.ToString();
         }
 
-        public CrichtonRepresentor<T> Deserialize<T>(string message)
+        public CrichtonRepresentor Deserialize(string message)
         {
-            var representor = new CrichtonRepresentor<T>();
+            var representor = new CrichtonRepresentor();
 
             var document = JsonConvert.DeserializeObject<HalDocument>(message);
 
@@ -41,8 +41,8 @@ namespace Crichton.Representors.Serializers
 
             representor.SelfLink = document.Links["self"].Href;
 
-            // deserialize using root properties on Hal document
-            representor.Data = JsonConvert.DeserializeObject<T>(message);
+            // set representor attributes to be that of root properties in message
+            representor.Attributes = JObject.Parse(message);
 
             return representor;
         }
