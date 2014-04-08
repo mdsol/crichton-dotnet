@@ -1,5 +1,4 @@
-# Crichton.NET [![Build Status](http://crichton-dn-ci.cloudapp.net/app/rest/builds/buildType:%28id:CrichtonDotnet_Develop%29/statusIcon](http://crichton-dn-ci.cloudapp.net/?guest=1)
-
+# Crichton.NET [![Build Status](http://crichton-dn-ci.cloudapp.net/app/rest/builds/buildType:\(id:CrichtonDotnet_Develop\)/statusIcon)](http://crichton-dn-ci.cloudapp.net/?guest=1)
 Crichton is a library to simplify generating and consuming Hypermedia API responses. It has the knowledge of Hypermedia
 from the Ancients.
 
