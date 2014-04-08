@@ -1,14 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Crichton.Representors.Serializers;
 using FluentAssertions;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using Ploeh.AutoFixture;
-using Rhino.Mocks.Constraints;
 
 namespace Crichton.Representors.Tests.Serializers
 {
@@ -70,7 +65,8 @@ namespace Crichton.Representors.Tests.Serializers
             var relArray = links[fixedRel];
             foreach (var transition in representor.Transitions)
             {
-                Assert.IsTrue(relArray.Any(l => l.Value<string>("href") == transition.Uri));
+                var crichtonTransition = transition; // copy to prevent "Access to foreach variable in closure" warning
+                relArray.Should().Contain(l => l.Value<string>("href") == crichtonTransition.Uri);
             }
         }
 

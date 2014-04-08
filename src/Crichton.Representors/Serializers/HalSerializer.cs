@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace Crichton.Representors.Serializers
@@ -30,7 +26,7 @@ namespace Crichton.Representors.Serializers
             return jObject.ToString();
         }
 
-        private void AddLink(JObject document, string rel, string href)
+        private static void AddLink(JObject document, string rel, string href)
         {
             if (document["_links"] == null) document.Add("_links", new JObject());
 
@@ -91,7 +87,7 @@ namespace Crichton.Representors.Serializers
                 if (array == null)
                 {
                     // single link for this rel only
-                    representor.Transitions.Add(new CrichtonTransition()
+                    representor.Transitions.Add(new CrichtonTransition
                     {
                         Rel = rel,
                         Uri = document["_links"][rel]["href"].Value<string>()
@@ -102,7 +98,7 @@ namespace Crichton.Representors.Serializers
                     // create a transition for each array element
                     foreach (var link in array)
                     {
-                        representor.Transitions.Add(new CrichtonTransition()
+                        representor.Transitions.Add(new CrichtonTransition
                         {
                             Rel = rel,
                             Uri = link["href"].Value<string>()
