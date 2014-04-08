@@ -65,6 +65,7 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="ExampleDataObject.cs" />
     <Compile Include="Serializers\HalSerializerTests.cs" />
     <Compile Include="Serializers\Hal\LinkTests.cs" />
     <Compile Include="TestBase.cs" />
