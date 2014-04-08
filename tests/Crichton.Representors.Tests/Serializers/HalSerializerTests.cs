@@ -95,7 +95,44 @@ namespace Crichton.Representors.Tests.Serializers
             var result = sut.Deserialize(json);
 
             Assert.AreEqual(href, result.SelfLink);
+        }
 
+        [Test]
+        public void Deserialize_DoesNotSetSelfLinkForPartiallyCompleteLinks()
+        {
+            var json = @"
+            {{
+                ""_links"": {{
+                    ""self"": {{
+                        ""not-href"": ""blah""
+                                }}
+                }}
+            }}";
+
+            json = String.Format(json);
+
+            var result = sut.Deserialize(json);
+
+            Assert.IsNull(result.SelfLink);
+        }
+
+        [Test]
+        public void Deserialize_DoesNotSetSelfLinkForMissingSelf()
+        {
+            var json = @"
+            {{
+                ""_links"": {{
+                    ""not-self"": {{
+                        ""href"": ""blah""
+                                }}
+                }}
+            }}";
+
+            json = String.Format(json);
+
+            var result = sut.Deserialize(json);
+
+            Assert.IsNull(result.SelfLink);
         }
 
         [Test]

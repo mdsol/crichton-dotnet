@@ -86,23 +86,29 @@ namespace Crichton.Representors.Serializers
                 var array = document["_links"][rel] as JArray;
                 if (array == null)
                 {
-                    // single link for this rel only
-                    representor.Transitions.Add(new CrichtonTransition
+                    if (document["_links"][rel]["href"] != null)
                     {
-                        Rel = rel,
-                        Uri = document["_links"][rel]["href"].Value<string>()
-                    });
+                        // single link for this rel only
+                        representor.Transitions.Add(new CrichtonTransition
+                        {
+                            Rel = rel,
+                            Uri = document["_links"][rel]["href"].Value<string>()
+                        });
+                    }
                 }
                 else
                 {
                     // create a transition for each array element
                     foreach (var link in array)
                     {
-                        representor.Transitions.Add(new CrichtonTransition
+                        if (link["href"] != null)
                         {
-                            Rel = rel,
-                            Uri = link["href"].Value<string>()
-                        });
+                            representor.Transitions.Add(new CrichtonTransition
+                            {
+                                Rel = rel,
+                                Uri = link["href"].Value<string>()
+                            });
+                        }
                     }
                 }
             }
