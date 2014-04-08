@@ -15,7 +15,7 @@ namespace Crichton.Representors.Tests
     {
         private CrichtonRepresentor sut;
 
-        [TestFixtureSetUp]
+        [SetUp]
         public void Init()
         {
             sut = new CrichtonRepresentor();

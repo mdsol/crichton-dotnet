@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Crichton.Representors.Serializers.Hal;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -12,14 +11,14 @@ namespace Crichton.Representors.Serializers
     {
         public string Serialize(CrichtonRepresentor representor)
         {
-            var document = new HalDocument();
-            
-            if (String.IsNullOrWhiteSpace(representor.SelfLink)) throw new InvalidOperationException("HAL Specification requires Self Link to be set.");
+            var jObject = new JObject();
 
-            // set Self link
-            document.Links = new Dictionary<string, Link> {{"self", new Link(representor.SelfLink)}};
+            if (!String.IsNullOrWhiteSpace(representor.SelfLink)) AddLink(jObject, "self", representor.SelfLink);
 
-            var jObject = JObject.FromObject(document);
+            foreach (var transition in representor.Transitions)
+            {
+                AddLink(jObject, transition.Rel, transition.Uri);
+            }
 
             // add a root property for each property on data
             var dataJobject = JObject.FromObject(representor.Attributes);
@@ -31,15 +30,39 @@ namespace Crichton.Representors.Serializers
             return jObject.ToString();
         }
 
+        private void AddLink(JObject document, string rel, string href)
+        {
+            if (document["_links"] == null) document.Add("_links", new JObject());
+
+            var existingRel = document["_links"][rel];
+            if (existingRel == null)
+            {
+                var jobject = (JObject) document["_links"];
+                var linkObject = new JObject {{"href", href}};
+                jobject.Add(rel, linkObject);
+            }
+            else
+            {
+                // we already have a ref. Need to convert this to an array if not already.
+                var array = existingRel as JArray ?? new JArray {existingRel};
+                var linkObject = new JObject { { "href", href } };
+                array.Add(linkObject);
+
+                // override the existing _links > rel
+                document["_links"][rel] = array;
+
+            }
+        }
+
         public CrichtonRepresentor Deserialize(string message)
         {
             var representor = new CrichtonRepresentor();
 
-            var document = JsonConvert.DeserializeObject<HalDocument>(message);
+            var document = JObject.Parse(message);
 
-            ValidateDeserializedHalDocument(document);
+            SetSelfLinkIfPresent(representor, document);
 
-            representor.SelfLink = document.Links["self"].Href;
+            CreateTransitions(document, representor);
 
             // set representor attributes to be that of root properties in message
             representor.Attributes = JObject.Parse(message);
@@ -47,16 +70,46 @@ namespace Crichton.Representors.Serializers
             return representor;
         }
 
-        private static void ValidateDeserializedHalDocument(HalDocument document)
+        private static void SetSelfLinkIfPresent(CrichtonRepresentor representor, JObject document)
         {
-            const string message = "HAL Specification requires _links with self and href";
+            if (document["_links"] == null) return;
+            if (document["_links"]["self"] == null) return;
+            if (document["_links"]["self"]["href"] == null) return;
 
-            if (document.Links == null)
-                throw new InvalidOperationException(message);
-            if (!document.Links.ContainsKey("self"))
-                throw new InvalidOperationException(message);
-            if (String.IsNullOrWhiteSpace(document.Links["self"].Href))
-                throw new InvalidOperationException(message);
+            representor.SelfLink = document["_links"]["self"]["href"].Value<string>();
+        }
+
+        private static void CreateTransitions(JObject document, CrichtonRepresentor representor)
+        {
+            if (document["_links"] == null) return;
+
+            foreach (var child in ((JObject) document["_links"]).Properties())
+            {
+                var rel = child.Name;
+
+                var array = document["_links"][rel] as JArray;
+                if (array == null)
+                {
+                    // single link for this rel only
+                    representor.Transitions.Add(new CrichtonTransition()
+                    {
+                        Rel = rel,
+                        Uri = document["_links"][rel]["href"].Value<string>()
+                    });
+                }
+                else
+                {
+                    // create a transition for each array element
+                    foreach (var link in array)
+                    {
+                        representor.Transitions.Add(new CrichtonTransition()
+                        {
+                            Rel = rel,
+                            Uri = link["href"].Value<string>()
+                        });
+                    }
+                }
+            }
         }
     }
 }

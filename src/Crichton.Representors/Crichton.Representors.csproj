@@ -36,8 +36,6 @@
     <Compile Include="CrichtonRepresentor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Serializers\HalSerializer.cs" />
-    <Compile Include="Serializers\Hal\HalDocument.cs" />
-    <Compile Include="Serializers\Hal\Link.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

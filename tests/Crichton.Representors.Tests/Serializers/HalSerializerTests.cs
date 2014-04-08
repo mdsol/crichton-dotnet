@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Crichton.Representors.Serializers;
+using FluentAssertions;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using Ploeh.AutoFixture;
@@ -16,7 +17,7 @@ namespace Crichton.Representors.Tests.Serializers
         private HalSerializer sut;
         private CrichtonRepresentor representor;
 
-        [TestFixtureSetUp]
+        [SetUp]
         public void Init()
         {
             sut = new HalSerializer();
@@ -33,14 +34,6 @@ namespace Crichton.Representors.Tests.Serializers
         }
 
         [Test]
-        public void Serialize_ThrowsExceptionIfNoSelfLinkSet()
-        {
-            representor.SelfLink = null;
-
-            Assert.Throws<InvalidOperationException>(() => sut.Serialize(representor));
-        }
-
-        [Test]
         public void Serialize_AddsPropertiesToRootForEachAttributeInRepresentor()
         {
             var dataJobject = JObject.FromObject(Fixture.Create<ExampleDataObject>());
@@ -52,6 +45,40 @@ namespace Crichton.Representors.Tests.Serializers
             {
                 Assert.AreEqual(dataJobject.GetValue(property.Name), result.GetValue(property.Name));
             }
+        }
+
+        [Test]
+        public void Serialize_AddsHrefLinkAttributeForEachTransition()
+        {
+            var result = JObject.Parse(sut.Serialize(representor));
+
+            foreach (var transition in representor.Transitions)
+            {
+                Assert.AreEqual(transition.Uri, result["_links"][transition.Rel]["href"].Value<string>());
+            }
+        }
+
+        [Test]
+        public void Serialize_AddsMultipleLinkItemsWhenTransitionRelIsShared()
+        {
+            var fixedRel = Fixture.Create<string>();
+            foreach (var transition in representor.Transitions) transition.Rel = fixedRel;
+
+            var result = JObject.Parse(sut.Serialize(representor));
+
+            var links = result["_links"];
+            var relArray = links[fixedRel];
+            foreach (var transition in representor.Transitions)
+            {
+                Assert.IsTrue(relArray.Any(l => l.Value<string>("href") == transition.Uri));
+            }
+        }
+
+        [Test]
+        public void Serialize_DoesNotThrowForNullSelfLink()
+        {
+            representor.SelfLink = null;
+            Assert.DoesNotThrow(() => sut.Serialize(representor));
         }
 
         [Test]
@@ -101,27 +128,58 @@ namespace Crichton.Representors.Tests.Serializers
         }
 
         [Test]
-        public void Deserialize_ThrowsExceptionWhenNoLinksSet()
+        public void Deserialize_SetsTransitionsForSingleLink()
+        {
+            var href = Fixture.Create<string>();
+            var rel = Fixture.Create<string>();
+            var json = @"
+            {{
+                ""_links"": {{
+                    ""self"": {{
+                        ""href"": ""self-url""
+                                }},
+                    ""{0}"": {{ ""href"" : ""{1}"" }}
+                }}
+            }}";
+
+            json = String.Format(json, rel, href);
+
+            var result = sut.Deserialize(json);
+
+            result.Transitions.Should().Contain(t => t.Rel == rel && t.Uri == href);
+        }
+
+        [Test]
+        public void Deserialize_SetsTransitionsForMultipleLinks()
+        {
+            var href = Fixture.Create<string>();
+            var href2 = Fixture.Create<string>();
+            var rel = Fixture.Create<string>();
+            var json = @"
+            {{
+                ""_links"": {{
+                    ""self"": {{
+                        ""href"": ""self-url""
+                                }},
+                    ""{0}"": [ {{ ""href"" : ""{1}"" }}, {{ ""href"" : ""{2}"" }} ]
+                }}
+            }}";
+
+            json = String.Format(json, rel, href, href2);
+
+            var result = sut.Deserialize(json);
+
+            result.Transitions.Should().Contain(t => t.Rel == rel && t.Uri == href);
+            result.Transitions.Should().Contain(t => t.Rel == rel && t.Uri == href2);
+        }
+
+        [Test]
+        public void Deserialize_DoesNotThrowForEmptyDocument()
         {
             const string json = @"{ }";
 
-            Assert.Throws<InvalidOperationException>(() => sut.Deserialize(json));
+            Assert.DoesNotThrow(() => sut.Deserialize(json));
         }
 
-        [Test]
-        public void Deserialize_ThrowsExceptionWhenNoSelfLinkSet()
-        {
-            const string json = @"{ ""_links"" : { ""not-self"" : {""href"" : ""not-self"" }}}";
-
-            Assert.Throws<InvalidOperationException>(() => sut.Deserialize(json));
-        }
-
-        [Test]
-        public void Deserialize_ThrowsExceptionWhenHrefInSelfLinkIsBlank()
-        {
-            const string json = @"{ ""_links"" : { ""self"" : {""not-href"" : """" }}}";
-
-            Assert.Throws<InvalidOperationException>(() => sut.Deserialize(json));
-        }
     }
 }

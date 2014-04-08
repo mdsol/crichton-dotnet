@@ -73,7 +73,6 @@
     <Compile Include="CrichtonRepresentorTests.cs" />
     <Compile Include="ExampleDataObject.cs" />
     <Compile Include="Serializers\HalSerializerTests.cs" />
-    <Compile Include="Serializers\Hal\LinkTests.cs" />
     <Compile Include="TestWithFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
