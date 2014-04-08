@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30110.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crichton.Representors", "src\Crichton.Representors\Crichton.Representors.csproj", "{E9B71D6B-E1FA-4EC7-B35A-C1C666D69D22}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crichton.Representors.Tests", "tests\Crichton.Representors.Tests\Crichton.Representors.Tests.csproj", "{B5258B16-32DB-4A32-9742-AA5E6C6DE4AA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{2CEA9269-7E6C-41D6-BAEA-4D249E175840}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\packages.config = .nuget\packages.config
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E9B71D6B-E1FA-4EC7-B35A-C1C666D69D22}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E9B71D6B-E1FA-4EC7-B35A-C1C666D69D22}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E9B71D6B-E1FA-4EC7-B35A-C1C666D69D22}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E9B71D6B-E1FA-4EC7-B35A-C1C666D69D22}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B5258B16-32DB-4A32-9742-AA5E6C6DE4AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5258B16-32DB-4A32-9742-AA5E6C6DE4AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5258B16-32DB-4A32-9742-AA5E6C6DE4AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5258B16-32DB-4A32-9742-AA5E6C6DE4AA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
