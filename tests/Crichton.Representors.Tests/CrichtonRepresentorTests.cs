@@ -41,5 +41,17 @@ namespace Crichton.Representors.Tests
             }
 
         }
+
+        [Test]
+        public void SetAttributes_RoundTrip()
+        {
+            var expected = Fixture.Create<ExampleDataObject>();
+            
+            sut.SetAttributesFromObject(expected);
+
+            var result = sut.ToObject<ExampleDataObject>();
+
+            result.ShouldBeEquivalentTo(expected, options => options.IncludingAllDeclaredProperties());
+        }
     }
 }
