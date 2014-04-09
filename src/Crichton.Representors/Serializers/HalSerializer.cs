@@ -3,7 +3,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Crichton.Representors.Serializers
 {
-    public class HalSerializer
+    public class HalSerializer : ISerializer
     {
         public string Serialize(CrichtonRepresentor representor)
         {
