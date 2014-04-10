@@ -3,7 +3,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Crichton.Representors.Serializers
 {
-    public class HalSerializer
+    public class HalSerializer : ISerializer
     {
         public string Serialize(CrichtonRepresentor representor)
         {
@@ -50,32 +50,28 @@ namespace Crichton.Representors.Serializers
             }
         }
 
-        public CrichtonRepresentor Deserialize(string message)
+        public void DeserializeToBuilder(string message, IRepresentorBuilder builder)
         {
-            var representor = new CrichtonRepresentor();
-
             var document = JObject.Parse(message);
 
-            SetSelfLinkIfPresent(representor, document);
+            SetSelfLinkIfPresent(document, builder);
 
-            CreateTransitions(document, representor);
+            CreateTransitions(document, builder);
 
-            // set representor attributes to be that of root properties in message
-            representor.Attributes = JObject.Parse(message);
-
-            return representor;
+            // set builder attributes to be that of root properties in message
+            builder.SetAttributes(JObject.Parse(message));
         }
 
-        private static void SetSelfLinkIfPresent(CrichtonRepresentor representor, JObject document)
+        private static void SetSelfLinkIfPresent(JObject document, IRepresentorBuilder builder)
         {
             if (document["_links"] == null) return;
             if (document["_links"]["self"] == null) return;
             if (document["_links"]["self"]["href"] == null) return;
 
-            representor.SelfLink = document["_links"]["self"]["href"].Value<string>();
+            builder.SetSelfLink(document["_links"]["self"]["href"].Value<string>());
         }
 
-        private static void CreateTransitions(JObject document, CrichtonRepresentor representor)
+        private static void CreateTransitions(JObject document, IRepresentorBuilder builder)
         {
             if (document["_links"] == null) return;
 
@@ -89,11 +85,7 @@ namespace Crichton.Representors.Serializers
                     if (document["_links"][rel]["href"] != null)
                     {
                         // single link for this rel only
-                        representor.Transitions.Add(new CrichtonTransition
-                        {
-                            Rel = rel,
-                            Uri = document["_links"][rel]["href"].Value<string>()
-                        });
+                        builder.AddTransition(rel, document["_links"][rel]["href"].Value<string>());
                     }
                 }
                 else
@@ -103,11 +95,7 @@ namespace Crichton.Representors.Serializers
                     {
                         if (link["href"] != null)
                         {
-                            representor.Transitions.Add(new CrichtonTransition
-                            {
-                                Rel = rel,
-                                Uri = link["href"].Value<string>()
-                            });
+                            builder.AddTransition(rel, link["href"].Value<string>());
                         }
                     }
                 }
