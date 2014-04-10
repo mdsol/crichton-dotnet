@@ -75,7 +75,21 @@ namespace Crichton.Representors.Tests
             sut.AddTransition(rel, uri);
             var result = sut.ToRepresentor();
 
-            result.Transitions.Should().Contain(t => t.Rel == rel && t.Uri == uri);
+            result.Transitions.Should().ContainSingle(t => t.Rel == rel && t.Uri == uri);
+
+        }
+
+        [Test]
+        public void AddTransition_CorrectlyAddsSimpleTransitionWithTitle()
+        {
+            var rel = Fixture.Create<string>();
+            var uri = Fixture.Create<string>();
+            var title = Fixture.Create<string>();
+
+            sut.AddTransition(rel, uri, title);
+            var result = sut.ToRepresentor();
+
+            result.Transitions.Should().ContainSingle(t => t.Rel == rel && t.Uri == uri && t.Title == title);
 
         }
     

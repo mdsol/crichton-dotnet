@@ -57,6 +57,17 @@ namespace Crichton.Representors.Tests.Serializers
         }
 
         [Test]
+        public void Serialize_AddsTitleLinkAttributeForEachTransition()
+        {
+            var result = JObject.Parse(sut.Serialize(representor));
+
+            foreach (var transition in representor.Transitions)
+            {
+                Assert.AreEqual(transition.Title, result["_links"][transition.Rel]["title"].Value<string>());
+            }
+        }
+
+        [Test]
         public void Serialize_AddsMultipleLinkItemsWhenTransitionRelIsShared()
         {
             var fixedRel = Fixture.Create<string>();
@@ -182,7 +193,7 @@ namespace Crichton.Representors.Tests.Serializers
 
             sut.DeserializeToBuilder(json, builder);
 
-            builder.AssertWasCalled(b => b.AddTransition(rel, href));
+            builder.AssertWasCalled(b => b.AddTransition(rel, href, null));
         }
 
         [Test]
@@ -205,8 +216,31 @@ namespace Crichton.Representors.Tests.Serializers
 
             sut.DeserializeToBuilder(json, builder);
 
-            builder.AssertWasCalled(b => b.AddTransition(rel, href));
-            builder.AssertWasCalled(b => b.AddTransition(rel, href2));
+            builder.AssertWasCalled(b => b.AddTransition(rel, href, null));
+            builder.AssertWasCalled(b => b.AddTransition(rel, href2, null));
+        }
+
+        [Test]
+        public void DeserializeToBuilder_SetsTransitionsIncludingTitle()
+        {
+            var href = Fixture.Create<string>();
+            var title = Fixture.Create<string>();
+            var rel = Fixture.Create<string>();
+            var json = @"
+            {{
+                ""_links"": {{
+                    ""self"": {{
+                        ""href"": ""self-url""
+                                }},
+                    ""{0}"": {{ ""href"" : ""{1}"", ""title"" : ""{2}"" }} 
+                }}
+            }}";
+
+            json = String.Format(json, rel, href, title);
+
+            sut.DeserializeToBuilder(json, builder);
+
+            builder.AssertWasCalled(b => b.AddTransition(rel, href, title));
         }
 
         [Test]

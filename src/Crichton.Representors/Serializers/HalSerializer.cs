@@ -1,24 +1,27 @@
 ﻿using System;
+using System.Linq;
 using Newtonsoft.Json.Linq;
 
 namespace Crichton.Representors.Serializers
 {
     public class HalSerializer : ISerializer
     {
+        private static readonly string[] ReservedAttributes = {"_links", "_embedded"};
+        private static readonly string[] ReservedLinkRels = {"self"};
+
         public string Serialize(CrichtonRepresentor representor)
         {
             var jObject = new JObject();
 
-            if (!String.IsNullOrWhiteSpace(representor.SelfLink)) AddLink(jObject, "self", representor.SelfLink);
+            if (!String.IsNullOrWhiteSpace(representor.SelfLink)) AddLink(jObject, "self", representor.SelfLink, null);
 
-            foreach (var transition in representor.Transitions)
+            foreach (var transition in representor.Transitions.Where(t=> !ReservedLinkRels.Contains(t.Rel)))
             {
-                AddLink(jObject, transition.Rel, transition.Uri);
+                AddLink(jObject, transition.Rel, transition.Uri, transition.Title);
             }
 
             // add a root property for each property on data
-            var dataJobject = JObject.FromObject(representor.Attributes);
-            foreach (var property in dataJobject.Properties())
+            foreach (var property in representor.Attributes.Properties().Where(p => !ReservedAttributes.Contains(p.Name)))
             {
                 jObject.Add(property.Name, property.Value);
             }
@@ -26,7 +29,7 @@ namespace Crichton.Representors.Serializers
             return jObject.ToString();
         }
 
-        private static void AddLink(JObject document, string rel, string href)
+        private static void AddLink(JObject document, string rel, string href, string title)
         {
             if (document["_links"] == null) document.Add("_links", new JObject());
 
@@ -35,6 +38,7 @@ namespace Crichton.Representors.Serializers
             {
                 var jobject = (JObject) document["_links"];
                 var linkObject = new JObject {{"href", href}};
+                if (!String.IsNullOrWhiteSpace(title)) linkObject["title"] = title;
                 jobject.Add(rel, linkObject);
             }
             else
@@ -42,6 +46,7 @@ namespace Crichton.Representors.Serializers
                 // we already have a ref. Need to convert this to an array if not already.
                 var array = existingRel as JArray ?? new JArray {existingRel};
                 var linkObject = new JObject { { "href", href } };
+                if (!String.IsNullOrWhiteSpace(title)) linkObject["title"] = title;
                 array.Add(linkObject);
 
                 // override the existing _links > rel
@@ -84,8 +89,10 @@ namespace Crichton.Representors.Serializers
                 {
                     if (document["_links"][rel]["href"] != null)
                     {
+                        var title = document["_links"][rel]["title"];
+
                         // single link for this rel only
-                        builder.AddTransition(rel, document["_links"][rel]["href"].Value<string>());
+                        builder.AddTransition(rel, document["_links"][rel]["href"].Value<string>(), (title == null) ? null : title.Value<string>());
                     }
                 }
                 else
@@ -95,7 +102,9 @@ namespace Crichton.Representors.Serializers
                     {
                         if (link["href"] != null)
                         {
-                            builder.AddTransition(rel, link["href"].Value<string>());
+                            var title = link["title"];
+
+                            builder.AddTransition(rel, link["href"].Value<string>(), (title == null) ? null : title.Value<string>());
                         }
                     }
                 }
