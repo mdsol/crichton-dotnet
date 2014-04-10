@@ -161,8 +161,6 @@ namespace Crichton.Representors.Tests.Serializers
 
             builder.AssertWasCalled(b => b.SetAttributes(Arg<JObject>.Matches(j => j["id"].Value<string>() == id && j["int_id"].Value<int>() == intId)));
 
-            //Assert.AreEqual(id, result.Attributes["id"].Value<string>());
-            //Assert.AreEqual(intId, result.Attributes["int_id"].Value<int>());
         }
 
         [Test]
@@ -185,8 +183,6 @@ namespace Crichton.Representors.Tests.Serializers
             sut.DeserializeToBuilder(json, builder);
 
             builder.AssertWasCalled(b => b.AddTransition(rel, href));
-
-            // result.Transitions.Should().Contain(t => t.Rel == rel && t.Uri == href);
         }
 
         [Test]
@@ -211,9 +207,6 @@ namespace Crichton.Representors.Tests.Serializers
 
             builder.AssertWasCalled(b => b.AddTransition(rel, href));
             builder.AssertWasCalled(b => b.AddTransition(rel, href2));
-
-            //result.Transitions.Should().Contain(t => t.Rel == rel && t.Uri == href);
-            //result.Transitions.Should().Contain(t => t.Rel == rel && t.Uri == href2);
         }
 
         [Test]
