@@ -4,6 +4,7 @@ using FluentAssertions;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using Ploeh.AutoFixture;
+using Rhino.Mocks;
 
 namespace Crichton.Representors.Tests.Serializers
 {
@@ -11,6 +12,7 @@ namespace Crichton.Representors.Tests.Serializers
     {
         private HalSerializer sut;
         private CrichtonRepresentor representor;
+        private IRepresentorBuilder builder;
 
         [SetUp]
         public void Init()
@@ -18,6 +20,7 @@ namespace Crichton.Representors.Tests.Serializers
             sut = new HalSerializer();
             Fixture = GetFixture();
             representor = Fixture.Create<CrichtonRepresentor>();
+            builder = MockRepository.GenerateMock<IRepresentorBuilder>();
         }
 
         [Test]
@@ -78,7 +81,7 @@ namespace Crichton.Representors.Tests.Serializers
         }
 
         [Test]
-        public void Deserialize_SetsSelfLink()
+        public void DeserializeToBuilder_SetsSelfLinkOnBuilder()
         {
             var href = Fixture.Create<string>();
             var json = @"
@@ -92,13 +95,13 @@ namespace Crichton.Representors.Tests.Serializers
 
             json = String.Format(json, href);
 
-            var result = sut.Deserialize(json);
+            sut.DeserializeToBuilder(json, builder);
 
-            Assert.AreEqual(href, result.SelfLink);
+            builder.AssertWasCalled(b => b.SetSelfLink(href));
         }
 
         [Test]
-        public void Deserialize_DoesNotSetSelfLinkForPartiallyCompleteLinks()
+        public void DeserializeToBuilder_DoesNotSetSelfLinkForPartiallyCompleteLinks()
         {
             var json = @"
             {{
@@ -111,13 +114,13 @@ namespace Crichton.Representors.Tests.Serializers
 
             json = String.Format(json);
 
-            var result = sut.Deserialize(json);
+            sut.DeserializeToBuilder(json, builder);
 
-            Assert.IsNull(result.SelfLink);
+            builder.AssertWasNotCalled(b => b.SetSelfLink(Arg<string>.Is.Anything));
         }
 
         [Test]
-        public void Deserialize_DoesNotSetSelfLinkForMissingSelf()
+        public void DeserializeToBuilder_DoesNotSetSelfLinkForMissingSelf()
         {
             var json = @"
             {{
@@ -130,13 +133,13 @@ namespace Crichton.Representors.Tests.Serializers
 
             json = String.Format(json);
 
-            var result = sut.Deserialize(json);
+            sut.DeserializeToBuilder(json, builder);
 
-            Assert.IsNull(result.SelfLink);
+            builder.AssertWasNotCalled(b => b.SetSelfLink(Arg<string>.Is.Anything));
         }
 
         [Test]
-        public void Deserialize_DeserializesObjectCorrectly()
+        public void DeserializeToBuilder_DeserializesObjectCorrectly()
         {
             var href = Fixture.Create<string>();
             var id = Fixture.Create<string>();
@@ -154,14 +157,16 @@ namespace Crichton.Representors.Tests.Serializers
 
             json = String.Format(json, href, id, intId);
 
-            var result = sut.Deserialize(json);
+            sut.DeserializeToBuilder(json, builder);
 
-            Assert.AreEqual(id, result.Attributes["id"].Value<string>());
-            Assert.AreEqual(intId, result.Attributes["int_id"].Value<int>());
+            builder.AssertWasCalled(b => b.SetAttributes(Arg<JObject>.Matches(j => j["id"].Value<string>() == id && j["int_id"].Value<int>() == intId)));
+
+            //Assert.AreEqual(id, result.Attributes["id"].Value<string>());
+            //Assert.AreEqual(intId, result.Attributes["int_id"].Value<int>());
         }
 
         [Test]
-        public void Deserialize_SetsTransitionsForSingleLink()
+        public void DeserializeToBuilder_SetsTransitionsForSingleLink()
         {
             var href = Fixture.Create<string>();
             var rel = Fixture.Create<string>();
@@ -177,13 +182,15 @@ namespace Crichton.Representors.Tests.Serializers
 
             json = String.Format(json, rel, href);
 
-            var result = sut.Deserialize(json);
+            sut.DeserializeToBuilder(json, builder);
 
-            result.Transitions.Should().Contain(t => t.Rel == rel && t.Uri == href);
+            builder.AssertWasCalled(b => b.AddTransition(rel, href));
+
+            // result.Transitions.Should().Contain(t => t.Rel == rel && t.Uri == href);
         }
 
         [Test]
-        public void Deserialize_SetsTransitionsForMultipleLinks()
+        public void DeserializeToBuilder_SetsTransitionsForMultipleLinks()
         {
             var href = Fixture.Create<string>();
             var href2 = Fixture.Create<string>();
@@ -200,18 +207,21 @@ namespace Crichton.Representors.Tests.Serializers
 
             json = String.Format(json, rel, href, href2);
 
-            var result = sut.Deserialize(json);
+            sut.DeserializeToBuilder(json, builder);
 
-            result.Transitions.Should().Contain(t => t.Rel == rel && t.Uri == href);
-            result.Transitions.Should().Contain(t => t.Rel == rel && t.Uri == href2);
+            builder.AssertWasCalled(b => b.AddTransition(rel, href));
+            builder.AssertWasCalled(b => b.AddTransition(rel, href2));
+
+            //result.Transitions.Should().Contain(t => t.Rel == rel && t.Uri == href);
+            //result.Transitions.Should().Contain(t => t.Rel == rel && t.Uri == href2);
         }
 
         [Test]
-        public void Deserialize_DoesNotThrowForEmptyDocument()
+        public void DeserializeToBuilder_DoesNotThrowForEmptyDocument()
         {
             const string json = @"{ }";
 
-            Assert.DoesNotThrow(() => sut.Deserialize(json));
+            Assert.DoesNotThrow(() => sut.DeserializeToBuilder(json, builder));
         }
 
     }

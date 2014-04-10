@@ -36,6 +36,7 @@
     <Compile Include="CrichtonRepresentor.cs" />
     <Compile Include="CrichtonTransition.cs" />
     <Compile Include="CrichtonTransitionAttribute.cs" />
+    <Compile Include="IRepresentorBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RepresentorBuilder.cs" />
     <Compile Include="Serializers\HalSerializer.cs" />

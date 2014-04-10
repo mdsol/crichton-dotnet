@@ -6,7 +6,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Crichton.Representors
 {
-    public class RepresentorBuilder
+    public class RepresentorBuilder : IRepresentorBuilder
     {
         private readonly CrichtonRepresentor representor;
 
