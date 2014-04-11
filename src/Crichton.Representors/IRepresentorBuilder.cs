@@ -10,5 +10,6 @@ namespace Crichton.Representors
         void SetAttributesFromObject(object data);
         void AddTransition(string rel, string uri);
         void AddTransition(string rel, string uri, string title);
+        void AddEmbeddedResource(string key, CrichtonRepresentor resource);
     }
 }

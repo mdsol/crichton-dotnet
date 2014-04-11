@@ -14,13 +14,11 @@ namespace Crichton.Representors.Tests.Integration
     public class HalSerializerRoundTrips : TestWithFixture
     {
         private HalSerializer serializer;
-        private RepresentorBuilder builder;
 
         [SetUp]
         public void Init()
         {
             serializer = new HalSerializer();
-            builder = new RepresentorBuilder();
             Fixture = GetFixture();
         }
 
@@ -82,7 +80,7 @@ namespace Crichton.Representors.Tests.Integration
         {
             var expected = JObject.Parse(json).ToString();
 
-            serializer.DeserializeToBuilder(expected, builder);
+            var builder = serializer.DeserializeToNewBuilder(expected, () => new RepresentorBuilder());
 
             var result = serializer.Serialize(builder.ToRepresentor());
 

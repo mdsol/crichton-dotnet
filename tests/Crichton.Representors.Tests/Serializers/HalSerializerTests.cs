@@ -13,7 +13,7 @@ namespace Crichton.Representors.Tests.Serializers
     {
         private HalSerializer sut;
         private CrichtonRepresentor representor;
-        private IRepresentorBuilder builder;
+        private Func<IRepresentorBuilder> builderFactoryMethod;
 
         [SetUp]
         public void Init()
@@ -21,7 +21,7 @@ namespace Crichton.Representors.Tests.Serializers
             sut = new HalSerializer();
             Fixture = GetFixture();
             representor = Fixture.Create<CrichtonRepresentor>();
-            builder = MockRepository.GenerateMock<IRepresentorBuilder>();
+            builderFactoryMethod = () => MockRepository.GenerateMock<IRepresentorBuilder>();
         }
 
         [Test]
@@ -124,7 +124,7 @@ namespace Crichton.Representors.Tests.Serializers
         }
 
         [Test]
-        public void DeserializeToBuilder_SetsSelfLinkOnBuilder()
+        public void DeserializeToNewBuilder_SetsSelfLinkOnBuilder()
         {
             var href = Fixture.Create<string>();
             var json = @"
@@ -138,13 +138,13 @@ namespace Crichton.Representors.Tests.Serializers
 
             json = String.Format(json, href);
 
-            sut.DeserializeToBuilder(json, builder);
+            var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
 
             builder.AssertWasCalled(b => b.SetSelfLink(href));
         }
 
         [Test]
-        public void DeserializeToBuilder_DoesNotSetSelfLinkForPartiallyCompleteLinks()
+        public void DeserializeToNewBuilder_DoesNotSetSelfLinkForPartiallyCompleteLinks()
         {
             var json = @"
             {{
@@ -157,13 +157,13 @@ namespace Crichton.Representors.Tests.Serializers
 
             json = String.Format(json);
 
-            sut.DeserializeToBuilder(json, builder);
+            var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
 
             builder.AssertWasNotCalled(b => b.SetSelfLink(Arg<string>.Is.Anything));
         }
 
         [Test]
-        public void DeserializeToBuilder_DoesNotSetSelfLinkForMissingSelf()
+        public void DeserializeToNewBuilder_DoesNotSetSelfLinkForMissingSelf()
         {
             var json = @"
             {{
@@ -176,13 +176,13 @@ namespace Crichton.Representors.Tests.Serializers
 
             json = String.Format(json);
 
-            sut.DeserializeToBuilder(json, builder);
+            var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
 
             builder.AssertWasNotCalled(b => b.SetSelfLink(Arg<string>.Is.Anything));
         }
 
         [Test]
-        public void DeserializeToBuilder_DeserializesObjectCorrectly()
+        public void DeserializeToNewBuilder_DeserializesObjectCorrectly()
         {
             var href = Fixture.Create<string>();
             var id = Fixture.Create<string>();
@@ -200,14 +200,14 @@ namespace Crichton.Representors.Tests.Serializers
 
             json = String.Format(json, href, id, intId);
 
-            sut.DeserializeToBuilder(json, builder);
+            var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
 
             builder.AssertWasCalled(b => b.SetAttributes(Arg<JObject>.Matches(j => j["id"].Value<string>() == id && j["int_id"].Value<int>() == intId)));
 
         }
 
         [Test]
-        public void DeserializeToBuilder_SetsTransitionsForSingleLink()
+        public void DeserializeToNewBuilder_SetsTransitionsForSingleLink()
         {
             var href = Fixture.Create<string>();
             var rel = Fixture.Create<string>();
@@ -223,13 +223,13 @@ namespace Crichton.Representors.Tests.Serializers
 
             json = String.Format(json, rel, href);
 
-            sut.DeserializeToBuilder(json, builder);
+            var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
 
             builder.AssertWasCalled(b => b.AddTransition(rel, href, null));
         }
 
         [Test]
-        public void DeserializeToBuilder_SetsTransitionsForMultipleLinks()
+        public void DeserializeToNewBuilder_SetsTransitionsForMultipleLinks()
         {
             var href = Fixture.Create<string>();
             var href2 = Fixture.Create<string>();
@@ -246,14 +246,14 @@ namespace Crichton.Representors.Tests.Serializers
 
             json = String.Format(json, rel, href, href2);
 
-            sut.DeserializeToBuilder(json, builder);
+            var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
 
             builder.AssertWasCalled(b => b.AddTransition(rel, href, null));
             builder.AssertWasCalled(b => b.AddTransition(rel, href2, null));
         }
 
         [Test]
-        public void DeserializeToBuilder_SetsTransitionsIncludingTitle()
+        public void DeserializeToNewBuilder_SetsTransitionsIncludingTitle()
         {
             var href = Fixture.Create<string>();
             var title = Fixture.Create<string>();
@@ -270,17 +270,78 @@ namespace Crichton.Representors.Tests.Serializers
 
             json = String.Format(json, rel, href, title);
 
-            sut.DeserializeToBuilder(json, builder);
+            var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
 
             builder.AssertWasCalled(b => b.AddTransition(rel, href, title));
         }
 
         [Test]
-        public void DeserializeToBuilder_DoesNotThrowForEmptyDocument()
+        public void DeserializeToNewBuilder_DoesNotThrowForEmptyDocument()
         {
             const string json = @"{ }";
 
-            Assert.DoesNotThrow(() => sut.DeserializeToBuilder(json, builder));
+            Assert.DoesNotThrow(() => sut.DeserializeToNewBuilder(json, builderFactoryMethod));
+        }
+
+        [Test]
+        public void DeserializeToNewBuilder_AddsSingleEmbeddedResource()
+        {
+            var href = Fixture.Create<string>();
+            var id = Fixture.Create<string>();
+            var intId = Fixture.Create<int>();
+            var key = Fixture.Create<string>();
+            var json = @"
+            {{
+                ""_embedded"" : {{ ""{0}"" : {{
+                ""_links"": {{
+                    ""self"": {{
+                        ""href"": ""{1}""
+                                }}
+                }},
+                ""id"" : ""{2}"",
+                ""int_id"" : ""{3}""
+                }} }}
+            }}";
+
+            json = String.Format(json, key, href, id, intId);
+
+            var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
+
+            builder.AssertWasCalled(b => b.AddEmbeddedResource(Arg<string>.Is.Equal(key), Arg<CrichtonRepresentor>.Is.Anything), options => options.Repeat.Once());
+
+        }
+
+        [Test]
+        public void DeserializeToNewBuilder_AddsMultipleEmbeddedResources()
+        {
+            var href = Fixture.Create<string>();
+            var href2 = Fixture.Create<string>();
+            var key = Fixture.Create<string>();
+            var json = @"
+            {{
+                ""_embedded"" : {{ ""{0}"" : [ 
+                {{
+                ""_links"": {{
+                    ""self"": {{
+                        ""href"": ""{1}""
+                                }} }}
+                }},
+                {{
+                ""_links"": {{
+                    ""self"": {{
+                        ""href"": ""{2}""
+                                }} }}
+                }} 
+                ]
+                }}
+            }}";
+
+            json = String.Format(json, key, href, href2);
+
+            var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
+
+            builder.AssertWasCalled(b => b.AddEmbeddedResource(Arg<string>.Is.Equal(key), Arg<CrichtonRepresentor>.Is.Anything), options => options.Repeat.Twice());
+
         }
 
     }

@@ -90,16 +90,58 @@ namespace Crichton.Representors.Serializers
             }
         }
 
-        public void DeserializeToBuilder(string message, IRepresentorBuilder builder)
+        public IRepresentorBuilder DeserializeToNewBuilder(string message, Func<IRepresentorBuilder> builderFactoryMethod)
         {
             var document = JObject.Parse(message);
+            
+            var builder = BuildRepresentorBuilderFromJObject(builderFactoryMethod, document);
+
+            return builder;
+        }
+
+        private IRepresentorBuilder BuildRepresentorBuilderFromJObject(Func<IRepresentorBuilder> builderFactoryMethod, JObject document)
+        {
+            var builder = builderFactoryMethod();
 
             SetSelfLinkIfPresent(document, builder);
 
             CreateTransitions(document, builder);
 
+            CreateEmbeddedResources(document, builder, builderFactoryMethod);
+
             // set builder attributes to be that of root properties in message
-            builder.SetAttributes(JObject.Parse(message));
+            builder.SetAttributes(document);
+
+
+            return builder;
+        }
+
+        private void CreateEmbeddedResources(JObject document, IRepresentorBuilder currentBuilder,
+            Func<IRepresentorBuilder> builderFactoryMethod)
+        {
+            if (document["_embedded"] == null) return;
+
+            var embedded = (JObject)document["_embedded"];
+
+            foreach (var property in embedded.Properties())
+            {
+                var propertyAsArray = embedded[property.Name] as JArray;
+                if (propertyAsArray != null)
+                {
+                    // multiple items in same embedded resource key as an array
+                    foreach (var item in propertyAsArray.OfType<JObject>())
+                    {
+                        var builderResult = BuildRepresentorBuilderFromJObject(builderFactoryMethod, item);
+                        currentBuilder.AddEmbeddedResource(property.Name, builderResult.ToRepresentor());
+                    }
+                }
+                else
+                {
+                    // single item under resource key
+                    var builderResult = BuildRepresentorBuilderFromJObject(builderFactoryMethod, (JObject)embedded[property.Name]);
+                    currentBuilder.AddEmbeddedResource(property.Name, builderResult.ToRepresentor());
+                }
+            }
         }
 
         private static void SetSelfLinkIfPresent(JObject document, IRepresentorBuilder builder)

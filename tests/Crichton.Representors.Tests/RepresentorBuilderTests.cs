@@ -104,6 +104,5 @@ namespace Crichton.Representors.Tests
 
             result.EmbeddedResources[key].Should().ContainSingle(t => t == resource);
         }
-    
     }
 }
