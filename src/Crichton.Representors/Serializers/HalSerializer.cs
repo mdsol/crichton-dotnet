@@ -112,7 +112,6 @@ namespace Crichton.Representors.Serializers
             // set builder attributes to be that of root properties in message
             builder.SetAttributes(document);
 
-
             return builder;
         }
 

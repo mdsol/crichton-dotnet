@@ -22,6 +22,18 @@ namespace Crichton.Representors.Tests.Integration
             Fixture = GetFixture();
         }
 
+
+        public void TestRoundTripJson(string json)
+        {
+            var expected = JObject.Parse(json).ToString();
+
+            var builder = serializer.DeserializeToNewBuilder(expected, () => new RepresentorBuilder());
+
+            var result = serializer.Serialize(builder.ToRepresentor());
+
+            Assert.AreEqual(expected, result);
+        }
+
         private const string SelfLinkOnly = @"{
             '_links': {
                 'self': { 'href': '/example_resource' }
@@ -76,15 +88,55 @@ namespace Crichton.Representors.Tests.Integration
             TestRoundTripJson(SimpleLinksAndAttributes);
         }
 
-        public void TestRoundTripJson(string json)
+
+        // From "Resources" here: https://phlyrestfully.readthedocs.org/en/latest/halprimer.html
+        private const string ComplexEmbeddedResources = @"
         {
-            var expected = JObject.Parse(json).ToString();
+            '_links': {
+                'self': {
+                    'href': 'http://example.org/api/user/matthew'
+                }
+            },
+            'id': 'matthew',
+            'name': 'Matthew Weier O\'Phinney',
+            '_embedded': {
+                'contacts': [
+                    {
+                        '_links': {
+                            'self': {
+                                'href': 'http://example.org/api/user/mac_nibblet'
+                            }
+                        },
+                        'id': 'mac_nibblet',
+                        'name': 'Antoine Hedgecock'
+                    },
+                    {
+                        '_links': {
+                            'self': {
+                                'href': 'http://example.org/api/user/spiffyjr'
+                            }
+                        },
+                        'id': 'spiffyjr',
+                        'name': 'Kyle Spraggs'
+                    }
+                ],
+                'website': {
+                    '_links': {
+                        'self': {
+                            'href': 'http://example.org/api/locations/mwop'
+                        }
+                    },
+                    'id': 'mwop',
+                    'url': 'http://www.mwop.net'
+                },
+            }
+        }
+        ";
 
-            var builder = serializer.DeserializeToNewBuilder(expected, () => new RepresentorBuilder());
-
-            var result = serializer.Serialize(builder.ToRepresentor());
-
-            Assert.AreEqual(expected, result);
+        [Test]
+        public void ComplexEmbeddedResources_RoundTrip()
+        {
+            TestRoundTripJson(ComplexEmbeddedResources);
         }
 
     }
