@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Crichton.Representors.Serializers;
 using FluentAssertions;
 using Newtonsoft.Json.Linq;
@@ -89,6 +90,37 @@ namespace Crichton.Representors.Tests.Serializers
         {
             representor.SelfLink = null;
             Assert.DoesNotThrow(() => sut.Serialize(representor));
+        }
+
+        [Test]
+        public void Serialize_SetsSingleEmbeddedResource()
+        {
+            var key = Fixture.Create<string>();
+            var resource = Fixture.Create<CrichtonRepresentor>();
+
+            representor.EmbeddedResources[key] = new List<CrichtonRepresentor> { resource };
+
+            var result = JObject.Parse(sut.Serialize(representor));
+
+            Assert.AreEqual(resource.SelfLink, result["_embedded"][key]["_links"]["self"]["href"].Value<string>());
+        }
+
+        [Test]
+        public void Serialize_SetsMultipleEmbeddedResourcesAsArray()
+        {
+            var key = Fixture.Create<string>();
+            var resources = Fixture.Create<IList<CrichtonRepresentor>>();
+
+            representor.EmbeddedResources[key] = resources;
+
+            var result = JObject.Parse(sut.Serialize(representor));
+
+            var array = (JArray)result["_embedded"][key];
+            foreach (var resource in resources)
+            {
+                var crichtonRepresentor = resource;
+                array.Should().Contain(a => a["_links"]["self"]["href"].Value<string>() == crichtonRepresentor.SelfLink);
+            }
         }
 
         [Test]

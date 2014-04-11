@@ -11,11 +11,18 @@ namespace Crichton.Representors.Serializers
 
         public string Serialize(CrichtonRepresentor representor)
         {
+            var jObject = CreateJObjectForRepresentor(representor);
+
+            return jObject.ToString();
+        }
+
+        private static JObject CreateJObjectForRepresentor(CrichtonRepresentor representor)
+        {
             var jObject = new JObject();
 
             if (!String.IsNullOrWhiteSpace(representor.SelfLink)) AddLink(jObject, "self", representor.SelfLink, null);
 
-            foreach (var transition in representor.Transitions.Where(t=> !ReservedLinkRels.Contains(t.Rel)))
+            foreach (var transition in representor.Transitions.Where(t => !ReservedLinkRels.Contains(t.Rel)))
             {
                 AddLink(jObject, transition.Rel, transition.Uri, transition.Title);
             }
@@ -26,7 +33,35 @@ namespace Crichton.Representors.Serializers
                 jObject.Add(property.Name, property.Value);
             }
 
-            return jObject.ToString();
+            // create embedded resources
+            if (representor.EmbeddedResources.Any())
+            {
+                var embeddedJObject = new JObject();
+
+                foreach (var embeddedResourceKey in representor.EmbeddedResources.Keys)
+                {
+                    var list = representor.EmbeddedResources[embeddedResourceKey];
+                    if (list.Count == 1)
+                    {
+                        // single embedded resources are resources
+                        embeddedJObject.Add(embeddedResourceKey, CreateJObjectForRepresentor(list.Single()));
+                    } 
+                    else if (list.Count > 1)
+                    {
+                        // multiple embedded resources are an array of resources
+                        var array = new JArray();
+                        foreach (var resource in list)
+                        {
+                            array.Add(CreateJObjectForRepresentor(resource));
+                        }
+                        embeddedJObject.Add(embeddedResourceKey, array);
+                    }
+                }
+
+                jObject.Add("_embedded", embeddedJObject);
+            }
+
+            return jObject;
         }
 
         private static void AddLink(JObject document, string rel, string href, string title)
