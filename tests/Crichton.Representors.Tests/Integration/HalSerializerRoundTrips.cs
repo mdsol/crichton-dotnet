@@ -22,7 +22,6 @@ namespace Crichton.Representors.Tests.Integration
             Fixture = GetFixture();
         }
 
-
         public void TestRoundTripJson(string json)
         {
             var expected = JObject.Parse(json).ToString();
@@ -31,7 +30,7 @@ namespace Crichton.Representors.Tests.Integration
 
             var result = serializer.Serialize(builder.ToRepresentor());
 
-            Assert.AreEqual(expected, result);
+            Assert.AreEqual(expected, JObject.Parse(result).ToString());
         }
 
         private const string SelfLinkOnly = @"{
