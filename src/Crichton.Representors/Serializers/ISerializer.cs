@@ -1,8 +1,10 @@
-﻿namespace Crichton.Representors.Serializers
+﻿using System;
+
+namespace Crichton.Representors.Serializers
 {
     public interface ISerializer
     {
         string Serialize(CrichtonRepresentor representor);
-        void DeserializeToBuilder(string message, IRepresentorBuilder builder);
+        IRepresentorBuilder DeserializeToNewBuilder(string message, Func<IRepresentorBuilder> builderFactoryMethod);
     }
 }

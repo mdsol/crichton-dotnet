@@ -9,11 +9,14 @@ namespace Crichton.Representors
 
         public JObject Attributes { get; set; }
 
-        public IList<CrichtonTransition> Transitions { get; set; }
+        public IList<CrichtonTransition> Transitions { get; private set; }
+
+        public Dictionary<string, IList<CrichtonRepresentor>> EmbeddedResources { get; private set; }
 
         public CrichtonRepresentor()
         {
             Transitions = new List<CrichtonTransition>();
+            EmbeddedResources = new Dictionary<string, IList<CrichtonRepresentor>>();
         }
 
         public T ToObject<T>()

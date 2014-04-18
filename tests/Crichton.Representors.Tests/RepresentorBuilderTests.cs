@@ -92,6 +92,17 @@ namespace Crichton.Representors.Tests
             result.Transitions.Should().ContainSingle(t => t.Rel == rel && t.Uri == uri && t.Title == title);
 
         }
-    
+
+        [Test]
+        public void AddEmbeddedResource_AddsResourceWithCorrectKey()
+        {
+            var key = Fixture.Create<string>();
+            var resource = Fixture.Create<CrichtonRepresentor>();
+
+            sut.AddEmbeddedResource(key, resource);
+            var result = sut.ToRepresentor();
+
+            result.EmbeddedResources[key].Should().ContainSingle(t => t == resource);
+        }
     }
 }

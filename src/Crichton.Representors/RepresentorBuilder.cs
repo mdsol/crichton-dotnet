@@ -42,7 +42,15 @@ namespace Crichton.Representors
 
         public void AddTransition(string rel, string uri, string title)
         {
-            representor.Transitions.Add(new CrichtonTransition() { Rel = rel, Uri = uri, Title = title});
+            representor.Transitions.Add(new CrichtonTransition() { Rel = rel, Uri = uri, Title = title });
+        }
+
+        public void AddEmbeddedResource(string key, CrichtonRepresentor resource)
+        {
+            if (!representor.EmbeddedResources.ContainsKey(key))
+                representor.EmbeddedResources[key] = new List<CrichtonRepresentor>();
+
+            representor.EmbeddedResources[key].Add(resource);
         }
     }
 }

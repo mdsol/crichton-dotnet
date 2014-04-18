@@ -11,11 +11,18 @@ namespace Crichton.Representors.Serializers
 
         public string Serialize(CrichtonRepresentor representor)
         {
+            var jObject = CreateJObjectForRepresentor(representor);
+
+            return jObject.ToString();
+        }
+
+        private static JObject CreateJObjectForRepresentor(CrichtonRepresentor representor)
+        {
             var jObject = new JObject();
 
             if (!String.IsNullOrWhiteSpace(representor.SelfLink)) AddLink(jObject, "self", representor.SelfLink, null);
 
-            foreach (var transition in representor.Transitions.Where(t=> !ReservedLinkRels.Contains(t.Rel)))
+            foreach (var transition in representor.Transitions.Where(t => !ReservedLinkRels.Contains(t.Rel)))
             {
                 AddLink(jObject, transition.Rel, transition.Uri, transition.Title);
             }
@@ -26,7 +33,35 @@ namespace Crichton.Representors.Serializers
                 jObject.Add(property.Name, property.Value);
             }
 
-            return jObject.ToString();
+            // create embedded resources
+            if (representor.EmbeddedResources.Any())
+            {
+                var embeddedJObject = new JObject();
+
+                foreach (var embeddedResourceKey in representor.EmbeddedResources.Keys)
+                {
+                    var list = representor.EmbeddedResources[embeddedResourceKey];
+                    if (list.Count == 1)
+                    {
+                        // single embedded resources are resources
+                        embeddedJObject.Add(embeddedResourceKey, CreateJObjectForRepresentor(list.Single()));
+                    } 
+                    else if (list.Count > 1)
+                    {
+                        // multiple embedded resources are an array of resources
+                        var array = new JArray();
+                        foreach (var resource in list)
+                        {
+                            array.Add(CreateJObjectForRepresentor(resource));
+                        }
+                        embeddedJObject.Add(embeddedResourceKey, array);
+                    }
+                }
+
+                jObject.Add("_embedded", embeddedJObject);
+            }
+
+            return jObject;
         }
 
         private static void AddLink(JObject document, string rel, string href, string title)
@@ -55,16 +90,57 @@ namespace Crichton.Representors.Serializers
             }
         }
 
-        public void DeserializeToBuilder(string message, IRepresentorBuilder builder)
+        public IRepresentorBuilder DeserializeToNewBuilder(string message, Func<IRepresentorBuilder> builderFactoryMethod)
         {
             var document = JObject.Parse(message);
+            
+            var builder = BuildRepresentorBuilderFromJObject(builderFactoryMethod, document);
+
+            return builder;
+        }
+
+        private IRepresentorBuilder BuildRepresentorBuilderFromJObject(Func<IRepresentorBuilder> builderFactoryMethod, JObject document)
+        {
+            var builder = builderFactoryMethod();
 
             SetSelfLinkIfPresent(document, builder);
 
             CreateTransitions(document, builder);
 
+            CreateEmbeddedResources(document, builder, builderFactoryMethod);
+
             // set builder attributes to be that of root properties in message
-            builder.SetAttributes(JObject.Parse(message));
+            builder.SetAttributes(document);
+
+            return builder;
+        }
+
+        private void CreateEmbeddedResources(JObject document, IRepresentorBuilder currentBuilder,
+            Func<IRepresentorBuilder> builderFactoryMethod)
+        {
+            if (document["_embedded"] == null) return;
+
+            var embedded = (JObject)document["_embedded"];
+
+            foreach (var property in embedded.Properties())
+            {
+                var propertyAsArray = embedded[property.Name] as JArray;
+                if (propertyAsArray != null)
+                {
+                    // multiple items in same embedded resource key as an array
+                    foreach (var item in propertyAsArray.OfType<JObject>())
+                    {
+                        var builderResult = BuildRepresentorBuilderFromJObject(builderFactoryMethod, item);
+                        currentBuilder.AddEmbeddedResource(property.Name, builderResult.ToRepresentor());
+                    }
+                }
+                else
+                {
+                    // single item under resource key
+                    var builderResult = BuildRepresentorBuilderFromJObject(builderFactoryMethod, (JObject)embedded[property.Name]);
+                    currentBuilder.AddEmbeddedResource(property.Name, builderResult.ToRepresentor());
+                }
+            }
         }
 
         private static void SetSelfLinkIfPresent(JObject document, IRepresentorBuilder builder)
