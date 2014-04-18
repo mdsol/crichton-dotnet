@@ -9,5 +9,6 @@ namespace Crichton.Representors
         void SetAttributes(JObject attributes);
         void SetAttributesFromObject(object data);
         void AddTransition(string rel, string uri);
+        void AddTransition(string rel, string uri, string title);
     }
 }

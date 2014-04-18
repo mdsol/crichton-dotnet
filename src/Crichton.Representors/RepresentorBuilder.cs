@@ -37,7 +37,12 @@ namespace Crichton.Representors
 
         public void AddTransition(string rel, string uri)
         {
-            representor.Transitions.Add(new CrichtonTransition() { Rel = rel, Uri = uri});
+            AddTransition(rel, uri, null);
+        }
+
+        public void AddTransition(string rel, string uri, string title)
+        {
+            representor.Transitions.Add(new CrichtonTransition() { Rel = rel, Uri = uri, Title = title});
         }
     }
 }

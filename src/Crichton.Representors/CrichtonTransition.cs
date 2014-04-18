@@ -8,6 +8,7 @@ namespace Crichton.Representors
         public string Uri { get; set; }
         public string TemplatedUri { get; set; }
         public string InterfaceMethod { get; set; }
+        public string Title { get; set; }
         public IList<CrichtonTransitionAttribute> Attributes { get; set; } 
     }
 }
