@@ -104,5 +104,22 @@ namespace Crichton.Representors.Tests
 
             result.EmbeddedResources[key].Should().ContainSingle(t => t == resource);
         }
+
+        [Test]
+        public void SetCollection_SetsCollectionDataWithSelfLinks()
+        {
+            var examples = Fixture.Create<IList<ExampleDataObject>>();
+            Func<ExampleDataObject, string> selfLinkFunc = e => "self-link-" + e.Id;
+
+            sut.SetCollection(examples, selfLinkFunc);
+
+            var result = sut.ToRepresentor();
+
+            foreach (var example in examples)
+            {
+                var exampleDataObject = example; // prevent different version of compiler warning
+                result.Collection.Should().ContainSingle(c => c.SelfLink == selfLinkFunc(exampleDataObject));
+            }
+        }
     }
 }
