@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<package>
+  <metadata>
+    <id>Crichton.Representors</id>
+    <title>Crichton Hypermedia Representors</title>
+    <version>$version$</version>
+    <authors>Ed Andersen</authors>
+    <copyright>Medidata Solutions</copyright>
+    <licenseUrl>https://github.com/mdsol/crichton-dotnet/blob/develop/LICENSE.md</licenseUrl>
+    <projectUrl>https://github.com/mdsol/crichton-dotnet</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Core components for the Crichton Hypermedia solution.</description>
+    <language>en-US</language>
+    <tags>hypermedia hateoas webapi soa</tags>
+    <dependencies>
+      <dependency id="Newtonsoft.Json" version="6.0.2" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="\bin\Release\Crichton.Representors.dll" target="lib\portable-net40+sl50+wp80+win" />
+  </files>
+</package>
