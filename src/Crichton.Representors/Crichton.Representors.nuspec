@@ -18,5 +18,6 @@
   </metadata>
   <files>
     <file src="\bin\Release\Crichton.Representors.dll" target="lib\portable-net40+sl50+wp80+win" />
+    <file src="\bin\Release\Crichton.Representors.dll" target="lib\net40" />
   </files>
 </package>
