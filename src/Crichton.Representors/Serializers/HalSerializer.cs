@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 
@@ -33,35 +34,43 @@ namespace Crichton.Representors.Serializers
                 jObject.Add(property.Name, property.Value);
             }
 
-            // create embedded resources
-            if (representor.EmbeddedResources.Any())
+            // embedded resources and Collections both require _embedded
+            if (representor.EmbeddedResources.Any() || representor.Collection.Any())
             {
                 var embeddedJObject = new JObject();
+                jObject.Add("_embedded", embeddedJObject);
 
+                // create embedded resources
                 foreach (var embeddedResourceKey in representor.EmbeddedResources.Keys)
                 {
                     var list = representor.EmbeddedResources[embeddedResourceKey];
-                    if (list.Count == 1)
-                    {
-                        // single embedded resources are resources
-                        embeddedJObject.Add(embeddedResourceKey, CreateJObjectForRepresentor(list.Single()));
-                    } 
-                    else if (list.Count > 1)
-                    {
-                        // multiple embedded resources are an array of resources
-                        var array = new JArray();
-                        foreach (var resource in list)
-                        {
-                            array.Add(CreateJObjectForRepresentor(resource));
-                        }
-                        embeddedJObject.Add(embeddedResourceKey, array);
-                    }
+                    AddRepresentorsToEmbedded(list, embeddedJObject, embeddedResourceKey);
                 }
 
-                jObject.Add("_embedded", embeddedJObject);
+                // add Collection objects to _embedded.items
+                AddRepresentorsToEmbedded(representor.Collection.ToList(), embeddedJObject, "items");
             }
 
             return jObject;
+        }
+
+        private static void AddRepresentorsToEmbedded(IList<CrichtonRepresentor> list, JObject embeddedJObject, string embeddedResourceKey)
+        {
+            if (list.Count == 1)
+            {
+                // single embedded resources are resources
+                embeddedJObject.Add(embeddedResourceKey, CreateJObjectForRepresentor(list.Single()));
+            }
+            else if (list.Count > 1)
+            {
+                // multiple embedded resources are an array of resources
+                var array = new JArray();
+                foreach (var resource in list)
+                {
+                    array.Add(CreateJObjectForRepresentor(resource));
+                }
+                embeddedJObject.Add(embeddedResourceKey, array);
+            }
         }
 
         private static void AddLink(JObject document, string rel, string href, string title)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Crichton.Representors.Serializers;
 using FluentAssertions;
 using Newtonsoft.Json.Linq;
@@ -120,6 +121,21 @@ namespace Crichton.Representors.Tests.Serializers
             {
                 var crichtonRepresentor = resource;
                 array.Should().Contain(a => a["_links"]["self"]["href"].Value<string>() == crichtonRepresentor.SelfLink);
+            }
+        }
+
+        [Test]
+        public void Serialize_SetsCollectionToItemsEmbeddedResource()
+        {
+            representor.Collection.AddMany(() => Fixture.Create<CrichtonRepresentor>(), Fixture.Create<int>());
+
+            var result = JObject.Parse(sut.Serialize(representor));
+
+            var embeddedCollection = (JArray) result["_embedded"]["items"];
+            foreach (var resource in representor.Collection)
+            {
+                var crichtonRepresentor = resource;
+                embeddedCollection.Should().Contain(a => a["_links"]["self"]["href"].Value<string>() == crichtonRepresentor.SelfLink);
             }
         }
 

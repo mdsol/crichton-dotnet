@@ -9,7 +9,7 @@ namespace Crichton.Representors
 
         public JObject Attributes { get; set; }
 
-        public IList<CrichtonTransition> Transitions { get; private set; }
+        public IList<CrichtonTransition> Transitions { get; set; }
 
         public Dictionary<string, IList<CrichtonRepresentor>> EmbeddedResources { get; private set; }
 
