@@ -15,5 +15,6 @@ namespace Crichton.Representors
         void AddEmbeddedResource(string key, CrichtonRepresentor resource);
         void SetCollection(IEnumerable<CrichtonRepresentor> representors);
         void SetCollection<T>(IEnumerable<T> collection, Func<T, string> selfLinkFunc);
+        void AddTransition(string rel, string uri, string title, string type);
     }
 }

@@ -21,11 +21,11 @@ namespace Crichton.Representors.Serializers
         {
             var jObject = new JObject();
 
-            if (!String.IsNullOrWhiteSpace(representor.SelfLink)) AddLink(jObject, "self", representor.SelfLink, null);
+            if (!String.IsNullOrWhiteSpace(representor.SelfLink)) AddLink(jObject, "self", representor.SelfLink, null, null);
 
             foreach (var transition in representor.Transitions.Where(t => !ReservedLinkRels.Contains(t.Rel)))
             {
-                AddLink(jObject, transition.Rel, transition.Uri, transition.Title);
+                AddLink(jObject, transition.Rel, transition.Uri, transition.Title, transition.Type);
             }
 
             // add a root property for each property on data
@@ -73,7 +73,7 @@ namespace Crichton.Representors.Serializers
             }
         }
 
-        private static void AddLink(JObject document, string rel, string href, string title)
+        private static void AddLink(JObject document, string rel, string href, string title, string type)
         {
             if (document["_links"] == null) document.Add("_links", new JObject());
 
@@ -83,6 +83,7 @@ namespace Crichton.Representors.Serializers
                 var jobject = (JObject) document["_links"];
                 var linkObject = new JObject {{"href", href}};
                 if (!String.IsNullOrWhiteSpace(title)) linkObject["title"] = title;
+                if (!String.IsNullOrWhiteSpace(type)) linkObject["type"] = type;
                 jobject.Add(rel, linkObject);
             }
             else
@@ -91,6 +92,7 @@ namespace Crichton.Representors.Serializers
                 var array = existingRel as JArray ?? new JArray {existingRel};
                 var linkObject = new JObject { { "href", href } };
                 if (!String.IsNullOrWhiteSpace(title)) linkObject["title"] = title;
+                if (!String.IsNullOrWhiteSpace(type)) linkObject["type"] = type;
                 array.Add(linkObject);
 
                 // override the existing _links > rel
@@ -193,9 +195,12 @@ namespace Crichton.Representors.Serializers
                     if (document["_links"][rel]["href"] != null)
                     {
                         var title = document["_links"][rel]["title"];
+                        var type = document["_links"][rel]["type"];
 
                         // single link for this rel only
-                        builder.AddTransition(rel, document["_links"][rel]["href"].Value<string>(), (title == null) ? null : title.Value<string>());
+                        builder.AddTransition(rel, document["_links"][rel]["href"].Value<string>(),
+                            (title == null) ? null : title.Value<string>(),
+                            (type == null) ? null : type.Value<string>());
                     }
                 }
                 else
@@ -206,8 +211,11 @@ namespace Crichton.Representors.Serializers
                         if (link["href"] != null)
                         {
                             var title = link["title"];
+                            var type = link["type"];
 
-                            builder.AddTransition(rel, link["href"].Value<string>(), (title == null) ? null : title.Value<string>());
+                            builder.AddTransition(rel, link["href"].Value<string>(),
+                                (title == null) ? null : title.Value<string>(),
+                                (type == null) ? null : type.Value<string>());
                         }
                     }
                 }

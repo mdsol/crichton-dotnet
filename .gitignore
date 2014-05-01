@@ -12,3 +12,5 @@ src/*/obj/*
 tests/*/bin/*
 tests/*/obj/*
 _NCrunch_Crichton/
+*.ncrunchsolution
+*.ncrunchproject

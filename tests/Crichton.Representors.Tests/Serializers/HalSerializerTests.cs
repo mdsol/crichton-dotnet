@@ -70,6 +70,17 @@ namespace Crichton.Representors.Tests.Serializers
         }
 
         [Test]
+        public void Serialize_AddsTypeLinkAttributeForEachTransition()
+        {
+            var result = JObject.Parse(sut.Serialize(representor));
+
+            foreach (var transition in representor.Transitions)
+            {
+                Assert.AreEqual(transition.Type, result["_links"][transition.Rel]["type"].Value<string>());
+            }
+        }
+
+        [Test]
         public void Serialize_AddsMultipleLinkItemsWhenTransitionRelIsShared()
         {
             var fixedRel = Fixture.Create<string>();
@@ -241,7 +252,7 @@ namespace Crichton.Representors.Tests.Serializers
 
             var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
 
-            builder.AssertWasCalled(b => b.AddTransition(rel, href, null));
+            builder.AssertWasCalled(b => b.AddTransition(rel, href, null, null));
         }
 
         [Test]
@@ -264,8 +275,8 @@ namespace Crichton.Representors.Tests.Serializers
 
             var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
 
-            builder.AssertWasCalled(b => b.AddTransition(rel, href, null));
-            builder.AssertWasCalled(b => b.AddTransition(rel, href2, null));
+            builder.AssertWasCalled(b => b.AddTransition(rel, href, null, null));
+            builder.AssertWasCalled(b => b.AddTransition(rel, href2, null, null));
         }
 
         [Test]
@@ -288,7 +299,31 @@ namespace Crichton.Representors.Tests.Serializers
 
             var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
 
-            builder.AssertWasCalled(b => b.AddTransition(rel, href, title));
+            builder.AssertWasCalled(b => b.AddTransition(rel, href, title, null));
+        }
+
+        [Test]
+        public void DeserializeToNewBuilder_SetsTransitionsIncludingTitleAndType()
+        {
+            var href = Fixture.Create<string>();
+            var title = Fixture.Create<string>();
+            var rel = Fixture.Create<string>();
+            var type = Fixture.Create<string>();
+            var json = @"
+            {{
+                ""_links"": {{
+                    ""self"": {{
+                        ""href"": ""self-url""
+                                }},
+                    ""{0}"": {{ ""href"" : ""{1}"", ""title"" : ""{2}"", ""type"" : ""{3}"" }} 
+                }}
+            }}";
+
+            json = String.Format(json, rel, href, title, type);
+
+            var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
+
+            builder.AssertWasCalled(b => b.AddTransition(rel, href, title, type));
         }
 
         [Test]

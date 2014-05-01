@@ -94,6 +94,22 @@ namespace Crichton.Representors.Tests
 
         }
 
+
+        [Test]
+        public void AddTransition_CorrectlyAddsSimpleTransitionWithTitleAndType()
+        {
+            var rel = Fixture.Create<string>();
+            var uri = Fixture.Create<string>();
+            var title = Fixture.Create<string>();
+            var type = Fixture.Create<string>();
+
+            sut.AddTransition(rel, uri, title, type);
+            var result = sut.ToRepresentor();
+
+            result.Transitions.Should().ContainSingle(t => t.Rel == rel && t.Uri == uri && t.Title == title && t.Type == type);
+
+        }
+
         [Test]
         public void AddEmbeddedResource_AddsResourceWithCorrectKey()
         {
