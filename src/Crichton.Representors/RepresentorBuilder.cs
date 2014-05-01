@@ -53,6 +53,12 @@ namespace Crichton.Representors
             representor.EmbeddedResources[key].Add(resource);
         }
 
+        public void SetCollection(IEnumerable<CrichtonRepresentor> representors)
+        {
+            foreach(var representorInCollection in representors)
+                representor.Collection.Add(representorInCollection);
+        }
+
         public void SetCollection<T>(IEnumerable<T> collection, Func<T, string> selfLinkFunc)
         {
             foreach (var item in collection)

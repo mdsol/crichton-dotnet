@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -120,6 +121,18 @@ namespace Crichton.Representors.Tests
                 var exampleDataObject = example; // prevent different version of compiler warning
                 result.Collection.Should().ContainSingle(c => c.SelfLink == selfLinkFunc(exampleDataObject));
             }
+        }
+
+        [Test]
+        public void SetCollection_SetsRepresentors()
+        {
+            var representors = Fixture.CreateMany<CrichtonRepresentor>().ToList();
+
+            sut.SetCollection(representors);
+
+            var result = sut.ToRepresentor();
+
+            CollectionAssert.AreEquivalent(representors, result.Collection);
         }
     }
 }

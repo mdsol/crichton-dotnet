@@ -360,5 +360,68 @@ namespace Crichton.Representors.Tests.Serializers
 
         }
 
+        [Test]
+        public void DeserializeToNewBuilder_AddsCollectionForEmbeddedItemsKeyWithMultipleItems()
+        {
+            var href = Fixture.Create<string>();
+            var href2 = Fixture.Create<string>();
+            var key = "items";
+            var json = @"
+            {{
+                ""_embedded"" : {{ ""{0}"" : [ 
+                {{
+                ""_links"": {{
+                    ""self"": {{
+                        ""href"": ""{1}""
+                                }} }}
+                }},
+                {{
+                ""_links"": {{
+                    ""self"": {{
+                        ""href"": ""{2}""
+                                }} }}
+                }} 
+                ]
+                }}
+            }}";
+
+            json = String.Format(json, key, href, href2);
+
+            var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
+
+            var calledCollection = (IEnumerable<CrichtonRepresentor>)builder.GetArgumentsForCallsMadeOn(b => b.SetCollection(null)).First()[0];
+            
+            Assert.AreEqual(2, calledCollection.Count());
+           
+        }
+
+        [Test]
+        public void DeserializeToNewBuilder_AddsCollectionForEmbeddedItemsKeyWithSingleItem()
+        {
+            var href = Fixture.Create<string>();
+            var key = "items";
+            var json = @"
+            {{
+                ""_embedded"" : {{ ""{0}"" : 
+                {{
+                ""_links"": {{
+                    ""self"": {{
+                        ""href"": ""{1}""
+                                }} }}
+                
+                }}
+                }}
+            }}";
+
+            json = String.Format(json, key, href);
+
+            var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
+
+            var calledCollection = (IEnumerable<CrichtonRepresentor>)builder.GetArgumentsForCallsMadeOn(b => b.SetCollection(null)).First()[0];
+
+            Assert.AreEqual(1, calledCollection.Count());
+
+        }
+
     }
 }

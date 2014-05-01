@@ -133,23 +133,41 @@ namespace Crichton.Representors.Serializers
 
             foreach (var property in embedded.Properties())
             {
-                var propertyAsArray = embedded[property.Name] as JArray;
-                if (propertyAsArray != null)
+                var propertyJObject = embedded[property.Name];
+
+                if (property.Name == "items") // collections use the "items" embedded resource key by convention
                 {
-                    // multiple items in same embedded resource key as an array
-                    foreach (var item in propertyAsArray.OfType<JObject>())
-                    {
-                        var builderResult = BuildRepresentorBuilderFromJObject(builderFactoryMethod, item);
-                        currentBuilder.AddEmbeddedResource(property.Name, builderResult.ToRepresentor());
-                    }
+                    currentBuilder.SetCollection(GetRepresentorsFromEmbeddedJObject(builderFactoryMethod, propertyJObject));
                 }
                 else
                 {
-                    // single item under resource key
-                    var builderResult = BuildRepresentorBuilderFromJObject(builderFactoryMethod, (JObject)embedded[property.Name]);
-                    currentBuilder.AddEmbeddedResource(property.Name, builderResult.ToRepresentor());
+                    foreach (var representor in GetRepresentorsFromEmbeddedJObject(builderFactoryMethod, propertyJObject))
+                    {
+                        currentBuilder.AddEmbeddedResource(property.Name, representor);
+                    }
                 }
             }
+        }
+
+        private IEnumerable<CrichtonRepresentor> GetRepresentorsFromEmbeddedJObject(Func<IRepresentorBuilder> builderFactoryMethod, JToken propertyJToken)
+        {
+            var representorsInCollection = new List<CrichtonRepresentor>();
+            var propertyAsArray = propertyJToken as JArray;
+            if (propertyAsArray != null)
+            {
+                // multiple items in same embedded resource an array
+                representorsInCollection.AddRange(propertyAsArray.OfType<JObject>()
+                    .Select(item => BuildRepresentorBuilderFromJObject(builderFactoryMethod, item))
+                    .Select(builderResult => builderResult.ToRepresentor()));
+            }
+            else
+            {
+                // single item as embedded resource
+                var builderResult = BuildRepresentorBuilderFromJObject(builderFactoryMethod,
+                    (JObject)propertyJToken);
+                representorsInCollection.Add(builderResult.ToRepresentor());
+            }
+            return representorsInCollection;
         }
 
         private static void SetSelfLinkIfPresent(JObject document, IRepresentorBuilder builder)

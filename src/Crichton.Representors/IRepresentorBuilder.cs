@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 
 namespace Crichton.Representors
@@ -11,5 +13,7 @@ namespace Crichton.Representors
         void AddTransition(string rel, string uri);
         void AddTransition(string rel, string uri, string title);
         void AddEmbeddedResource(string key, CrichtonRepresentor resource);
+        void SetCollection(IEnumerable<CrichtonRepresentor> representors);
+        void SetCollection<T>(IEnumerable<T> collection, Func<T, string> selfLinkFunc);
     }
 }
