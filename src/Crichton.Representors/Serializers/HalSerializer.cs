@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 
@@ -20,11 +21,11 @@ namespace Crichton.Representors.Serializers
         {
             var jObject = new JObject();
 
-            if (!String.IsNullOrWhiteSpace(representor.SelfLink)) AddLink(jObject, "self", representor.SelfLink, null);
+            if (!String.IsNullOrWhiteSpace(representor.SelfLink)) AddLink(jObject, "self", representor.SelfLink, null, null);
 
             foreach (var transition in representor.Transitions.Where(t => !ReservedLinkRels.Contains(t.Rel)))
             {
-                AddLink(jObject, transition.Rel, transition.Uri, transition.Title);
+                AddLink(jObject, transition.Rel, transition.Uri, transition.Title, transition.Type);
             }
 
             // add a root property for each property on data
@@ -33,38 +34,46 @@ namespace Crichton.Representors.Serializers
                 jObject.Add(property.Name, property.Value);
             }
 
-            // create embedded resources
-            if (representor.EmbeddedResources.Any())
+            // embedded resources and Collections both require _embedded
+            if (representor.EmbeddedResources.Any() || representor.Collection.Any())
             {
                 var embeddedJObject = new JObject();
+                jObject.Add("_embedded", embeddedJObject);
 
+                // create embedded resources
                 foreach (var embeddedResourceKey in representor.EmbeddedResources.Keys)
                 {
                     var list = representor.EmbeddedResources[embeddedResourceKey];
-                    if (list.Count == 1)
-                    {
-                        // single embedded resources are resources
-                        embeddedJObject.Add(embeddedResourceKey, CreateJObjectForRepresentor(list.Single()));
-                    } 
-                    else if (list.Count > 1)
-                    {
-                        // multiple embedded resources are an array of resources
-                        var array = new JArray();
-                        foreach (var resource in list)
-                        {
-                            array.Add(CreateJObjectForRepresentor(resource));
-                        }
-                        embeddedJObject.Add(embeddedResourceKey, array);
-                    }
+                    AddRepresentorsToEmbedded(list, embeddedJObject, embeddedResourceKey);
                 }
 
-                jObject.Add("_embedded", embeddedJObject);
+                // add Collection objects to _embedded.items
+                AddRepresentorsToEmbedded(representor.Collection.ToList(), embeddedJObject, "items");
             }
 
             return jObject;
         }
 
-        private static void AddLink(JObject document, string rel, string href, string title)
+        private static void AddRepresentorsToEmbedded(IList<CrichtonRepresentor> list, JObject embeddedJObject, string embeddedResourceKey)
+        {
+            if (list.Count == 1)
+            {
+                // single embedded resources are resources
+                embeddedJObject.Add(embeddedResourceKey, CreateJObjectForRepresentor(list.Single()));
+            }
+            else if (list.Count > 1)
+            {
+                // multiple embedded resources are an array of resources
+                var array = new JArray();
+                foreach (var resource in list)
+                {
+                    array.Add(CreateJObjectForRepresentor(resource));
+                }
+                embeddedJObject.Add(embeddedResourceKey, array);
+            }
+        }
+
+        private static void AddLink(JObject document, string rel, string href, string title, string type)
         {
             if (document["_links"] == null) document.Add("_links", new JObject());
 
@@ -74,6 +83,7 @@ namespace Crichton.Representors.Serializers
                 var jobject = (JObject) document["_links"];
                 var linkObject = new JObject {{"href", href}};
                 if (!String.IsNullOrWhiteSpace(title)) linkObject["title"] = title;
+                if (!String.IsNullOrWhiteSpace(type)) linkObject["type"] = type;
                 jobject.Add(rel, linkObject);
             }
             else
@@ -82,6 +92,7 @@ namespace Crichton.Representors.Serializers
                 var array = existingRel as JArray ?? new JArray {existingRel};
                 var linkObject = new JObject { { "href", href } };
                 if (!String.IsNullOrWhiteSpace(title)) linkObject["title"] = title;
+                if (!String.IsNullOrWhiteSpace(type)) linkObject["type"] = type;
                 array.Add(linkObject);
 
                 // override the existing _links > rel
@@ -124,23 +135,41 @@ namespace Crichton.Representors.Serializers
 
             foreach (var property in embedded.Properties())
             {
-                var propertyAsArray = embedded[property.Name] as JArray;
-                if (propertyAsArray != null)
+                var propertyJObject = embedded[property.Name];
+
+                if (property.Name == "items") // collections use the "items" embedded resource key by convention
                 {
-                    // multiple items in same embedded resource key as an array
-                    foreach (var item in propertyAsArray.OfType<JObject>())
-                    {
-                        var builderResult = BuildRepresentorBuilderFromJObject(builderFactoryMethod, item);
-                        currentBuilder.AddEmbeddedResource(property.Name, builderResult.ToRepresentor());
-                    }
+                    currentBuilder.SetCollection(GetRepresentorsFromEmbeddedJObject(builderFactoryMethod, propertyJObject));
                 }
                 else
                 {
-                    // single item under resource key
-                    var builderResult = BuildRepresentorBuilderFromJObject(builderFactoryMethod, (JObject)embedded[property.Name]);
-                    currentBuilder.AddEmbeddedResource(property.Name, builderResult.ToRepresentor());
+                    foreach (var representor in GetRepresentorsFromEmbeddedJObject(builderFactoryMethod, propertyJObject))
+                    {
+                        currentBuilder.AddEmbeddedResource(property.Name, representor);
+                    }
                 }
             }
+        }
+
+        private IEnumerable<CrichtonRepresentor> GetRepresentorsFromEmbeddedJObject(Func<IRepresentorBuilder> builderFactoryMethod, JToken propertyJToken)
+        {
+            var representorsInCollection = new List<CrichtonRepresentor>();
+            var propertyAsArray = propertyJToken as JArray;
+            if (propertyAsArray != null)
+            {
+                // multiple items in same embedded resource an array
+                representorsInCollection.AddRange(propertyAsArray.OfType<JObject>()
+                    .Select(item => BuildRepresentorBuilderFromJObject(builderFactoryMethod, item))
+                    .Select(builderResult => builderResult.ToRepresentor()));
+            }
+            else
+            {
+                // single item as embedded resource
+                var builderResult = BuildRepresentorBuilderFromJObject(builderFactoryMethod,
+                    (JObject)propertyJToken);
+                representorsInCollection.Add(builderResult.ToRepresentor());
+            }
+            return representorsInCollection;
         }
 
         private static void SetSelfLinkIfPresent(JObject document, IRepresentorBuilder builder)
@@ -166,9 +195,12 @@ namespace Crichton.Representors.Serializers
                     if (document["_links"][rel]["href"] != null)
                     {
                         var title = document["_links"][rel]["title"];
+                        var type = document["_links"][rel]["type"];
 
                         // single link for this rel only
-                        builder.AddTransition(rel, document["_links"][rel]["href"].Value<string>(), (title == null) ? null : title.Value<string>());
+                        builder.AddTransition(rel, document["_links"][rel]["href"].Value<string>(),
+                            (title == null) ? null : title.Value<string>(),
+                            (type == null) ? null : type.Value<string>());
                     }
                 }
                 else
@@ -179,8 +211,11 @@ namespace Crichton.Representors.Serializers
                         if (link["href"] != null)
                         {
                             var title = link["title"];
+                            var type = link["type"];
 
-                            builder.AddTransition(rel, link["href"].Value<string>(), (title == null) ? null : title.Value<string>());
+                            builder.AddTransition(rel, link["href"].Value<string>(),
+                                (title == null) ? null : title.Value<string>(),
+                                (type == null) ? null : type.Value<string>());
                         }
                     }
                 }

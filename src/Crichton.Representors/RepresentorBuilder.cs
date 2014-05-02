@@ -45,12 +45,34 @@ namespace Crichton.Representors
             representor.Transitions.Add(new CrichtonTransition() { Rel = rel, Uri = uri, Title = title });
         }
 
+        public void AddTransition(string rel, string uri, string title, string type)
+        {
+            representor.Transitions.Add(new CrichtonTransition() { Rel = rel, Uri = uri, Title = title, Type = type});
+        }
+
         public void AddEmbeddedResource(string key, CrichtonRepresentor resource)
         {
             if (!representor.EmbeddedResources.ContainsKey(key))
                 representor.EmbeddedResources[key] = new List<CrichtonRepresentor>();
 
             representor.EmbeddedResources[key].Add(resource);
+        }
+
+        public void SetCollection(IEnumerable<CrichtonRepresentor> representors)
+        {
+            foreach(var representorInCollection in representors)
+                representor.Collection.Add(representorInCollection);
+        }
+
+        public void SetCollection<T>(IEnumerable<T> collection, Func<T, string> selfLinkFunc)
+        {
+            foreach (var item in collection)
+            {
+                var newRepresentor = new CrichtonRepresentor {SelfLink = selfLinkFunc(item)};
+                newRepresentor.SetAttributesFromObject(item);
+
+                representor.Collection.Add(newRepresentor);
+            }
         }
     }
 }

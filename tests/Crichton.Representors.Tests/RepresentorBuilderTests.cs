@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -93,6 +94,22 @@ namespace Crichton.Representors.Tests
 
         }
 
+
+        [Test]
+        public void AddTransition_CorrectlyAddsSimpleTransitionWithTitleAndType()
+        {
+            var rel = Fixture.Create<string>();
+            var uri = Fixture.Create<string>();
+            var title = Fixture.Create<string>();
+            var type = Fixture.Create<string>();
+
+            sut.AddTransition(rel, uri, title, type);
+            var result = sut.ToRepresentor();
+
+            result.Transitions.Should().ContainSingle(t => t.Rel == rel && t.Uri == uri && t.Title == title && t.Type == type);
+
+        }
+
         [Test]
         public void AddEmbeddedResource_AddsResourceWithCorrectKey()
         {
@@ -103,6 +120,35 @@ namespace Crichton.Representors.Tests
             var result = sut.ToRepresentor();
 
             result.EmbeddedResources[key].Should().ContainSingle(t => t == resource);
+        }
+
+        [Test]
+        public void SetCollection_SetsCollectionDataWithSelfLinks()
+        {
+            var examples = Fixture.Create<IList<ExampleDataObject>>();
+            Func<ExampleDataObject, string> selfLinkFunc = e => "self-link-" + e.Id;
+
+            sut.SetCollection(examples, selfLinkFunc);
+
+            var result = sut.ToRepresentor();
+
+            foreach (var example in examples)
+            {
+                var exampleDataObject = example; // prevent different version of compiler warning
+                result.Collection.Should().ContainSingle(c => c.SelfLink == selfLinkFunc(exampleDataObject));
+            }
+        }
+
+        [Test]
+        public void SetCollection_SetsRepresentors()
+        {
+            var representors = Fixture.CreateMany<CrichtonRepresentor>().ToList();
+
+            sut.SetCollection(representors);
+
+            var result = sut.ToRepresentor();
+
+            CollectionAssert.AreEquivalent(representors, result.Collection);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Crichton.Representors.Serializers;
 using FluentAssertions;
 using Newtonsoft.Json.Linq;
@@ -69,6 +70,17 @@ namespace Crichton.Representors.Tests.Serializers
         }
 
         [Test]
+        public void Serialize_AddsTypeLinkAttributeForEachTransition()
+        {
+            var result = JObject.Parse(sut.Serialize(representor));
+
+            foreach (var transition in representor.Transitions)
+            {
+                Assert.AreEqual(transition.Type, result["_links"][transition.Rel]["type"].Value<string>());
+            }
+        }
+
+        [Test]
         public void Serialize_AddsMultipleLinkItemsWhenTransitionRelIsShared()
         {
             var fixedRel = Fixture.Create<string>();
@@ -120,6 +132,21 @@ namespace Crichton.Representors.Tests.Serializers
             {
                 var crichtonRepresentor = resource;
                 array.Should().Contain(a => a["_links"]["self"]["href"].Value<string>() == crichtonRepresentor.SelfLink);
+            }
+        }
+
+        [Test]
+        public void Serialize_SetsCollectionToItemsEmbeddedResource()
+        {
+            representor.Collection.AddMany(() => Fixture.Create<CrichtonRepresentor>(), Fixture.Create<int>());
+
+            var result = JObject.Parse(sut.Serialize(representor));
+
+            var embeddedCollection = (JArray) result["_embedded"]["items"];
+            foreach (var resource in representor.Collection)
+            {
+                var crichtonRepresentor = resource;
+                embeddedCollection.Should().Contain(a => a["_links"]["self"]["href"].Value<string>() == crichtonRepresentor.SelfLink);
             }
         }
 
@@ -225,7 +252,7 @@ namespace Crichton.Representors.Tests.Serializers
 
             var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
 
-            builder.AssertWasCalled(b => b.AddTransition(rel, href, null));
+            builder.AssertWasCalled(b => b.AddTransition(rel, href, null, null));
         }
 
         [Test]
@@ -248,8 +275,8 @@ namespace Crichton.Representors.Tests.Serializers
 
             var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
 
-            builder.AssertWasCalled(b => b.AddTransition(rel, href, null));
-            builder.AssertWasCalled(b => b.AddTransition(rel, href2, null));
+            builder.AssertWasCalled(b => b.AddTransition(rel, href, null, null));
+            builder.AssertWasCalled(b => b.AddTransition(rel, href2, null, null));
         }
 
         [Test]
@@ -272,7 +299,31 @@ namespace Crichton.Representors.Tests.Serializers
 
             var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
 
-            builder.AssertWasCalled(b => b.AddTransition(rel, href, title));
+            builder.AssertWasCalled(b => b.AddTransition(rel, href, title, null));
+        }
+
+        [Test]
+        public void DeserializeToNewBuilder_SetsTransitionsIncludingTitleAndType()
+        {
+            var href = Fixture.Create<string>();
+            var title = Fixture.Create<string>();
+            var rel = Fixture.Create<string>();
+            var type = Fixture.Create<string>();
+            var json = @"
+            {{
+                ""_links"": {{
+                    ""self"": {{
+                        ""href"": ""self-url""
+                                }},
+                    ""{0}"": {{ ""href"" : ""{1}"", ""title"" : ""{2}"", ""type"" : ""{3}"" }} 
+                }}
+            }}";
+
+            json = String.Format(json, rel, href, title, type);
+
+            var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
+
+            builder.AssertWasCalled(b => b.AddTransition(rel, href, title, type));
         }
 
         [Test]
@@ -341,6 +392,69 @@ namespace Crichton.Representors.Tests.Serializers
             var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
 
             builder.AssertWasCalled(b => b.AddEmbeddedResource(Arg<string>.Is.Equal(key), Arg<CrichtonRepresentor>.Is.Anything), options => options.Repeat.Twice());
+
+        }
+
+        [Test]
+        public void DeserializeToNewBuilder_AddsCollectionForEmbeddedItemsKeyWithMultipleItems()
+        {
+            var href = Fixture.Create<string>();
+            var href2 = Fixture.Create<string>();
+            var key = "items";
+            var json = @"
+            {{
+                ""_embedded"" : {{ ""{0}"" : [ 
+                {{
+                ""_links"": {{
+                    ""self"": {{
+                        ""href"": ""{1}""
+                                }} }}
+                }},
+                {{
+                ""_links"": {{
+                    ""self"": {{
+                        ""href"": ""{2}""
+                                }} }}
+                }} 
+                ]
+                }}
+            }}";
+
+            json = String.Format(json, key, href, href2);
+
+            var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
+
+            var calledCollection = (IEnumerable<CrichtonRepresentor>)builder.GetArgumentsForCallsMadeOn(b => b.SetCollection(null)).First()[0];
+            
+            Assert.AreEqual(2, calledCollection.Count());
+           
+        }
+
+        [Test]
+        public void DeserializeToNewBuilder_AddsCollectionForEmbeddedItemsKeyWithSingleItem()
+        {
+            var href = Fixture.Create<string>();
+            var key = "items";
+            var json = @"
+            {{
+                ""_embedded"" : {{ ""{0}"" : 
+                {{
+                ""_links"": {{
+                    ""self"": {{
+                        ""href"": ""{1}""
+                                }} }}
+                
+                }}
+                }}
+            }}";
+
+            json = String.Format(json, key, href);
+
+            var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
+
+            var calledCollection = (IEnumerable<CrichtonRepresentor>)builder.GetArgumentsForCallsMadeOn(b => b.SetCollection(null)).First()[0];
+
+            Assert.AreEqual(1, calledCollection.Count());
 
         }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,7 +12,7 @@ using Rhino.Mocks;
 
 namespace Crichton.Representors.Tests.Integration
 {
-    public class HalSerializerRoundTrips : TestWithFixture
+    public class HalSerializerRoundTrips : RoundTripTests
     {
         private HalSerializer serializer;
 
@@ -22,120 +23,35 @@ namespace Crichton.Representors.Tests.Integration
             Fixture = GetFixture();
         }
 
-        public void TestRoundTripJson(string json)
-        {
-            var expected = JObject.Parse(json).ToString();
-
-            var builder = serializer.DeserializeToNewBuilder(expected, () => new RepresentorBuilder());
-
-            var result = serializer.Serialize(builder.ToRepresentor());
-
-            Assert.AreEqual(expected, JObject.Parse(result).ToString());
-        }
-
-        private const string SelfLinkOnly = @"{
-            '_links': {
-                'self': { 'href': '/example_resource' }
-            }
-        }";
-
         [Test]
         public void SelfLinkOnly_RoundTrip()
         {
-            TestRoundTripJson(SelfLinkOnly);
+            TestRoundTripFromJsonTestData("Hal\\SelfLinkOnly", serializer);
         }
-
-        private const string MultipleLinksSameRelation = @"
-        {
-            '_links': {
-              'items': [{
-                  'href': '/first_item'
-              },{
-                  'href': '/second_item'
-              }]
-            }
-        }";
 
         [Test]
         public void MultipleLinksSameRelation_RoundTrip()
         {
-            TestRoundTripJson(MultipleLinksSameRelation);
+            TestRoundTripFromJsonTestData("Hal\\MultipleLinksSameRelation", serializer);
         }
-
-        private const string SimpleLinksAndAttributes = @"{
-        '_links': {
-            'self': { 'href': '/orders' },
-            'next': { 'href': '/orders?page=2' },
-            'ea:find': {
-                'href': '/orders{?id}'
-            },
-            'ea:admin': [{
-                'href': '/admins/2',
-                'title': 'Fred'
-            }, {
-                'href': '/admins/5',
-                'title': 'Kate'
-            }]
-        },
-        'currentlyProcessing': 14,
-        'shippedToday': 20,
-        }";
 
         [Test]
         public void SimpleLinksAndAttributes_RoundTrip()
         {
-            TestRoundTripJson(SimpleLinksAndAttributes);
+            TestRoundTripFromJsonTestData("Hal\\SimpleLinksAndAttributes", serializer);
         }
-
 
         // From "Resources" here: https://phlyrestfully.readthedocs.org/en/latest/halprimer.html
-        private const string ComplexEmbeddedResources = @"
-        {
-            '_links': {
-                'self': {
-                    'href': 'http://example.org/api/user/matthew'
-                }
-            },
-            'id': 'matthew',
-            'name': 'Matthew Weier O\'Phinney',
-            '_embedded': {
-                'contacts': [
-                    {
-                        '_links': {
-                            'self': {
-                                'href': 'http://example.org/api/user/mac_nibblet'
-                            }
-                        },
-                        'id': 'mac_nibblet',
-                        'name': 'Antoine Hedgecock'
-                    },
-                    {
-                        '_links': {
-                            'self': {
-                                'href': 'http://example.org/api/user/spiffyjr'
-                            }
-                        },
-                        'id': 'spiffyjr',
-                        'name': 'Kyle Spraggs'
-                    }
-                ],
-                'website': {
-                    '_links': {
-                        'self': {
-                            'href': 'http://example.org/api/locations/mwop'
-                        }
-                    },
-                    'id': 'mwop',
-                    'url': 'http://www.mwop.net'
-                },
-            }
-        }
-        ";
-
         [Test]
         public void ComplexEmbeddedResources_RoundTrip()
         {
-            TestRoundTripJson(ComplexEmbeddedResources);
+            TestRoundTripFromJsonTestData("Hal\\ComplexEmbeddedResources", serializer);
+        }
+
+        [Test]
+        public void WormholeSample_RoundTrip()
+        {
+            TestRoundTripFromJsonTestData("Hal\\WormholeSample", serializer);
         }
 
     }
