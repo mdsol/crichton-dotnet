@@ -21,11 +21,11 @@ namespace Crichton.Representors.Serializers
         {
             var jObject = new JObject();
 
-            if (!String.IsNullOrWhiteSpace(representor.SelfLink)) AddLink(jObject, "self", representor.SelfLink, null, null);
+            if (!String.IsNullOrWhiteSpace(representor.SelfLink)) AddLinkFromTransition(jObject, new CrichtonTransition() { Rel = "self", Uri = representor.SelfLink });
 
             foreach (var transition in representor.Transitions.Where(t => !ReservedLinkRels.Contains(t.Rel)))
             {
-                AddLink(jObject, transition.Rel, transition.Uri, transition.Title, transition.Type);
+                AddLinkFromTransition(jObject, transition);
             }
 
             // add a root property for each property on data
@@ -73,32 +73,34 @@ namespace Crichton.Representors.Serializers
             }
         }
 
-        private static void AddLink(JObject document, string rel, string href, string title, string type)
+        private static void AddLinkFromTransition(JObject document, CrichtonTransition transition)
         {
             if (document["_links"] == null) document.Add("_links", new JObject());
 
-            var existingRel = document["_links"][rel];
+            var existingRel = document["_links"][transition.Rel];
             if (existingRel == null)
             {
                 var jobject = (JObject) document["_links"];
-                var linkObject = new JObject {{"href", href}};
-                if (!String.IsNullOrWhiteSpace(title)) linkObject["title"] = title;
-                if (!String.IsNullOrWhiteSpace(type)) linkObject["type"] = type;
-                jobject.Add(rel, linkObject);
+                jobject.Add(transition.Rel, CreateLinkObjectFromTransition(transition));
             }
             else
             {
                 // we already have a ref. Need to convert this to an array if not already.
                 var array = existingRel as JArray ?? new JArray {existingRel};
-                var linkObject = new JObject { { "href", href } };
-                if (!String.IsNullOrWhiteSpace(title)) linkObject["title"] = title;
-                if (!String.IsNullOrWhiteSpace(type)) linkObject["type"] = type;
-                array.Add(linkObject);
+                array.Add(CreateLinkObjectFromTransition(transition));
 
                 // override the existing _links > rel
-                document["_links"][rel] = array;
-
+                document["_links"][transition.Rel] = array;
             }
+        }
+
+        private static JObject CreateLinkObjectFromTransition(CrichtonTransition transition)
+        {
+            var linkObject = new JObject {{"href", transition.Uri}};
+            if (!String.IsNullOrWhiteSpace(transition.Title)) linkObject["title"] = transition.Title;
+            if (!String.IsNullOrWhiteSpace(transition.Type)) linkObject["type"] = transition.Type;
+            if (transition.UriIsTemplated) linkObject["templated"] = true;
+            return linkObject;
         }
 
         public IRepresentorBuilder DeserializeToNewBuilder(string message, Func<IRepresentorBuilder> builderFactoryMethod)
@@ -196,11 +198,14 @@ namespace Crichton.Representors.Serializers
                     {
                         var title = document["_links"][rel]["title"];
                         var type = document["_links"][rel]["type"];
+                        var templatedField = document["_links"][rel]["templated"];
+                        var templated = templatedField != null && (bool)templatedField;
 
                         // single link for this rel only
                         builder.AddTransition(rel, document["_links"][rel]["href"].Value<string>(),
                             (title == null) ? null : title.Value<string>(),
-                            (type == null) ? null : type.Value<string>());
+                            (type == null) ? null : type.Value<string>(),
+                            templated);
                     }
                 }
                 else

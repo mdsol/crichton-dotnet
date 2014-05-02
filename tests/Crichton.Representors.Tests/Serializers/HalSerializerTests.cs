@@ -81,6 +81,22 @@ namespace Crichton.Representors.Tests.Serializers
         }
 
         [Test]
+        public void Serialize_AddsUriIsTemplatedAttributeForEachTransition()
+        {
+            var result = JObject.Parse(sut.Serialize(representor));
+
+            foreach (var transition in representor.Transitions)
+            {
+                var templatedToken = result["_links"][transition.Rel]["templated"];
+
+                if (templatedToken != null)
+                {
+                    Assert.AreEqual(transition.UriIsTemplated, templatedToken.Value<bool>());
+                }
+            }
+        }
+
+        [Test]
         public void Serialize_AddsMultipleLinkItemsWhenTransitionRelIsShared()
         {
             var fixedRel = Fixture.Create<string>();
@@ -299,7 +315,51 @@ namespace Crichton.Representors.Tests.Serializers
 
             var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
 
-            builder.AssertWasCalled(b => b.AddTransition(rel, href, title, null));
+            builder.AssertWasCalled(b => b.AddTransition(rel, href, title));
+        }
+
+        [Test]
+        public void DeserializeToNewBuilder_SetsTransitionUriIsTemplatedForTrue()
+        {
+            var href = Fixture.Create<string>();
+            var rel = Fixture.Create<string>();
+            var json = @"
+            {{
+                ""_links"": {{
+                    ""self"": {{
+                        ""href"": ""self-url""
+                                }},
+                    ""{0}"": {{ ""href"" : ""{1}"", ""templated"" : true }} 
+                }}
+            }}";
+
+            json = String.Format(json, rel, href);
+
+            var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
+
+            builder.AssertWasCalled(b => b.AddTransition(rel, href, uriIsTemplated: true));
+        }
+
+        [Test]
+        public void DeserializeToNewBuilder_SetsTransitionUriIsTemplatedForFalse()
+        {
+            var href = Fixture.Create<string>();
+            var rel = Fixture.Create<string>();
+            var json = @"
+            {{
+                ""_links"": {{
+                    ""self"": {{
+                        ""href"": ""self-url""
+                                }},
+                    ""{0}"": {{ ""href"" : ""{1}"", ""templated"" : false }} 
+                }}
+            }}";
+
+            json = String.Format(json, rel, href);
+
+            var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
+
+            builder.AssertWasCalled(b => b.AddTransition(rel, href));
         }
 
         [Test]
