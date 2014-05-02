@@ -15,7 +15,7 @@ namespace Crichton.Representors.Tests.Serializers
         private HalSerializer sut;
         private CrichtonRepresentor representor;
         private Func<IRepresentorBuilder> builderFactoryMethod;
-
+            
         [SetUp]
         public void Init()
         {
@@ -312,7 +312,7 @@ namespace Crichton.Representors.Tests.Serializers
 
             var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
 
-            builder.AssertWasCalled(b => b.AddTransition(rel, href, null, null));
+            builder.AssertWasCalled(b => b.AddTransition(Arg<CrichtonTransition>.Matches(t => t.Rel == rel && t.Uri == href)));
         }
 
         [Test]
@@ -335,8 +335,8 @@ namespace Crichton.Representors.Tests.Serializers
 
             var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
 
-            builder.AssertWasCalled(b => b.AddTransition(rel, href, null, null));
-            builder.AssertWasCalled(b => b.AddTransition(rel, href2, null, null));
+            builder.AssertWasCalled(b => b.AddTransition(Arg<CrichtonTransition>.Matches(t => t.Rel == rel && t.Uri == href)));
+            builder.AssertWasCalled(b => b.AddTransition(Arg<CrichtonTransition>.Matches(t => t.Rel == rel && t.Uri == href2)));
         }
 
         [Test]
@@ -359,7 +359,7 @@ namespace Crichton.Representors.Tests.Serializers
 
             var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
 
-            builder.AssertWasCalled(b => b.AddTransition(rel, href, title));
+            builder.AssertWasCalled(b => b.AddTransition(Arg<CrichtonTransition>.Matches(t => t.Rel == rel && t.Uri == href && t.Title == title)));
         }
 
         [Test]
@@ -382,7 +382,7 @@ namespace Crichton.Representors.Tests.Serializers
 
             var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
 
-            builder.AssertWasCalled(b => b.AddTransition(rel, href, depreciationUri: depreciationUri));
+            builder.AssertWasCalled(b => b.AddTransition(Arg<CrichtonTransition>.Matches(t => t.Rel == rel && t.Uri == href && t.DepreciationUri == depreciationUri)));
         }
 
         [Test]
@@ -405,7 +405,7 @@ namespace Crichton.Representors.Tests.Serializers
 
             var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
 
-            builder.AssertWasCalled(b => b.AddTransition(rel, href, name: name));
+            builder.AssertWasCalled(b => b.AddTransition(Arg<CrichtonTransition>.Matches(t => t.Rel == rel && t.Uri == href && t.Name == name)));
         }
 
         [Test]
@@ -428,7 +428,7 @@ namespace Crichton.Representors.Tests.Serializers
 
             var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
 
-            builder.AssertWasCalled(b => b.AddTransition(rel, href, languageTag: hreflang));
+            builder.AssertWasCalled(b => b.AddTransition(Arg<CrichtonTransition>.Matches(t => t.Rel == rel && t.Uri == href && t.LanguageTag == hreflang)));
         }
 
         [Test]
@@ -451,7 +451,7 @@ namespace Crichton.Representors.Tests.Serializers
 
             var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
 
-            builder.AssertWasCalled(b => b.AddTransition(rel, href, profileUri: profileUri));
+            builder.AssertWasCalled(b => b.AddTransition(Arg<CrichtonTransition>.Matches(t => t.Rel == rel && t.Uri == href && t.ProfileUri == profileUri)));
         }
 
         [Test]
@@ -473,7 +473,7 @@ namespace Crichton.Representors.Tests.Serializers
 
             var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
 
-            builder.AssertWasCalled(b => b.AddTransition(rel, href, uriIsTemplated: true));
+            builder.AssertWasCalled(b => b.AddTransition(Arg<CrichtonTransition>.Matches(t => t.Rel == rel && t.Uri == href && t.UriIsTemplated)));
         }
 
         [Test]
@@ -495,7 +495,7 @@ namespace Crichton.Representors.Tests.Serializers
 
             var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
 
-            builder.AssertWasCalled(b => b.AddTransition(rel, href));
+            builder.AssertWasCalled(b => b.AddTransition(Arg<CrichtonTransition>.Matches(t => t.Rel == rel && t.Uri == href && t.UriIsTemplated == false)));
         }
 
         [Test]
@@ -519,7 +519,7 @@ namespace Crichton.Representors.Tests.Serializers
 
             var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
 
-            builder.AssertWasCalled(b => b.AddTransition(rel, href, title, type));
+            builder.AssertWasCalled(b => b.AddTransition(Arg<CrichtonTransition>.Matches(t => t.Rel == rel && t.Uri == href && t.Title == title && t.Type == type)));
         }
 
         [Test]

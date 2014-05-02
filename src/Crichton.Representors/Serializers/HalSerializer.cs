@@ -200,23 +200,21 @@ namespace Crichton.Representors.Serializers
                 if (array == null)
                 {
                     // single link for this rel only
-                    AddTransitionToBuilderFromLinkObject(builder, document["_links"][rel], rel);
+                    builder.AddTransition(GetTransitionFromLinkObject(document["_links"][rel], rel));
                 }
                 else
                 {
                     // create a transition for each array element
                     foreach (var link in array)
                     {
-                         AddTransitionToBuilderFromLinkObject(builder, link, rel);
+                         builder.AddTransition(GetTransitionFromLinkObject(link, rel));
                     }
                 }
             }
         }
 
-        private static void AddTransitionToBuilderFromLinkObject(IRepresentorBuilder builder, JToken link, string rel)
+        private static CrichtonTransition GetTransitionFromLinkObject(JToken link, string rel)
         {
-            if (link["href"] == null) return; // href is REQUIRED in HAL
-
             var href = link["href"];
             var title = link["title"];
             var type = link["type"];
@@ -227,14 +225,20 @@ namespace Crichton.Representors.Serializers
             var hreflang = link["hreflang"];
             var templated = templatedField != null && (bool) templatedField;
 
-            builder.AddTransition(rel, href.Value<string>(),
-                title: (title == null) ? null : title.Value<string>(),
-                type: (type == null) ? null : type.Value<string>(),
-                uriIsTemplated: templated,
-                depreciationUri: (deprecated == null) ? null : deprecated.Value<string>(),
-                name: (name == null) ? null : name.Value<string>(),
-                profileUri: (profile == null) ? null : profile.Value<string>(),
-                languageTag: (hreflang == null) ? null : hreflang.Value<string>());
+            var transition = new CrichtonTransition
+            {
+                Rel = rel,
+                Uri = (href == null) ? null : href.Value<string>(),
+                Title = (title == null) ? null : title.Value<string>(),
+                Type = (type == null) ? null : type.Value<string>(),
+                UriIsTemplated = templated,
+                DepreciationUri = (deprecated == null) ? null : deprecated.Value<string>(),
+                Name = (name == null) ? null : name.Value<string>(),
+                ProfileUri = (profile == null) ? null : profile.Value<string>(),
+                LanguageTag = (hreflang == null) ? null : hreflang.Value<string>()
+            };
+
+            return transition;
         }
     }
 }

@@ -68,6 +68,18 @@ namespace Crichton.Representors.Tests
         }
 
         [Test]
+        public void AddTransition_AddsCrichtonTransitionObjectOnce()
+        {
+            var transition = Fixture.Create<CrichtonTransition>();
+            
+            sut.AddTransition(transition);
+            var result = sut.ToRepresentor();
+
+            Assert.IsNotNull(result.Transitions.SingleOrDefault(t => t == transition));
+
+        }
+
+        [Test]
         public void AddTransition_CorrectlyAddsSimpleTransition()
         {
             var rel = Fixture.Create<string>();

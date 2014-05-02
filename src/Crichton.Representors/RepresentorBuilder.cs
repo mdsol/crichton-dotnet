@@ -35,6 +35,11 @@ namespace Crichton.Representors
             representor.Attributes = JObject.FromObject(data);
         }
 
+        public void AddTransition(CrichtonTransition transition)
+        {
+            representor.Transitions.Add(transition);
+        }
+
         public void AddTransition(string rel, string uri = null, string title = null, string type = null, bool uriIsTemplated = false, 
             string depreciationUri = null, string name = null, string profileUri = null, string languageTag = null)
         {
