@@ -32,34 +32,34 @@ namespace Crichton.Representors.Tests.Integration
 
             if (left.Type == JTokenType.Array)
             {
-                var l = left.Children().GetEnumerator();
-                var r = right.Children().GetEnumerator();
+                var leftEnumerator = left.Children().GetEnumerator();
+                var rightEnumerator = right.Children().GetEnumerator();
 
-                while (l.MoveNext())
+                while (leftEnumerator.MoveNext())
                 {
-                    if (!r.MoveNext()) Assert.Fail(message);
+                    if (!rightEnumerator.MoveNext()) Assert.Fail(message);
 
-                    AssertDeepEqualsUnordered(l.Current, r.Current, message);
+                    AssertDeepEqualsUnordered(leftEnumerator.Current, rightEnumerator.Current, message);
                 }
 
-                Assert.IsTrue(!r.MoveNext(), message);
+                Assert.IsTrue(!rightEnumerator.MoveNext(), message);
             }
 
             if (left.Type == JTokenType.Object)
             {
-                var l = ((IDictionary<string, JToken>)left).OrderBy(p => p.Key).GetEnumerator();
-                var r = ((IDictionary<string, JToken>)right).OrderBy(p => p.Key).GetEnumerator();
+                var leftEnumerator = ((IDictionary<string, JToken>)left).OrderBy(p => p.Key).GetEnumerator();
+                var rightEnumerator = ((IDictionary<string, JToken>)right).OrderBy(p => p.Key).GetEnumerator();
 
-                while (l.MoveNext())
+                while (leftEnumerator.MoveNext())
                 {
-                    if (!r.MoveNext()) Assert.Fail(message);
+                    if (!rightEnumerator.MoveNext()) Assert.Fail(message);
 
-                    if (l.Current.Key != r.Current.Key) Assert.Fail(message);
+                    if (leftEnumerator.Current.Key != rightEnumerator.Current.Key) Assert.Fail(message);
 
-                    AssertDeepEqualsUnordered(l.Current.Value, r.Current.Value, message);
+                    AssertDeepEqualsUnordered(leftEnumerator.Current.Value, rightEnumerator.Current.Value, message);
                 }
 
-                Assert.IsTrue(!r.MoveNext(), message);
+                Assert.IsTrue(!rightEnumerator.MoveNext(), message);
             }
 
             Assert.IsTrue(JToken.DeepEquals(left, right), message);
