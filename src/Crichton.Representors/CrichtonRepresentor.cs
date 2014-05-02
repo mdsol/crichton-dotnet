@@ -13,7 +13,7 @@ namespace Crichton.Representors
 
         public Dictionary<string, IList<CrichtonRepresentor>> EmbeddedResources { get; private set; }
 
-        public IList<CrichtonRepresentor> Collection { get; private set; } 
+        public ICollection<CrichtonRepresentor> Collection { get; private set; } 
 
         public CrichtonRepresentor()
         {
