@@ -11,7 +11,7 @@ namespace Crichton.Representors
         void SetAttributes(JObject attributes);
         void SetAttributesFromObject(object data);
         void AddTransition(string rel, string uri = null, string title = null, string type = null,
-            bool uriIsTemplated = false, string depreciationUri = null, string name = null, string profileUri = null);
+            bool uriIsTemplated = false, string depreciationUri = null, string name = null, string profileUri = null, string languageTag = null);
         void AddEmbeddedResource(string key, CrichtonRepresentor resource);
         void SetCollection(IEnumerable<CrichtonRepresentor> representors);
         void SetCollection<T>(IEnumerable<T> collection, Func<T, string> selfLinkFunc);

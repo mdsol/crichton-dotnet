@@ -103,6 +103,7 @@ namespace Crichton.Representors.Serializers
             if (!String.IsNullOrWhiteSpace(transition.DepreciationUri)) linkObject["deprecation"] = transition.DepreciationUri;
             if (!String.IsNullOrWhiteSpace(transition.Name)) linkObject["name"] = transition.Name;
             if (!String.IsNullOrWhiteSpace(transition.Name)) linkObject["profile"] = transition.ProfileUri;
+            if (!String.IsNullOrWhiteSpace(transition.LanguageTag)) linkObject["hreflang"] = transition.LanguageTag;
 
             return linkObject;
         }
@@ -223,6 +224,7 @@ namespace Crichton.Representors.Serializers
             var deprecated = link["deprecated"];
             var name = link["name"];
             var profile = link["profile"];
+            var hreflang = link["hreflang"];
             var templated = templatedField != null && (bool) templatedField;
 
             builder.AddTransition(rel, href.Value<string>(),
@@ -231,7 +233,8 @@ namespace Crichton.Representors.Serializers
                 uriIsTemplated: templated,
                 depreciationUri: (deprecated == null) ? null : deprecated.Value<string>(),
                 name: (name == null) ? null : name.Value<string>(),
-                profileUri: (profile == null) ? null : profile.Value<string>());
+                profileUri: (profile == null) ? null : profile.Value<string>(),
+                languageTag: (hreflang == null) ? null : hreflang.Value<string>());
         }
     }
 }

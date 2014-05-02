@@ -158,6 +158,18 @@ namespace Crichton.Representors.Tests
         }
 
         [Test]
+        public void AddTransition_CorrectlyAddsSimpleTransitionWithLanguageTag()
+        {
+            var rel = Fixture.Create<string>();
+            var languageTag = Fixture.Create<string>();
+
+            sut.AddTransition(rel, languageTag: languageTag);
+            var result = sut.ToRepresentor();
+
+            result.Transitions.Should().ContainSingle(t => t.Rel == rel && t.LanguageTag == languageTag);
+        }
+
+        [Test]
         public void AddEmbeddedResource_AddsResourceWithCorrectKey()
         {
             var key = Fixture.Create<string>();

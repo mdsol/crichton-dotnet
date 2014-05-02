@@ -114,6 +114,17 @@ namespace Crichton.Representors.Tests.Serializers
         }
 
         [Test]
+        public void Serialize_AddsLanguageTagAsHreflangAttributeForEachTransition()
+        {
+            var result = JObject.Parse(sut.Serialize(representor));
+
+            foreach (var transition in representor.Transitions)
+            {
+                Assert.AreEqual(transition.LanguageTag, result["_links"][transition.Rel]["hreflang"].Value<string>());
+            }
+        }
+
+        [Test]
         public void Serialize_AddsUriIsTemplatedAttributeForEachTransition()
         {
             var result = JObject.Parse(sut.Serialize(representor));
@@ -395,6 +406,29 @@ namespace Crichton.Representors.Tests.Serializers
             var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
 
             builder.AssertWasCalled(b => b.AddTransition(rel, href, name: name));
+        }
+
+        [Test]
+        public void DeserializeToNewBuilder_SetsTransitionsIncludingHreflangAsLanguageTag()
+        {
+            var href = Fixture.Create<string>();
+            var hreflang = Fixture.Create<string>();
+            var rel = Fixture.Create<string>();
+            var json = @"
+            {{
+                ""_links"": {{
+                    ""self"": {{
+                        ""href"": ""self-url""
+                                }},
+                    ""{0}"": {{ ""href"" : ""{1}"", ""hreflang"" : ""{2}"" }} 
+                }}
+            }}";
+
+            json = String.Format(json, rel, href, hreflang);
+
+            var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
+
+            builder.AssertWasCalled(b => b.AddTransition(rel, href, languageTag: hreflang));
         }
 
         [Test]
