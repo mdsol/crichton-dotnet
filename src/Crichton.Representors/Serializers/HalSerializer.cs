@@ -21,7 +21,7 @@ namespace Crichton.Representors.Serializers
         {
             var jObject = new JObject();
 
-            if (!String.IsNullOrWhiteSpace(representor.SelfLink)) AddLinkFromTransition(jObject, new CrichtonTransition() { Rel = "self", Uri = representor.SelfLink });
+            if (!String.IsNullOrWhiteSpace(representor.SelfLink)) AddLinkFromTransition(jObject, new CrichtonTransition { Rel = "self", Uri = representor.SelfLink });
 
             foreach (var transition in representor.Transitions.Where(t => !ReservedLinkRels.Contains(t.Rel)))
             {
@@ -100,6 +100,8 @@ namespace Crichton.Representors.Serializers
             if (!String.IsNullOrWhiteSpace(transition.Title)) linkObject["title"] = transition.Title;
             if (!String.IsNullOrWhiteSpace(transition.Type)) linkObject["type"] = transition.Type;
             if (transition.UriIsTemplated) linkObject["templated"] = true;
+            if (!String.IsNullOrWhiteSpace(transition.DepreciationUri)) linkObject["deprecation"] = transition.DepreciationUri;
+
             return linkObject;
         }
 
@@ -194,37 +196,36 @@ namespace Crichton.Representors.Serializers
                 var array = document["_links"][rel] as JArray;
                 if (array == null)
                 {
-                    if (document["_links"][rel]["href"] != null)
-                    {
-                        var title = document["_links"][rel]["title"];
-                        var type = document["_links"][rel]["type"];
-                        var templatedField = document["_links"][rel]["templated"];
-                        var templated = templatedField != null && (bool)templatedField;
-
-                        // single link for this rel only
-                        builder.AddTransition(rel, document["_links"][rel]["href"].Value<string>(),
-                            (title == null) ? null : title.Value<string>(),
-                            (type == null) ? null : type.Value<string>(),
-                            templated);
-                    }
+                    // single link for this rel only
+                    AddTransitionToBuilderFromLinkObject(builder, document["_links"][rel], rel);
                 }
                 else
                 {
                     // create a transition for each array element
                     foreach (var link in array)
                     {
-                        if (link["href"] != null)
-                        {
-                            var title = link["title"];
-                            var type = link["type"];
-
-                            builder.AddTransition(rel, link["href"].Value<string>(),
-                                (title == null) ? null : title.Value<string>(),
-                                (type == null) ? null : type.Value<string>());
-                        }
+                         AddTransitionToBuilderFromLinkObject(builder, link, rel);
                     }
                 }
             }
+        }
+
+        private static void AddTransitionToBuilderFromLinkObject(IRepresentorBuilder builder, JToken link, string rel)
+        {
+            if (link["href"] == null) return; // href is REQUIRED in HAL
+
+            var href = link["href"];
+            var title = link["title"];
+            var type = link["type"];
+            var templatedField = link["templated"];
+            var deprecated = link["deprecated"];
+            var templated = templatedField != null && (bool) templatedField;
+
+            builder.AddTransition(rel, href.Value<string>(),
+                title: (title == null) ? null : title.Value<string>(),
+                type: (type == null) ? null : type.Value<string>(),
+                uriIsTemplated: templated,
+                depreciationUri: (deprecated == null) ? null : deprecated.Value<string>());
         }
     }
 }

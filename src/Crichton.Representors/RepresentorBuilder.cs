@@ -35,9 +35,9 @@ namespace Crichton.Representors
             representor.Attributes = JObject.FromObject(data);
         }
 
-        public void AddTransition(string rel, string uri = null, string title = null, string type = null, bool uriIsTemplated = false)
+        public void AddTransition(string rel, string uri = null, string title = null, string type = null, bool uriIsTemplated = false, string depreciationUri = null)
         {
-            representor.Transitions.Add(new CrichtonTransition() { Rel = rel, Uri = uri, Title = title, Type = type, UriIsTemplated = uriIsTemplated});
+            representor.Transitions.Add(new CrichtonTransition() { Rel = rel, Uri = uri, Title = title, Type = type, UriIsTemplated = uriIsTemplated, DepreciationUri = depreciationUri});
         }
 
         public void AddEmbeddedResource(string key, CrichtonRepresentor resource)

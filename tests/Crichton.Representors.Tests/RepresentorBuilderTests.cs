@@ -122,6 +122,18 @@ namespace Crichton.Representors.Tests
         }
 
         [Test]
+        public void AddTransition_CorrectlyAddsSimpleTransitionWithDepreciationLink()
+        {
+            var rel = Fixture.Create<string>();
+            var depreciationUri = Fixture.Create<string>();
+
+            sut.AddTransition(rel, depreciationUri: depreciationUri);
+            var result = sut.ToRepresentor();
+
+            result.Transitions.Should().ContainSingle(t => t.Rel == rel && t.DepreciationUri == depreciationUri);
+        }
+
+        [Test]
         public void AddEmbeddedResource_AddsResourceWithCorrectKey()
         {
             var key = Fixture.Create<string>();
