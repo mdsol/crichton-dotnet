@@ -6,7 +6,7 @@ namespace Crichton.Representors
     {
         public string Rel { get; set; }
         public string Uri { get; set; }
-        public string TemplatedUri { get; set; }
+        public bool UriIsTemplated { get; set; }
         public string InterfaceMethod { get; set; }
         public string Title { get; set; }
         public string Type { get; set; }

@@ -94,7 +94,6 @@ namespace Crichton.Representors.Tests
 
         }
 
-
         [Test]
         public void AddTransition_CorrectlyAddsSimpleTransitionWithTitleAndType()
         {
@@ -108,6 +107,18 @@ namespace Crichton.Representors.Tests
 
             result.Transitions.Should().ContainSingle(t => t.Rel == rel && t.Uri == uri && t.Title == title && t.Type == type);
 
+        }
+
+        [Test]
+        public void AddTransition_CorrectlyAddsSimpleTransitionWithIsTemplatedTrue()
+        {
+            var rel = Fixture.Create<string>();
+            var isTemplated = Fixture.Create<bool>();
+
+            sut.AddTransition(rel, uriIsTemplated: isTemplated);
+            var result = sut.ToRepresentor();
+
+            result.Transitions.Should().ContainSingle(t => t.Rel == rel && t.UriIsTemplated == isTemplated);
         }
 
         [Test]
