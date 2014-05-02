@@ -12,6 +12,7 @@ namespace Crichton.Representors
         public string Type { get; set; }
         public string DepreciationUri { get; set; }
         public string Name { get; set; }
+        public string ProfileUri { get; set; }
         public IList<CrichtonTransitionAttribute> Attributes { get; set; } 
     }
 }

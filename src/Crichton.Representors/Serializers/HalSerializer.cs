@@ -102,6 +102,7 @@ namespace Crichton.Representors.Serializers
             if (transition.UriIsTemplated) linkObject["templated"] = true;
             if (!String.IsNullOrWhiteSpace(transition.DepreciationUri)) linkObject["deprecation"] = transition.DepreciationUri;
             if (!String.IsNullOrWhiteSpace(transition.Name)) linkObject["name"] = transition.Name;
+            if (!String.IsNullOrWhiteSpace(transition.Name)) linkObject["profile"] = transition.ProfileUri;
 
             return linkObject;
         }
@@ -221,6 +222,7 @@ namespace Crichton.Representors.Serializers
             var templatedField = link["templated"];
             var deprecated = link["deprecated"];
             var name = link["name"];
+            var profile = link["profile"];
             var templated = templatedField != null && (bool) templatedField;
 
             builder.AddTransition(rel, href.Value<string>(),
@@ -228,7 +230,8 @@ namespace Crichton.Representors.Serializers
                 type: (type == null) ? null : type.Value<string>(),
                 uriIsTemplated: templated,
                 depreciationUri: (deprecated == null) ? null : deprecated.Value<string>(),
-                name: (name == null) ? null : name.Value<string>());
+                name: (name == null) ? null : name.Value<string>(),
+                profileUri: (profile == null) ? null : profile.Value<string>());
         }
     }
 }

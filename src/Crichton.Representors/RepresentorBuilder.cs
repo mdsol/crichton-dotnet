@@ -36,10 +36,10 @@ namespace Crichton.Representors
         }
 
         public void AddTransition(string rel, string uri = null, string title = null, string type = null, bool uriIsTemplated = false, 
-            string depreciationUri = null, string name = null)
+            string depreciationUri = null, string name = null, string profileUri = null)
         {
             representor.Transitions.Add(new CrichtonTransition { Rel = rel, Uri = uri, Title = title, Type = type, 
-                UriIsTemplated = uriIsTemplated, DepreciationUri = depreciationUri, Name = name});
+                UriIsTemplated = uriIsTemplated, DepreciationUri = depreciationUri, Name = name, ProfileUri = profileUri});
         }
 
         public void AddEmbeddedResource(string key, CrichtonRepresentor resource)

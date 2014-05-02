@@ -146,6 +146,18 @@ namespace Crichton.Representors.Tests
         }
 
         [Test]
+        public void AddTransition_CorrectlyAddsSimpleTransitionWithProfileUri()
+        {
+            var rel = Fixture.Create<string>();
+            var profileUri = Fixture.Create<string>();
+
+            sut.AddTransition(rel, profileUri: profileUri);
+            var result = sut.ToRepresentor();
+
+            result.Transitions.Should().ContainSingle(t => t.Rel == rel && t.ProfileUri == profileUri);
+        }
+
+        [Test]
         public void AddEmbeddedResource_AddsResourceWithCorrectKey()
         {
             var key = Fixture.Create<string>();
