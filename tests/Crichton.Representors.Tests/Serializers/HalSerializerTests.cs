@@ -374,7 +374,7 @@ namespace Crichton.Representors.Tests.Serializers
                     ""self"": {{
                         ""href"": ""self-url""
                                 }},
-                    ""{0}"": {{ ""href"" : ""{1}"", ""deprecated"" : ""{2}"" }} 
+                    ""{0}"": {{ ""href"" : ""{1}"", ""deprecation"" : ""{2}"" }} 
                 }}
             }}";
 

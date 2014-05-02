@@ -219,7 +219,7 @@ namespace Crichton.Representors.Serializers
             var title = link["title"];
             var type = link["type"];
             var templatedField = link["templated"];
-            var deprecated = link["deprecated"];
+            var deprecated = link["deprecation"];
             var name = link["name"];
             var profile = link["profile"];
             var hreflang = link["hreflang"];

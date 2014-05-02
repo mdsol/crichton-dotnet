@@ -54,5 +54,11 @@ namespace Crichton.Representors.Tests.Integration
             TestRoundTripFromJsonTestData("Hal\\WormholeSample", serializer);
         }
 
+        [Test]
+        public void HalAllLinkObjectProperties_RoundTrip()
+        {
+            TestRoundTripFromJsonTestData("Hal\\HalAllLinkObjectProperties", serializer);
+        }
+
     }
 }

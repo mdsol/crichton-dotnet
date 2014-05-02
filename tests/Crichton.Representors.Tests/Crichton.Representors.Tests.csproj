@@ -92,6 +92,9 @@
     <Content Include="Integration\TestData\Hal\SimpleLinksAndAttributes.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="Integration\TestData\Hal\HalAllLinkObjectProperties.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Integration\TestData\Hal\WormholeSample.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
