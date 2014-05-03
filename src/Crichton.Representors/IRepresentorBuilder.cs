@@ -10,9 +10,9 @@ namespace Crichton.Representors
         void SetSelfLink(string self);
         void SetAttributes(JObject attributes);
         void SetAttributesFromObject(object data);
-        void AddTransition(string rel, string uri);
-        void AddTransition(string rel, string uri, string title);
-        void AddTransition(string rel, string uri, string title, string type);
+        void AddTransition(CrichtonTransition transition);
+        void AddTransition(string rel, string uri = null, string title = null, string type = null,
+            bool uriIsTemplated = false, string depreciationUri = null, string name = null, string profileUri = null, string languageTag = null);
         void AddEmbeddedResource(string key, CrichtonRepresentor resource);
         void SetCollection(IEnumerable<CrichtonRepresentor> representors);
         void SetCollection<T>(IEnumerable<T> collection, Func<T, string> selfLinkFunc);

@@ -35,19 +35,16 @@ namespace Crichton.Representors
             representor.Attributes = JObject.FromObject(data);
         }
 
-        public void AddTransition(string rel, string uri)
+        public void AddTransition(CrichtonTransition transition)
         {
-            AddTransition(rel, uri, null);
+            representor.Transitions.Add(transition);
         }
 
-        public void AddTransition(string rel, string uri, string title)
+        public void AddTransition(string rel, string uri = null, string title = null, string type = null, bool uriIsTemplated = false, 
+            string depreciationUri = null, string name = null, string profileUri = null, string languageTag = null)
         {
-            representor.Transitions.Add(new CrichtonTransition() { Rel = rel, Uri = uri, Title = title });
-        }
-
-        public void AddTransition(string rel, string uri, string title, string type)
-        {
-            representor.Transitions.Add(new CrichtonTransition() { Rel = rel, Uri = uri, Title = title, Type = type});
+            representor.Transitions.Add(new CrichtonTransition { Rel = rel, Uri = uri, Title = title, Type = type, 
+                UriIsTemplated = uriIsTemplated, DepreciationUri = depreciationUri, Name = name, ProfileUri = profileUri, LanguageTag = languageTag});
         }
 
         public void AddEmbeddedResource(string key, CrichtonRepresentor resource)

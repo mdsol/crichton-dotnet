@@ -14,3 +14,4 @@ tests/*/obj/*
 _NCrunch_Crichton/
 *.ncrunchsolution
 *.ncrunchproject
+*.ncrunchsolution.user

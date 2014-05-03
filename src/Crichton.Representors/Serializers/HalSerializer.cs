@@ -21,11 +21,11 @@ namespace Crichton.Representors.Serializers
         {
             var jObject = new JObject();
 
-            if (!String.IsNullOrWhiteSpace(representor.SelfLink)) AddLink(jObject, "self", representor.SelfLink, null, null);
+            if (!String.IsNullOrWhiteSpace(representor.SelfLink)) AddLinkFromTransition(jObject, new CrichtonTransition { Rel = "self", Uri = representor.SelfLink });
 
             foreach (var transition in representor.Transitions.Where(t => !ReservedLinkRels.Contains(t.Rel)))
             {
-                AddLink(jObject, transition.Rel, transition.Uri, transition.Title, transition.Type);
+                AddLinkFromTransition(jObject, transition);
             }
 
             // add a root property for each property on data
@@ -73,32 +73,39 @@ namespace Crichton.Representors.Serializers
             }
         }
 
-        private static void AddLink(JObject document, string rel, string href, string title, string type)
+        private static void AddLinkFromTransition(JObject document, CrichtonTransition transition)
         {
             if (document["_links"] == null) document.Add("_links", new JObject());
 
-            var existingRel = document["_links"][rel];
+            var existingRel = document["_links"][transition.Rel];
             if (existingRel == null)
             {
                 var jobject = (JObject) document["_links"];
-                var linkObject = new JObject {{"href", href}};
-                if (!String.IsNullOrWhiteSpace(title)) linkObject["title"] = title;
-                if (!String.IsNullOrWhiteSpace(type)) linkObject["type"] = type;
-                jobject.Add(rel, linkObject);
+                jobject.Add(transition.Rel, CreateLinkObjectFromTransition(transition));
             }
             else
             {
                 // we already have a ref. Need to convert this to an array if not already.
                 var array = existingRel as JArray ?? new JArray {existingRel};
-                var linkObject = new JObject { { "href", href } };
-                if (!String.IsNullOrWhiteSpace(title)) linkObject["title"] = title;
-                if (!String.IsNullOrWhiteSpace(type)) linkObject["type"] = type;
-                array.Add(linkObject);
+                array.Add(CreateLinkObjectFromTransition(transition));
 
                 // override the existing _links > rel
-                document["_links"][rel] = array;
-
+                document["_links"][transition.Rel] = array;
             }
+        }
+
+        private static JObject CreateLinkObjectFromTransition(CrichtonTransition transition)
+        {
+            var linkObject = new JObject {{"href", transition.Uri}};
+            if (!String.IsNullOrWhiteSpace(transition.Title)) linkObject["title"] = transition.Title;
+            if (!String.IsNullOrWhiteSpace(transition.Type)) linkObject["type"] = transition.Type;
+            if (transition.UriIsTemplated) linkObject["templated"] = true;
+            if (!String.IsNullOrWhiteSpace(transition.DepreciationUri)) linkObject["deprecation"] = transition.DepreciationUri;
+            if (!String.IsNullOrWhiteSpace(transition.Name)) linkObject["name"] = transition.Name;
+            if (!String.IsNullOrWhiteSpace(transition.ProfileUri)) linkObject["profile"] = transition.ProfileUri;
+            if (!String.IsNullOrWhiteSpace(transition.LanguageTag)) linkObject["hreflang"] = transition.LanguageTag;
+
+            return linkObject;
         }
 
         public IRepresentorBuilder DeserializeToNewBuilder(string message, Func<IRepresentorBuilder> builderFactoryMethod)
@@ -192,34 +199,46 @@ namespace Crichton.Representors.Serializers
                 var array = document["_links"][rel] as JArray;
                 if (array == null)
                 {
-                    if (document["_links"][rel]["href"] != null)
-                    {
-                        var title = document["_links"][rel]["title"];
-                        var type = document["_links"][rel]["type"];
-
-                        // single link for this rel only
-                        builder.AddTransition(rel, document["_links"][rel]["href"].Value<string>(),
-                            (title == null) ? null : title.Value<string>(),
-                            (type == null) ? null : type.Value<string>());
-                    }
+                    // single link for this rel only
+                    builder.AddTransition(GetTransitionFromLinkObject(document["_links"][rel], rel));
                 }
                 else
                 {
                     // create a transition for each array element
                     foreach (var link in array)
                     {
-                        if (link["href"] != null)
-                        {
-                            var title = link["title"];
-                            var type = link["type"];
-
-                            builder.AddTransition(rel, link["href"].Value<string>(),
-                                (title == null) ? null : title.Value<string>(),
-                                (type == null) ? null : type.Value<string>());
-                        }
+                         builder.AddTransition(GetTransitionFromLinkObject(link, rel));
                     }
                 }
             }
+        }
+
+        private static CrichtonTransition GetTransitionFromLinkObject(JToken link, string rel)
+        {
+            var href = link["href"];
+            var title = link["title"];
+            var type = link["type"];
+            var templatedField = link["templated"];
+            var deprecated = link["deprecation"];
+            var name = link["name"];
+            var profile = link["profile"];
+            var hreflang = link["hreflang"];
+            var templated = templatedField != null && (bool) templatedField;
+
+            var transition = new CrichtonTransition
+            {
+                Rel = rel,
+                Uri = (href == null) ? null : href.Value<string>(),
+                Title = (title == null) ? null : title.Value<string>(),
+                Type = (type == null) ? null : type.Value<string>(),
+                UriIsTemplated = templated,
+                DepreciationUri = (deprecated == null) ? null : deprecated.Value<string>(),
+                Name = (name == null) ? null : name.Value<string>(),
+                ProfileUri = (profile == null) ? null : profile.Value<string>(),
+                LanguageTag = (hreflang == null) ? null : hreflang.Value<string>()
+            };
+
+            return transition;
         }
     }
 }

@@ -68,6 +68,18 @@ namespace Crichton.Representors.Tests
         }
 
         [Test]
+        public void AddTransition_AddsCrichtonTransitionObjectOnce()
+        {
+            var transition = Fixture.Create<CrichtonTransition>();
+            
+            sut.AddTransition(transition);
+            var result = sut.ToRepresentor();
+
+            Assert.IsNotNull(result.Transitions.SingleOrDefault(t => t == transition));
+
+        }
+
+        [Test]
         public void AddTransition_CorrectlyAddsSimpleTransition()
         {
             var rel = Fixture.Create<string>();
@@ -94,7 +106,6 @@ namespace Crichton.Representors.Tests
 
         }
 
-
         [Test]
         public void AddTransition_CorrectlyAddsSimpleTransitionWithTitleAndType()
         {
@@ -108,6 +119,66 @@ namespace Crichton.Representors.Tests
 
             result.Transitions.Should().ContainSingle(t => t.Rel == rel && t.Uri == uri && t.Title == title && t.Type == type);
 
+        }
+
+        [Test]
+        public void AddTransition_CorrectlyAddsSimpleTransitionWithIsTemplatedTrue()
+        {
+            var rel = Fixture.Create<string>();
+            var isTemplated = Fixture.Create<bool>();
+
+            sut.AddTransition(rel, uriIsTemplated: isTemplated);
+            var result = sut.ToRepresentor();
+
+            result.Transitions.Should().ContainSingle(t => t.Rel == rel && t.UriIsTemplated == isTemplated);
+        }
+
+        [Test]
+        public void AddTransition_CorrectlyAddsSimpleTransitionWithDepreciationLink()
+        {
+            var rel = Fixture.Create<string>();
+            var depreciationUri = Fixture.Create<string>();
+
+            sut.AddTransition(rel, depreciationUri: depreciationUri);
+            var result = sut.ToRepresentor();
+
+            result.Transitions.Should().ContainSingle(t => t.Rel == rel && t.DepreciationUri == depreciationUri);
+        }
+
+        [Test]
+        public void AddTransition_CorrectlyAddsSimpleTransitionWithName()
+        {
+            var rel = Fixture.Create<string>();
+            var name = Fixture.Create<string>();
+
+            sut.AddTransition(rel, name: name);
+            var result = sut.ToRepresentor();
+
+            result.Transitions.Should().ContainSingle(t => t.Rel == rel && t.Name == name);
+        }
+
+        [Test]
+        public void AddTransition_CorrectlyAddsSimpleTransitionWithProfileUri()
+        {
+            var rel = Fixture.Create<string>();
+            var profileUri = Fixture.Create<string>();
+
+            sut.AddTransition(rel, profileUri: profileUri);
+            var result = sut.ToRepresentor();
+
+            result.Transitions.Should().ContainSingle(t => t.Rel == rel && t.ProfileUri == profileUri);
+        }
+
+        [Test]
+        public void AddTransition_CorrectlyAddsSimpleTransitionWithLanguageTag()
+        {
+            var rel = Fixture.Create<string>();
+            var languageTag = Fixture.Create<string>();
+
+            sut.AddTransition(rel, languageTag: languageTag);
+            var result = sut.ToRepresentor();
+
+            result.Transitions.Should().ContainSingle(t => t.Rel == rel && t.LanguageTag == languageTag);
         }
 
         [Test]

@@ -6,10 +6,14 @@ namespace Crichton.Representors
     {
         public string Rel { get; set; }
         public string Uri { get; set; }
-        public string TemplatedUri { get; set; }
+        public bool UriIsTemplated { get; set; }
         public string InterfaceMethod { get; set; }
         public string Title { get; set; }
         public string Type { get; set; }
+        public string DepreciationUri { get; set; }
+        public string Name { get; set; }
+        public string ProfileUri { get; set; }
+        public string LanguageTag { get; set; } // per http://tools.ietf.org/html/rfc5988
         public IList<CrichtonTransitionAttribute> Attributes { get; set; } 
     }
 }
