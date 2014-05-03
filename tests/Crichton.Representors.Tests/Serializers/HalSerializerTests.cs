@@ -13,7 +13,6 @@ namespace Crichton.Representors.Tests.Serializers
     public class HalSerializerTests : TestWithFixture
     {
         private HalSerializer sut;
-        private CrichtonRepresentor representor;
         private Func<IRepresentorBuilder> builderFactoryMethod;
             
         [SetUp]
@@ -21,13 +20,13 @@ namespace Crichton.Representors.Tests.Serializers
         {
             sut = new HalSerializer();
             Fixture = GetFixture();
-            representor = Fixture.Create<CrichtonRepresentor>();
             builderFactoryMethod = () => MockRepository.GenerateMock<IRepresentorBuilder>();
         }
 
         [Test]
         public void Serialize_SelfLinkIsSet()
         {
+            var representor = Fixture.Create<CrichtonRepresentor>();
             var result = JObject.Parse(sut.Serialize(representor));
 
             Assert.AreEqual(result["_links"]["self"].Value<string>("href"), representor.SelfLink);
@@ -36,6 +35,7 @@ namespace Crichton.Representors.Tests.Serializers
         [Test]
         public void Serialize_AddsPropertiesToRootForEachAttributeInRepresentor()
         {
+            var representor = Fixture.Create<CrichtonRepresentor>();
             var dataJobject = JObject.FromObject(Fixture.Create<ExampleDataObject>());
             representor.Attributes = dataJobject;
 
@@ -47,9 +47,19 @@ namespace Crichton.Representors.Tests.Serializers
             }
         }
 
+        private CrichtonRepresentor GetRepresentorWithTransitions(Func<CrichtonTransition> transitionFunc)
+        {
+            var result = Fixture.Create<CrichtonRepresentor>();
+            result.Transitions.Clear();
+            result.Transitions.AddMany(transitionFunc, new Random(DateTime.Now.Millisecond).Next(100));
+            return result;
+        }
+
         [Test]
         public void Serialize_AddsHrefLinkAttributeForEachTransition()
         {
+            var representor = GetRepresentorWithTransitions(() => new CrichtonTransition() {Rel = Fixture.Create<string>(), Uri = Fixture.Create<string>()});
+            
             var result = JObject.Parse(sut.Serialize(representor));
 
             foreach (var transition in representor.Transitions)
@@ -61,6 +71,8 @@ namespace Crichton.Representors.Tests.Serializers
         [Test]
         public void Serialize_AddsTitleLinkAttributeForEachTransition()
         {
+            var representor = GetRepresentorWithTransitions(() => new CrichtonTransition() { Rel = Fixture.Create<string>(), Title = Fixture.Create<string>() });
+
             var result = JObject.Parse(sut.Serialize(representor));
 
             foreach (var transition in representor.Transitions)
@@ -72,6 +84,7 @@ namespace Crichton.Representors.Tests.Serializers
         [Test]
         public void Serialize_AddsTypeLinkAttributeForEachTransition()
         {
+            var representor = GetRepresentorWithTransitions(() => new CrichtonTransition() { Rel = Fixture.Create<string>(), Type = Fixture.Create<string>() });
             var result = JObject.Parse(sut.Serialize(representor));
 
             foreach (var transition in representor.Transitions)
@@ -83,6 +96,7 @@ namespace Crichton.Representors.Tests.Serializers
         [Test]
         public void Serialize_AddsDepreciationUriAttributeForEachTransition()
         {
+            var representor = GetRepresentorWithTransitions(() => new CrichtonTransition() { Rel = Fixture.Create<string>(), DepreciationUri = Fixture.Create<string>() });
             var result = JObject.Parse(sut.Serialize(representor));
 
             foreach (var transition in representor.Transitions)
@@ -94,6 +108,7 @@ namespace Crichton.Representors.Tests.Serializers
         [Test]
         public void Serialize_AddsNameAttributeForEachTransition()
         {
+            var representor = GetRepresentorWithTransitions(() => new CrichtonTransition() { Rel = Fixture.Create<string>(), Name = Fixture.Create<string>() });
             var result = JObject.Parse(sut.Serialize(representor));
 
             foreach (var transition in representor.Transitions)
@@ -105,6 +120,7 @@ namespace Crichton.Representors.Tests.Serializers
         [Test]
         public void Serialize_AddsProfileUriAttributeForEachTransition()
         {
+            var representor = GetRepresentorWithTransitions(() => new CrichtonTransition() { Rel = Fixture.Create<string>(), ProfileUri = Fixture.Create<string>() });
             var result = JObject.Parse(sut.Serialize(representor));
 
             foreach (var transition in representor.Transitions)
@@ -116,6 +132,7 @@ namespace Crichton.Representors.Tests.Serializers
         [Test]
         public void Serialize_AddsLanguageTagAsHreflangAttributeForEachTransition()
         {
+            var representor = GetRepresentorWithTransitions(() => new CrichtonTransition() { Rel = Fixture.Create<string>(), LanguageTag = Fixture.Create<string>() });
             var result = JObject.Parse(sut.Serialize(representor));
 
             foreach (var transition in representor.Transitions)
@@ -127,6 +144,7 @@ namespace Crichton.Representors.Tests.Serializers
         [Test]
         public void Serialize_AddsUriIsTemplatedAttributeForEachTransition()
         {
+            var representor = GetRepresentorWithTransitions(() => new CrichtonTransition() { Rel = Fixture.Create<string>(), UriIsTemplated = Fixture.Create<bool>() });
             var result = JObject.Parse(sut.Serialize(representor));
 
             foreach (var transition in representor.Transitions)
@@ -143,6 +161,7 @@ namespace Crichton.Representors.Tests.Serializers
         [Test]
         public void Serialize_AddsMultipleLinkItemsWhenTransitionRelIsShared()
         {
+            var representor = Fixture.Create<CrichtonRepresentor>();
             var fixedRel = Fixture.Create<string>();
             foreach (var transition in representor.Transitions) transition.Rel = fixedRel;
 
@@ -160,6 +179,7 @@ namespace Crichton.Representors.Tests.Serializers
         [Test]
         public void Serialize_DoesNotThrowForNullSelfLink()
         {
+            var representor = Fixture.Create<CrichtonRepresentor>();
             representor.SelfLink = null;
             Assert.DoesNotThrow(() => sut.Serialize(representor));
         }
@@ -169,6 +189,7 @@ namespace Crichton.Representors.Tests.Serializers
         {
             var key = Fixture.Create<string>();
             var resource = Fixture.Create<CrichtonRepresentor>();
+            var representor = Fixture.Create<CrichtonRepresentor>();
 
             representor.EmbeddedResources[key] = new List<CrichtonRepresentor> { resource };
 
@@ -182,6 +203,7 @@ namespace Crichton.Representors.Tests.Serializers
         {
             var key = Fixture.Create<string>();
             var resources = Fixture.Create<IList<CrichtonRepresentor>>();
+            var representor = Fixture.Create<CrichtonRepresentor>();
 
             representor.EmbeddedResources[key] = resources;
 
@@ -198,6 +220,7 @@ namespace Crichton.Representors.Tests.Serializers
         [Test]
         public void Serialize_SetsCollectionToItemsEmbeddedResource()
         {
+            var representor = Fixture.Create<CrichtonRepresentor>();
             representor.Collection.AddMany(() => Fixture.Create<CrichtonRepresentor>(), Fixture.Create<int>());
 
             var result = JObject.Parse(sut.Serialize(representor));

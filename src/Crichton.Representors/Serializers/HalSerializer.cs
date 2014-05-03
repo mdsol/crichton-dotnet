@@ -102,7 +102,7 @@ namespace Crichton.Representors.Serializers
             if (transition.UriIsTemplated) linkObject["templated"] = true;
             if (!String.IsNullOrWhiteSpace(transition.DepreciationUri)) linkObject["deprecation"] = transition.DepreciationUri;
             if (!String.IsNullOrWhiteSpace(transition.Name)) linkObject["name"] = transition.Name;
-            if (!String.IsNullOrWhiteSpace(transition.Name)) linkObject["profile"] = transition.ProfileUri;
+            if (!String.IsNullOrWhiteSpace(transition.ProfileUri)) linkObject["profile"] = transition.ProfileUri;
             if (!String.IsNullOrWhiteSpace(transition.LanguageTag)) linkObject["hreflang"] = transition.LanguageTag;
 
             return linkObject;
