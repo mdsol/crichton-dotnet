@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Crichton.Representors.Serializers;
+using FluentAssertions;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using Ploeh.AutoFixture;
@@ -90,6 +92,52 @@ namespace Crichton.Representors.Tests.Serializers
                     Assert.IsTrue(array.Any(a => a.Value<string>() == mediaType));
                 }
             }
+        }
+
+        [Test]
+        public void DeserializeToNewBuilder_SetsTransitionsIncludingSingleMethod()
+        {
+            var href = Fixture.Create<string>();
+            var method = Fixture.Create<string>();
+            var rel = Fixture.Create<string>();
+            var json = @"
+            {{
+                ""_links"": {{
+                    ""self"": {{
+                        ""href"": ""self-url""
+                                }},
+                    ""{0}"": {{ ""href"" : ""{1}"", ""method"" : ""{2}"" }} 
+                }}
+            }}";
+
+            json = String.Format(json, rel, href, method);
+
+            var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
+
+            builder.AssertWasCalled(b => b.AddTransition(Arg<CrichtonTransition>.Matches(t => t.Rel == rel && t.Uri == href && t.Methods.Single() == method)));
+        }
+
+        [Test]
+        public void DeserializeToNewBuilder_SetsTransitionsIncludingMultipleMethods()
+        {
+            var href = Fixture.Create<string>();
+            var methods = Fixture.Create<string[]>();
+            var rel = Fixture.Create<string>();
+            var json = @"
+            {{
+                ""_links"": {{
+                    ""self"": {{
+                        ""href"": ""self-url""
+                                }},
+                    ""{0}"": {{ ""href"" : ""{1}"", ""method"" : {2} }} 
+                }}
+            }}";
+
+            json = String.Format(json, rel, href, JsonConvert.SerializeObject(methods));
+
+            var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
+
+            builder.AssertWasCalled(b => b.AddTransition(Arg<CrichtonTransition>.Matches(t => t.Rel == rel && t.Uri == href && !t.Methods.Except(methods).Any())));
         }
     }
 }

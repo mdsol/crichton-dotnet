@@ -48,5 +48,27 @@ namespace Crichton.Representors.Serializers
 
             return linkObject;
         }
+
+        public override CrichtonTransition GetTransitionFromLinkObject(JToken link, string rel)
+        {
+            var transition = base.GetTransitionFromLinkObject(link, rel);
+
+            var methods = link["method"];
+
+            if (methods != null)
+            {
+                var methodsAsArray = methods as JArray;
+                if (methodsAsArray == null)
+                {
+                    transition.Methods = new[] {methods.Value<string>()};
+                }
+                else
+                {
+                    transition.Methods = methods.Values<string>().ToArray();
+                }
+            }
+
+            return transition;
+        }
     }
 }

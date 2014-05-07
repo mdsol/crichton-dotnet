@@ -188,7 +188,7 @@ namespace Crichton.Representors.Serializers
             builder.SetSelfLink(document["_links"]["self"]["href"].Value<string>());
         }
 
-        private static void CreateTransitions(JObject document, IRepresentorBuilder builder)
+        private void CreateTransitions(JObject document, IRepresentorBuilder builder)
         {
             if (document["_links"] == null) return;
 
@@ -213,7 +213,7 @@ namespace Crichton.Representors.Serializers
             }
         }
 
-        private static CrichtonTransition GetTransitionFromLinkObject(JToken link, string rel)
+        public virtual CrichtonTransition GetTransitionFromLinkObject(JToken link, string rel)
         {
             var href = link["href"];
             var title = link["title"];
