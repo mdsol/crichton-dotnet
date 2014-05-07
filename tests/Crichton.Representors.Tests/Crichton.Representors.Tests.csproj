@@ -71,6 +71,7 @@
   <ItemGroup>
     <Compile Include="CrichtonRepresentorTests.cs" />
     <Compile Include="ExampleDataObject.cs" />
+    <Compile Include="Integration\HaleSerializerRoundTrips.cs" />
     <Compile Include="Integration\HalSerializerRoundTrips.cs" />
     <Compile Include="Integration\RoundTripTests.cs" />
     <Compile Include="RepresentorBuilderTests.cs" />
@@ -93,7 +94,10 @@
     <Content Include="Integration\TestData\Hal\SimpleLinksAndAttributes.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <None Include="Integration\TestData\Hal\HalAllLinkObjectProperties.json">
+    <None Include="Integration\TestData\Hale\AllLinkObjectPropertiesExceptData.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Integration\TestData\Hal\AllLinkObjectProperties.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Integration\TestData\Hal\WormholeSample.json">
