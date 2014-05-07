@@ -20,12 +20,7 @@ namespace Crichton.Representors.Serializers
                 }
                 else
                 {
-                    var methodArray = new JArray();
-                    foreach (var method in transition.Methods)
-                    {
-                        methodArray.Add(method);
-                    }
-                    linkObject["method"] = methodArray;
+                    linkObject["method"] = new JArray(transition.Methods.ToList());
                 }
             }
 
@@ -37,12 +32,7 @@ namespace Crichton.Representors.Serializers
                 }
                 else
                 {
-                    var methodArray = new JArray();
-                    foreach (var method in transition.MediaTypesAccepted)
-                    {
-                        methodArray.Add(method);
-                    }
-                    linkObject["enctype"] = methodArray;
+                    linkObject["enctype"] = new JArray(transition.MediaTypesAccepted.ToList());
                 }
             }
 
@@ -54,18 +44,18 @@ namespace Crichton.Representors.Serializers
             var transition = base.GetTransitionFromLinkObject(link, rel);
 
             var methods = link["method"];
+            var enctype = link["enctype"];
 
             if (methods != null)
             {
-                var methodsAsArray = methods as JArray;
-                if (methodsAsArray == null)
-                {
-                    transition.Methods = new[] {methods.Value<string>()};
-                }
-                else
-                {
-                    transition.Methods = methods.Values<string>().ToArray();
-                }
+                transition.Methods = methods is JArray ? 
+                    methods.Values<string>().ToArray() : new[] {methods.Value<string>()} ;
+            }
+
+            if (enctype != null)
+            {
+                transition.MediaTypesAccepted = enctype is JArray ? 
+                    enctype.Values<string>().ToArray() : new[] { enctype.Value<string>() } ;
             }
 
             return transition;

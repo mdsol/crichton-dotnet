@@ -139,5 +139,51 @@ namespace Crichton.Representors.Tests.Serializers
 
             builder.AssertWasCalled(b => b.AddTransition(Arg<CrichtonTransition>.Matches(t => t.Rel == rel && t.Uri == href && !t.Methods.Except(methods).Any())));
         }
+
+        [Test]
+        public void DeserializeToNewBuilder_SetsTransitionsIncludingSingleMediaType()
+        {
+            var href = Fixture.Create<string>();
+            var mediaType = Fixture.Create<string>();
+            var rel = Fixture.Create<string>();
+            var json = @"
+            {{
+                ""_links"": {{
+                    ""self"": {{
+                        ""href"": ""self-url""
+                                }},
+                    ""{0}"": {{ ""href"" : ""{1}"", ""enctype"" : ""{2}"" }} 
+                }}
+            }}";
+
+            json = String.Format(json, rel, href, mediaType);
+
+            var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
+
+            builder.AssertWasCalled(b => b.AddTransition(Arg<CrichtonTransition>.Matches(t => t.Rel == rel && t.Uri == href && t.MediaTypesAccepted.Single() == mediaType)));
+        }
+
+        [Test]
+        public void DeserializeToNewBuilder_SetsTransitionsIncludingMultipleMediaTypes()
+        {
+            var href = Fixture.Create<string>();
+            var mediaTypes = Fixture.Create<string[]>();
+            var rel = Fixture.Create<string>();
+            var json = @"
+            {{
+                ""_links"": {{
+                    ""self"": {{
+                        ""href"": ""self-url""
+                                }},
+                    ""{0}"": {{ ""href"" : ""{1}"", ""enctype"" : {2} }} 
+                }}
+            }}";
+
+            json = String.Format(json, rel, href, JsonConvert.SerializeObject(mediaTypes));
+
+            var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
+
+            builder.AssertWasCalled(b => b.AddTransition(Arg<CrichtonTransition>.Matches(t => t.Rel == rel && t.Uri == href && !t.MediaTypesAccepted.Except(mediaTypes).Any())));
+        }
     }
 }
