@@ -74,6 +74,7 @@
     <Compile Include="Integration\HalSerializerRoundTrips.cs" />
     <Compile Include="Integration\RoundTripTests.cs" />
     <Compile Include="RepresentorBuilderTests.cs" />
+    <Compile Include="Serializers\HaleSerializerTests.cs" />
     <Compile Include="Serializers\HalSerializerTests.cs" />
     <Compile Include="TestWithFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

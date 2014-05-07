@@ -17,7 +17,7 @@ namespace Crichton.Representors.Serializers
             return jObject.ToString();
         }
 
-        private static JObject CreateJObjectForRepresentor(CrichtonRepresentor representor)
+        private JObject CreateJObjectForRepresentor(CrichtonRepresentor representor)
         {
             var jObject = new JObject();
 
@@ -54,7 +54,7 @@ namespace Crichton.Representors.Serializers
             return jObject;
         }
 
-        private static void AddRepresentorsToEmbedded(IList<CrichtonRepresentor> list, JObject embeddedJObject, string embeddedResourceKey)
+        private void AddRepresentorsToEmbedded(IList<CrichtonRepresentor> list, JObject embeddedJObject, string embeddedResourceKey)
         {
             if (list.Count == 1)
             {
@@ -73,7 +73,7 @@ namespace Crichton.Representors.Serializers
             }
         }
 
-        private static void AddLinkFromTransition(JObject document, CrichtonTransition transition)
+        private void AddLinkFromTransition(JObject document, CrichtonTransition transition)
         {
             if (document["_links"] == null) document.Add("_links", new JObject());
 
@@ -94,7 +94,7 @@ namespace Crichton.Representors.Serializers
             }
         }
 
-        private static JObject CreateLinkObjectFromTransition(CrichtonTransition transition)
+        public virtual JObject CreateLinkObjectFromTransition(CrichtonTransition transition)
         {
             var linkObject = new JObject {{"href", transition.Uri}};
             if (!String.IsNullOrWhiteSpace(transition.Title)) linkObject["title"] = transition.Title;
