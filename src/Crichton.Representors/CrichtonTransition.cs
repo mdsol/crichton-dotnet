@@ -24,6 +24,7 @@ namespace Crichton.Representors
         public string[] Methods { get; set; }
         public string[] MediaTypesAccepted { get; set; }
         public TransitionRenderMethod RenderMethod { get; set; }
+        public string Target { get; set; }
         public IList<CrichtonTransitionAttribute> Attributes { get; set; } 
     }
 }

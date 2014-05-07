@@ -44,6 +44,8 @@ namespace Crichton.Representors.Serializers
                 linkObject["render"] = map.Value;
             }
 
+            if (!String.IsNullOrWhiteSpace(transition.Target)) linkObject["target"] = transition.Target;
+
             return linkObject;
         }
 
@@ -54,6 +56,7 @@ namespace Crichton.Representors.Serializers
             var methods = link["method"];
             var enctype = link["enctype"];
             var render = link["render"];
+            var target = link["target"];
 
             if (methods != null)
             {
@@ -73,6 +76,8 @@ namespace Crichton.Representors.Serializers
                 if (RenderMethodMappings.ContainsValue(renderValue))
                     transition.RenderMethod = RenderMethodMappings.Single(r => r.Value == renderValue).Key;
             }
+
+            if (target != null) transition.Target = target.Value<string>();
 
             return transition;
         }

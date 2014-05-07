@@ -134,6 +134,18 @@ namespace Crichton.Representors.Tests.Serializers
         }
 
         [Test]
+        public void Serialize_AddsTargetAttributeForEachTransition()
+        {
+            var representor = GetRepresentorWithTransitions(() => new CrichtonTransition() { Rel = Fixture.Create<string>(), Target = Fixture.Create<string>() });
+            var result = JObject.Parse(sut.Serialize(representor));
+
+            foreach (var transition in representor.Transitions)
+            {
+                Assert.AreEqual(transition.Target, result["_links"][transition.Rel]["target"].Value<string>());
+            }
+        }
+
+        [Test]
         public void DeserializeToNewBuilder_SetsTransitionsIncludingSingleMethod()
         {
             var href = Fixture.Create<string>();
@@ -290,6 +302,29 @@ namespace Crichton.Representors.Tests.Serializers
             var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
 
             builder.AssertWasCalled(b => b.AddTransition(Arg<CrichtonTransition>.Matches(t => t.Rel == rel && t.Uri == href && t.RenderMethod == TransitionRenderMethod.Undefined)));
+        }
+
+        [Test]
+        public void DeserializeToNewBuilder_SetsTransitionsIncludingTarget()
+        {
+            var href = Fixture.Create<string>();
+            var target = Fixture.Create<string>();
+            var rel = Fixture.Create<string>();
+            var json = @"
+            {{
+                ""_links"": {{
+                    ""self"": {{
+                        ""href"": ""self-url""
+                                }},
+                    ""{0}"": {{ ""href"" : ""{1}"", ""target"" : ""{2}"" }} 
+                }}
+            }}";
+
+            json = String.Format(json, rel, href, target);
+
+            var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
+
+            builder.AssertWasCalled(b => b.AddTransition(Arg<CrichtonTransition>.Matches(t => t.Rel == rel && t.Uri == href && t.Target == target)));
         }
     }
 }
