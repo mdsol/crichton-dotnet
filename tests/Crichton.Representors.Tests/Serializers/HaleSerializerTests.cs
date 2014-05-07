@@ -268,5 +268,28 @@ namespace Crichton.Representors.Tests.Serializers
 
             builder.AssertWasCalled(b => b.AddTransition(Arg<CrichtonTransition>.Matches(t => t.Rel == rel && t.Uri == href && t.RenderMethod == TransitionRenderMethod.Resource)));
         }
+
+        [Test]
+        public void DeserializeToNewBuilder_SetsToUndefinedForInvalidRenderMethod()
+        {
+            var href = Fixture.Create<string>();
+            var rel = Fixture.Create<string>();
+            var render = Fixture.Create<string>();
+            var json = @"
+            {{
+                ""_links"": {{
+                    ""self"": {{
+                        ""href"": ""self-url""
+                                }},
+                    ""{0}"": {{ ""href"" : ""{1}"", ""render"" : ""{2}"" }} 
+                }}
+            }}";
+
+            json = String.Format(json, rel, href, render);
+
+            var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
+
+            builder.AssertWasCalled(b => b.AddTransition(Arg<CrichtonTransition>.Matches(t => t.Rel == rel && t.Uri == href && t.RenderMethod == TransitionRenderMethod.Undefined)));
+        }
     }
 }
