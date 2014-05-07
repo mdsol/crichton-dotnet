@@ -61,5 +61,35 @@ namespace Crichton.Representors.Tests.Serializers
                 }
             }
         }
+
+        [Test]
+        public void Serialize_AddsSingleAcceptedMediaTypeAttributeForEachTransition()
+        {
+            var representor = GetRepresentorWithTransitions(() => new CrichtonTransition() { Rel = Fixture.Create<string>(), MediaTypesAccepted = new[] { Fixture.Create<string>() } });
+
+            var result = JObject.Parse(sut.Serialize(representor));
+
+            foreach (var transition in representor.Transitions)
+            {
+                Assert.AreEqual(transition.MediaTypesAccepted.Single(), result["_links"][transition.Rel]["enctype"].Value<string>());
+            }
+        }
+
+        [Test]
+        public void Serialize_AddsMultipleAcceptedMediaTypeAttributesForEachTransition()
+        {
+            var representor = GetRepresentorWithTransitions(() => new CrichtonTransition() { Rel = Fixture.Create<string>(), MediaTypesAccepted = Fixture.Create<string[]>() });
+
+            var result = JObject.Parse(sut.Serialize(representor));
+
+            foreach (var transition in representor.Transitions)
+            {
+                var array = (JArray)result["_links"][transition.Rel]["enctype"];
+                foreach (var mediaType in transition.MediaTypesAccepted)
+                {
+                    Assert.IsTrue(array.Any(a => a.Value<string>() == mediaType));
+                }
+            }
+        }
     }
 }

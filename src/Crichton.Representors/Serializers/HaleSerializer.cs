@@ -29,6 +29,23 @@ namespace Crichton.Representors.Serializers
                 }
             }
 
+            if (transition.MediaTypesAccepted != null && transition.MediaTypesAccepted.Any())
+            {
+                if (transition.MediaTypesAccepted.Count() == 1)
+                {
+                    linkObject["enctype"] = transition.MediaTypesAccepted.Single();
+                }
+                else
+                {
+                    var methodArray = new JArray();
+                    foreach (var method in transition.MediaTypesAccepted)
+                    {
+                        methodArray.Add(method);
+                    }
+                    linkObject["enctype"] = methodArray;
+                }
+            }
+
             return linkObject;
         }
     }

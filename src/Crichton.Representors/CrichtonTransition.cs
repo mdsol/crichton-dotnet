@@ -15,6 +15,7 @@ namespace Crichton.Representors
         public string ProfileUri { get; set; }
         public string LanguageTag { get; set; } // per http://tools.ietf.org/html/rfc5988
         public string[] Methods { get; set; }
+        public string[] MediaTypesAccepted { get; set; }
         public IList<CrichtonTransitionAttribute> Attributes { get; set; } 
     }
 }
