@@ -95,6 +95,45 @@ namespace Crichton.Representors.Tests.Serializers
         }
 
         [Test]
+        public void Serialize_DoesNotAddAttributeForUndefinedRenderMethod()
+        {
+            var representor = GetRepresentorWithTransitions(() => new CrichtonTransition() { Rel = Fixture.Create<string>(), RenderMethod = TransitionRenderMethod.Undefined });
+
+            var result = JObject.Parse(sut.Serialize(representor));
+
+            foreach (var transition in representor.Transitions)
+            {
+                Assert.IsNull(result["_links"][transition.Rel]["render"]);
+            }
+        }
+
+        [Test]
+        public void Serialize_AddsAttributeForEmbedRenderMethod()
+        {
+            var representor = GetRepresentorWithTransitions(() => new CrichtonTransition() { Rel = Fixture.Create<string>(), RenderMethod = TransitionRenderMethod.Embed });
+
+            var result = JObject.Parse(sut.Serialize(representor));
+
+            foreach (var transition in representor.Transitions)
+            {
+                Assert.AreEqual("embed", result["_links"][transition.Rel]["render"].Value<string>());
+            }
+        }
+
+        [Test]
+        public void Serialize_AddsAttributeForResourceRenderMethod()
+        {
+            var representor = GetRepresentorWithTransitions(() => new CrichtonTransition() { Rel = Fixture.Create<string>(), RenderMethod = TransitionRenderMethod.Resource });
+
+            var result = JObject.Parse(sut.Serialize(representor));
+
+            foreach (var transition in representor.Transitions)
+            {
+                Assert.AreEqual("resource", result["_links"][transition.Rel]["render"].Value<string>());
+            }
+        }
+
+        [Test]
         public void DeserializeToNewBuilder_SetsTransitionsIncludingSingleMethod()
         {
             var href = Fixture.Create<string>();
@@ -184,6 +223,50 @@ namespace Crichton.Representors.Tests.Serializers
             var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
 
             builder.AssertWasCalled(b => b.AddTransition(Arg<CrichtonTransition>.Matches(t => t.Rel == rel && t.Uri == href && !t.MediaTypesAccepted.Except(mediaTypes).Any())));
+        }
+
+        [Test]
+        public void DeserializeToNewBuilder_SetsRenderMethodToEmbed()
+        {
+            var href = Fixture.Create<string>();
+            var rel = Fixture.Create<string>();
+            var json = @"
+            {{
+                ""_links"": {{
+                    ""self"": {{
+                        ""href"": ""self-url""
+                                }},
+                    ""{0}"": {{ ""href"" : ""{1}"", ""render"" : ""embed"" }} 
+                }}
+            }}";
+
+            json = String.Format(json, rel, href);
+
+            var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
+
+            builder.AssertWasCalled(b => b.AddTransition(Arg<CrichtonTransition>.Matches(t => t.Rel == rel && t.Uri == href && t.RenderMethod == TransitionRenderMethod.Embed)));
+        }
+
+        [Test]
+        public void DeserializeToNewBuilder_SetsRenderMethodToResource()
+        {
+            var href = Fixture.Create<string>();
+            var rel = Fixture.Create<string>();
+            var json = @"
+            {{
+                ""_links"": {{
+                    ""self"": {{
+                        ""href"": ""self-url""
+                                }},
+                    ""{0}"": {{ ""href"" : ""{1}"", ""render"" : ""resource"" }} 
+                }}
+            }}";
+
+            json = String.Format(json, rel, href);
+
+            var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
+
+            builder.AssertWasCalled(b => b.AddTransition(Arg<CrichtonTransition>.Matches(t => t.Rel == rel && t.Uri == href && t.RenderMethod == TransitionRenderMethod.Resource)));
         }
     }
 }

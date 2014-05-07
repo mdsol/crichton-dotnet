@@ -8,6 +8,9 @@ namespace Crichton.Representors.Serializers
 {
     public class HaleSerializer : HalSerializer
     {
+        private static readonly Dictionary<TransitionRenderMethod, string>
+            RenderMethodMappings = new Dictionary<TransitionRenderMethod, string> { { TransitionRenderMethod.Resource, "resource" }, { TransitionRenderMethod.Embed, "embed" } };
+
         public override JObject CreateLinkObjectFromTransition(CrichtonTransition transition)
         {
             var linkObject = base.CreateLinkObjectFromTransition(transition);
@@ -36,6 +39,11 @@ namespace Crichton.Representors.Serializers
                 }
             }
 
+            foreach (var map in RenderMethodMappings.Where(map => transition.RenderMethod == map.Key))
+            {
+                linkObject["render"] = map.Value;
+            }
+
             return linkObject;
         }
 
@@ -45,17 +53,25 @@ namespace Crichton.Representors.Serializers
 
             var methods = link["method"];
             var enctype = link["enctype"];
+            var render = link["render"];
 
             if (methods != null)
             {
-                transition.Methods = methods is JArray ? 
-                    methods.Values<string>().ToArray() : new[] {methods.Value<string>()} ;
+                transition.Methods = methods is JArray ?
+                    methods.Values<string>().ToArray() : new[] { methods.Value<string>() };
             }
 
             if (enctype != null)
             {
-                transition.MediaTypesAccepted = enctype is JArray ? 
-                    enctype.Values<string>().ToArray() : new[] { enctype.Value<string>() } ;
+                transition.MediaTypesAccepted = enctype is JArray ?
+                    enctype.Values<string>().ToArray() : new[] { enctype.Value<string>() };
+            }
+
+            if (render != null)
+            {
+                var renderValue = render.Value<string>();
+                if (RenderMethodMappings.ContainsValue(renderValue))
+                    transition.RenderMethod = RenderMethodMappings.Single(r => r.Value == renderValue).Key;
             }
 
             return transition;
