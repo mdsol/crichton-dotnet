@@ -40,7 +40,7 @@
       "embedded1":{
          "_links":{
             "self":{
-               "href":"http:/nice.com"
+               "href":"http://nice.com"
             },
             "testrel":{
                "href":"http://example.org/api/user/test",
@@ -57,7 +57,7 @@
          {
             "_links":{
                "self":{
-                  "href":"http:/nice.com"
+                  "href":"http://nice.com"
                },
                "testrel":{
                   "href":"http://example.org/api/user/test",
@@ -73,7 +73,7 @@
          {
             "_links":{
                "self":{
-                  "href":"http:/nice.com"
+                  "href":"http://nice.com"
                },
                "testrel":{
                   "href":"http://example.org/api/user/test",
