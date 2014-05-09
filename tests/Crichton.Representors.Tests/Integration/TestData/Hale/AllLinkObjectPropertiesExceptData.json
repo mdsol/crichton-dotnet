@@ -1,0 +1,93 @@
+﻿{
+   "_links":{
+      "self":{
+         "href":"http://example.org/api/user/ed"
+      },
+      "testrel":{
+         "href":"http://example.org/api/user/test",
+         "templated":true,
+         "deprecation":"http://very-deprecated.com",
+         "name":"some-name",
+         "title":"A Great Title",
+         "hreflang":"en-US",
+         "render" : "embed"
+      },
+      "testrelarray":[
+         {
+            "href":"http://example.org/api/user/test1",
+            "type":"some-type",
+            "deprecation":"http://very-deprecated.com",
+            "name":"some-name",
+            "profile":"some-profile",
+            "title":"A Great Title",
+            "hreflang":"en-US",
+            "render" : "resource"
+         },
+         {
+            "href":"http://example.org/api/user/test2",
+            "templated":true,
+            "type":"some-type",
+            "deprecation":"http://very-deprecated.com",
+            "name":"some-name",
+            "profile":"some-profile",
+            "title":"A Great Title",
+            "method" : "GET"
+         }
+      ]
+   },
+   "some-property":123,
+   "_embedded":{
+      "embedded1":{
+         "_links":{
+            "self":{
+               "href":"http://nice.com"
+            },
+            "testrel":{
+               "href":"http://example.org/api/user/test",
+               "templated":true,
+               "type":"some-type",
+               "title":"A Great Title",
+               "hreflang":"en-US",
+               "method" : [ "POST", "PUT" ]
+            }
+         },
+         "some-property":1234
+      },
+      "embeddedarray":[
+         {
+            "_links":{
+               "self":{
+                  "href":"http://nice.com"
+               },
+               "testrel":{
+                  "href":"http://example.org/api/user/test",
+                  "templated":true,
+                  "type":"some-type",
+                  "deprecation":"http://very-deprecated.com",
+                  "name":"some-name",
+                  "enctype" : [ "application/json", "application/xml" ]
+               }
+            },
+            "some-property":1234
+         },
+         {
+            "_links":{
+               "self":{
+                  "href":"http://nice.com"
+               },
+               "testrel":{
+                  "href":"http://example.org/api/user/test",
+                  "hreflang":"en-US",
+                  "enctype" : "application/json"
+               },
+               "testrel2":{
+                  "href":"http://example.org/api/user/test",
+                  "hreflang":"en-US",
+                  "target" : "x.store.book[0].title"
+               }
+            },
+            "some-property":1234
+         }
+      ]
+   }
+}

@@ -57,7 +57,7 @@ namespace Crichton.Representors.Tests.Integration
         [Test]
         public void HalAllLinkObjectProperties_RoundTrip()
         {
-            TestRoundTripFromJsonTestData("Hal\\HalAllLinkObjectProperties", serializer);
+            TestRoundTripFromJsonTestData("Hal\\AllLinkObjectProperties", serializer);
         }
 
     }
