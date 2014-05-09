@@ -46,6 +46,29 @@ namespace Crichton.Representors.Serializers
 
             if (!String.IsNullOrWhiteSpace(transition.Target)) linkObject["target"] = transition.Target;
 
+            if (transition.Attributes != null && transition.Attributes.Any())
+            {
+                var dataObject = linkObject["data"] = new JObject();
+
+                foreach (var attribute in transition.Attributes)
+                {
+                    var attributeObject = new JObject();
+                    if (!String.IsNullOrWhiteSpace(attribute.Value.JsonType))
+                    {
+                        var typeValue = new StringBuilder(attribute.Value.JsonType);
+                        if (!String.IsNullOrWhiteSpace(attribute.Value.DataType))
+                        {
+                            typeValue.Append(":");
+                            typeValue.Append(attribute.Value.DataType);
+                        }
+                        attributeObject["type"] = typeValue.ToString();
+
+                    }
+
+                    dataObject[attribute.Key] = attributeObject;
+                }
+            }
+
             return linkObject;
         }
 
@@ -57,6 +80,7 @@ namespace Crichton.Representors.Serializers
             var enctype = link["enctype"];
             var render = link["render"];
             var target = link["target"];
+            var data = link["data"];
 
             if (methods != null)
             {
@@ -78,6 +102,28 @@ namespace Crichton.Representors.Serializers
             }
 
             if (target != null) transition.Target = target.Value<string>();
+
+            if (data != null)
+            {
+                transition.Attributes = new Dictionary<string, CrichtonTransitionAttribute>();
+
+                foreach (var dataProperty in ((JObject) data).Properties())
+                {
+                    var dataObject = data[dataProperty.Name];
+                    var type = dataObject["type"];
+
+                    var transitionAttribute = new CrichtonTransitionAttribute();
+
+                    if (type != null)
+                    {
+                        var splitType = type.Value<string>().Split(':');
+                        transitionAttribute.JsonType = splitType[0];
+                        if (splitType.Count() > 1) transitionAttribute.DataType = splitType[1];
+                    }
+
+                    transition.Attributes[dataProperty.Name] = transitionAttribute;
+                }
+            }
 
             return transition;
         }
