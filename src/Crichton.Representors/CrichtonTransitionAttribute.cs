@@ -6,7 +6,7 @@ namespace Crichton.Representors
     public class CrichtonTransitionAttribute
     {
         public string Default { get; set; }
-        public string Description { get; set; }
+        public string ProfileUri { get; set; }
         public string JsonType { get; set; }
         public string DataType { get; set; }
         public string Constraints { get; set; }

@@ -189,6 +189,27 @@ namespace Crichton.Representors.Tests.Serializers
         }
 
         [Test]
+        public void Serialize_AddsProfileUriTypeForEachTransition()
+        {
+            Func<CrichtonTransition> transitionFunc = () =>
+            {
+                var attributes = Fixture.Create<IDictionary<string, CrichtonTransitionAttribute>>();
+                return new CrichtonTransition() { Rel = Fixture.Create<string>(), Attributes = attributes };
+            };
+
+            var representor = GetRepresentorWithTransitions(transitionFunc);
+            var result = JObject.Parse(sut.Serialize(representor));
+
+            foreach (var transition in representor.Transitions)
+            {
+                foreach (var attribute in transition.Attributes)
+                {
+                    Assert.AreEqual(attribute.Value.ProfileUri, result["_links"][transition.Rel]["data"][attribute.Key]["profile"].Value<string>());
+                }
+            }
+        }
+
+        [Test]
         public void DeserializeToNewBuilder_SetsTransitionsIncludingSingleMethod()
         {
             var href = Fixture.Create<string>();
@@ -417,6 +438,30 @@ namespace Crichton.Representors.Tests.Serializers
             var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
 
             builder.AssertWasCalled(b => b.AddTransition(Arg<CrichtonTransition>.Matches(t => t.Rel == rel && t.Uri == href && t.Attributes[attributeName].JsonType == type && t.Attributes[attributeName].DataType == dataType)));
+        }
+
+        [Test]
+        public void DeserializeToNewBuilder_SetsTransitionsIncludingProfileUri()
+        {
+            var href = Fixture.Create<string>();
+            var attributeName = Fixture.Create<string>();
+            var profileUri = Fixture.Create<string>();
+            var rel = Fixture.Create<string>();
+            var json = @"
+            {{
+                ""_links"": {{
+                    ""self"": {{
+                        ""href"": ""self-url""
+                                }},
+                    ""{0}"": {{ ""href"" : ""{1}"", ""data"" : {{ ""{2}"" : {{ ""profile"" : ""{3}"" }}}}}} 
+                }}
+            }}";
+
+            json = String.Format(json, rel, href, attributeName, profileUri);
+
+            var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
+
+            builder.AssertWasCalled(b => b.AddTransition(Arg<CrichtonTransition>.Matches(t => t.Rel == rel && t.Uri == href && t.Attributes[attributeName].ProfileUri == profileUri)));
         }
     }
 }

@@ -53,6 +53,7 @@ namespace Crichton.Representors.Serializers
                 foreach (var attribute in transition.Attributes)
                 {
                     var attributeObject = new JObject();
+
                     if (!String.IsNullOrWhiteSpace(attribute.Value.JsonType))
                     {
                         var typeValue = new StringBuilder(attribute.Value.JsonType);
@@ -62,7 +63,11 @@ namespace Crichton.Representors.Serializers
                             typeValue.Append(attribute.Value.DataType);
                         }
                         attributeObject["type"] = typeValue.ToString();
+                    }
 
+                    if (!String.IsNullOrWhiteSpace(attribute.Value.ProfileUri))
+                    {
+                        attributeObject["profile"] = attribute.Value.ProfileUri;
                     }
 
                     dataObject[attribute.Key] = attributeObject;
@@ -111,6 +116,7 @@ namespace Crichton.Representors.Serializers
                 {
                     var dataObject = data[dataProperty.Name];
                     var type = dataObject["type"];
+                    var profileUri = dataObject["profile"];
 
                     var transitionAttribute = new CrichtonTransitionAttribute();
 
@@ -120,6 +126,8 @@ namespace Crichton.Representors.Serializers
                         transitionAttribute.JsonType = splitType[0];
                         if (splitType.Count() > 1) transitionAttribute.DataType = splitType[1];
                     }
+
+                    if (profileUri != null) transitionAttribute.ProfileUri = profileUri.Value<string>();
 
                     transition.Attributes[dataProperty.Name] = transitionAttribute;
                 }
