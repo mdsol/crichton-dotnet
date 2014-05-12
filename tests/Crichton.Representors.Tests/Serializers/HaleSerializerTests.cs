@@ -209,6 +209,47 @@ namespace Crichton.Representors.Tests.Serializers
             }
         }
 
+        private object GetRandomObject()
+        {
+            var fixtureFuncs = new Func<object>[]
+            {
+                () => Fixture.Create<string>(), 
+                () => Fixture.Create<bool>(), 
+                () => Fixture.Create<int>(), 
+                () => Fixture.Create<Guid>()
+            };
+
+            var random = new Random(DateTime.Now.Millisecond);
+
+            return fixtureFuncs[random.Next(fixtureFuncs.Length - 1)]();
+        }
+
+        [Test]
+        public void Serialize_AddsValueForEachTransition()
+        {
+            Func<CrichtonTransition> transitionFunc = () =>
+            {
+                var attributes = Fixture.Create<IDictionary<string, CrichtonTransitionAttribute>>();
+                foreach (var attribute in attributes)
+                {
+                    attribute.Value.Value = GetRandomObject();
+                }
+                return new CrichtonTransition() { Rel = Fixture.Create<string>(), Attributes = attributes };
+            };
+
+            var representor = GetRepresentorWithTransitions(transitionFunc);
+            var result = JObject.Parse(sut.Serialize(representor));
+
+            foreach (var transition in representor.Transitions)
+            {
+                foreach (var attribute in transition.Attributes)
+                {
+                    var token = result["_links"][transition.Rel]["data"][attribute.Key]["value"];
+                    Assert.AreEqual(attribute.Value.Value, token.ToObject(attribute.Value.Value.GetType()));
+                }
+            }
+        }
+
         [Test]
         public void DeserializeToNewBuilder_SetsTransitionsIncludingSingleMethod()
         {
@@ -462,6 +503,31 @@ namespace Crichton.Representors.Tests.Serializers
             var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
 
             builder.AssertWasCalled(b => b.AddTransition(Arg<CrichtonTransition>.Matches(t => t.Rel == rel && t.Uri == href && t.Attributes[attributeName].ProfileUri == profileUri)));
+        }
+
+        [Test]
+        public void DeserializeToNewBuilder_SetsTransitionsIncludingValue()
+        {
+            var href = Fixture.Create<string>();
+            var attributeName = Fixture.Create<string>();
+            var value = Fixture.Create<int>();
+            var rel = Fixture.Create<string>();
+            var json = @"
+            {{
+                ""_links"": {{
+                    ""{0}"": {{ ""href"" : ""{1}"", ""data"" : {{ ""{2}"" : {{ ""value"" : {3} }}}}}} 
+                }}
+            }}";
+
+            json = String.Format(json, rel, href, attributeName, value);
+
+            var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
+
+            var transition = (CrichtonTransition)(builder.GetArgumentsForCallsMadeOn(b => b.AddTransition(null))[0].First());
+
+            Assert.AreEqual(rel, transition.Rel, rel);
+            Assert.AreEqual(href, transition.Uri);
+            Assert.AreEqual(value, transition.Attributes[attributeName].Value);
         }
     }
 }

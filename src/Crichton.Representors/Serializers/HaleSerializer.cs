@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace Crichton.Representors.Serializers
@@ -70,6 +71,11 @@ namespace Crichton.Representors.Serializers
                         attributeObject["profile"] = attribute.Value.ProfileUri;
                     }
 
+                    if (attribute.Value.Value != null)
+                    {
+                        attributeObject["value"] = JToken.FromObject(attribute.Value.Value);
+                    }
+
                     dataObject[attribute.Key] = attributeObject;
                 }
             }
@@ -117,6 +123,7 @@ namespace Crichton.Representors.Serializers
                     var dataObject = data[dataProperty.Name];
                     var type = dataObject["type"];
                     var profileUri = dataObject["profile"];
+                    var value = dataObject["value"];
 
                     var transitionAttribute = new CrichtonTransitionAttribute();
 
@@ -128,6 +135,8 @@ namespace Crichton.Representors.Serializers
                     }
 
                     if (profileUri != null) transitionAttribute.ProfileUri = profileUri.Value<string>();
+
+                    if (value != null) transitionAttribute.Value = JsonConvert.DeserializeObject(value.ToString());
 
                     transition.Attributes[dataProperty.Name] = transitionAttribute;
                 }

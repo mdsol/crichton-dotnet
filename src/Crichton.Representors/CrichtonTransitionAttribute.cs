@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Crichton.Representors
 {
     public class CrichtonTransitionAttribute
     {
-        public string Default { get; set; }
+        public object Value { get; set; }
         public string ProfileUri { get; set; }
         public string JsonType { get; set; }
         public string DataType { get; set; }
