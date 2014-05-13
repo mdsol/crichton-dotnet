@@ -26,10 +26,12 @@ namespace Crichton.Representors
         public TransitionRenderMethod RenderMethod { get; set; }
         public string Target { get; set; }
         public IDictionary<string, CrichtonTransitionAttribute> Attributes { get; set; }
+        public IDictionary<string, CrichtonTransitionAttribute> Parameters { get; set; }
 
         public CrichtonTransition()
         {
             Attributes = new Dictionary<string, CrichtonTransitionAttribute>();
+            Parameters = new Dictionary<string, CrichtonTransitionAttribute>();
         }
     }
 }
