@@ -2,7 +2,7 @@
 
 namespace Crichton.Representors
 {
-    public class CrichtonTransitionAttribute
+    public class CrichtonTransitionAttribute : IAttributesContainer
     {
         public object Value { get; set; }
         public string ProfileUri { get; set; }

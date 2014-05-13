@@ -9,7 +9,7 @@ namespace Crichton.Representors
         Resource = 2
     }
 
-    public class CrichtonTransition
+    public class CrichtonTransition : IAttributesContainer
     {
         public string Rel { get; set; }
         public string Uri { get; set; }

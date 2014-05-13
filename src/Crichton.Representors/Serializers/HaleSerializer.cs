@@ -47,22 +47,27 @@ namespace Crichton.Representors.Serializers
 
             if (!String.IsNullOrWhiteSpace(transition.Target)) linkObject["target"] = transition.Target;
 
-            var onlyInAttributes = transition.Attributes.Where(
-                a => !transition.Parameters.ContainsKey(a.Key))
+            AddAttributeesFromAttributesContainerToLinkObject(transition, linkObject);
+
+            return linkObject;
+        }
+
+        private static void AddAttributeesFromAttributesContainerToLinkObject(IAttributesContainer attributesContainer, JObject linkObject)
+        {
+            var onlyInAttributes = attributesContainer.Attributes.Where(
+                a => !attributesContainer.Parameters.ContainsKey(a.Key))
                 .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
-            var onlyInParameters = transition.Parameters.Where(
-                a => !transition.Attributes.ContainsKey(a.Key))
+            var onlyInParameters = attributesContainer.Parameters.Where(
+                a => !attributesContainer.Attributes.ContainsKey(a.Key))
                 .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
-            var inBoth = transition.Attributes.Where(a => transition.Parameters.ContainsKey(a.Key))
+            var inBoth = attributesContainer.Attributes.Where(a => attributesContainer.Parameters.ContainsKey(a.Key))
                 .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
             AddAttributesFromAttributesDictionaryToLinkObject(onlyInAttributes, linkObject);
             AddAttributesFromAttributesDictionaryToLinkObject(onlyInParameters, linkObject, "href");
             AddAttributesFromAttributesDictionaryToLinkObject(inBoth, linkObject, "either");
-
-            return linkObject;
         }
 
         private static void AddAttributesFromAttributesDictionaryToLinkObject(
@@ -104,20 +109,7 @@ namespace Crichton.Representors.Serializers
                     attributeObject["scope"] = scope;
                 }
 
-                var onlyInAttributes = attribute.Value.Attributes.Where(
-                    a => !attribute.Value.Parameters.ContainsKey(a.Key))
-                    .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-
-                var onlyInParameters = attribute.Value.Parameters.Where(
-                    a => !attribute.Value.Attributes.ContainsKey(a.Key))
-                    .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-
-                var inBoth = attribute.Value.Attributes.Where(a => attribute.Value.Parameters.ContainsKey(a.Key))
-                    .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-
-                AddAttributesFromAttributesDictionaryToLinkObject(onlyInAttributes, attributeObject);
-                AddAttributesFromAttributesDictionaryToLinkObject(onlyInParameters, attributeObject, "href");
-                AddAttributesFromAttributesDictionaryToLinkObject(inBoth, attributeObject, "neither");
+                AddAttributeesFromAttributesContainerToLinkObject(attribute.Value, attributeObject);
 
                 dataObject[attribute.Key] = attributeObject;
             }
@@ -154,16 +146,20 @@ namespace Crichton.Representors.Serializers
 
             if (target != null) transition.Target = target.Value<string>();
 
-            if (data != null)
-            {
-                var noScopeSet = GetAttributesDictionaryFromDataToken(data, null);
-                var hrefScopeSet = GetAttributesDictionaryFromDataToken(data, "href");
-                var eitherScopeSet = GetAttributesDictionaryFromDataToken(data, "either");
-                transition.Attributes = noScopeSet.MergeLeft(eitherScopeSet);
-                transition.Parameters = hrefScopeSet.MergeLeft(eitherScopeSet);
-            }
+            SetAttributesAndParametersOnAttributesContainer(data, transition);
 
             return transition;
+        }
+
+        private static void SetAttributesAndParametersOnAttributesContainer(JToken dataToken, IAttributesContainer transition)
+        {
+            if (dataToken == null) return;
+
+            var noScopeSet = GetAttributesDictionaryFromDataToken(dataToken, null);
+            var hrefScopeSet = GetAttributesDictionaryFromDataToken(dataToken, "href");
+            var eitherScopeSet = GetAttributesDictionaryFromDataToken(dataToken, "either");
+            transition.Attributes = noScopeSet.MergeLeft(eitherScopeSet);
+            transition.Parameters = hrefScopeSet.MergeLeft(eitherScopeSet);
         }
 
         private static Dictionary<string, CrichtonTransitionAttribute> 
@@ -198,35 +194,12 @@ namespace Crichton.Representors.Serializers
 
                 if (value != null) transitionAttribute.Value = JsonConvert.DeserializeObject(value.ToString());
 
-                if (dataToken != null)
-                {
-                    var noScopeSet = GetAttributesDictionaryFromDataToken(dataToken, null);
-                    var hrefScopeSet = GetAttributesDictionaryFromDataToken(dataToken, "href");
-                    var eitherScopeSet = GetAttributesDictionaryFromDataToken(dataToken, "either");
-                    transitionAttribute.Attributes = noScopeSet.MergeLeft(eitherScopeSet);
-                    transitionAttribute.Parameters = hrefScopeSet.MergeLeft(eitherScopeSet);
-                }
+                SetAttributesAndParametersOnAttributesContainer(dataToken, transitionAttribute);
 
                 result[dataProperty.Name] = transitionAttribute;
             }
 
             return result;
         }
-    }
-
-    // adapted from http://stackoverflow.com/a/2679857
-    public static class DictionaryExtensions
-    {
-        public static T MergeLeft<T, TK, TV>(this T me, params IDictionary<TK, TV>[] others)
-            where T : IDictionary<TK, TV>, new()
-        {
-            var newMap = new T();
-            foreach (var p in (new List<IDictionary<TK, TV>> { me }).Concat(others).SelectMany(src => src))
-            {
-                newMap[p.Key] = p.Value;
-            }
-            return newMap;
-        }
-
     }
 }
