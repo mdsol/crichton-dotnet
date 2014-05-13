@@ -9,6 +9,7 @@ namespace Crichton.Representors
         public string JsonType { get; set; }
         public string DataType { get; set; }
         public string Constraints { get; set; }
-        public IList<string> Options { get; set; } 
+        public IList<string> Options { get; set; }
+        public IDictionary<string, CrichtonTransitionAttribute> Attributes { get; set; }
     }
 }

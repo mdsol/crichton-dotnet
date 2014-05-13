@@ -47,40 +47,48 @@ namespace Crichton.Representors.Serializers
 
             if (!String.IsNullOrWhiteSpace(transition.Target)) linkObject["target"] = transition.Target;
 
-            if (transition.Attributes != null && transition.Attributes.Any())
-            {
-                var dataObject = linkObject["data"] = new JObject();
-
-                foreach (var attribute in transition.Attributes)
-                {
-                    var attributeObject = new JObject();
-
-                    if (!String.IsNullOrWhiteSpace(attribute.Value.JsonType))
-                    {
-                        var typeValue = new StringBuilder(attribute.Value.JsonType);
-                        if (!String.IsNullOrWhiteSpace(attribute.Value.DataType))
-                        {
-                            typeValue.Append(":");
-                            typeValue.Append(attribute.Value.DataType);
-                        }
-                        attributeObject["type"] = typeValue.ToString();
-                    }
-
-                    if (!String.IsNullOrWhiteSpace(attribute.Value.ProfileUri))
-                    {
-                        attributeObject["profile"] = attribute.Value.ProfileUri;
-                    }
-
-                    if (attribute.Value.Value != null)
-                    {
-                        attributeObject["value"] = JToken.FromObject(attribute.Value.Value);
-                    }
-
-                    dataObject[attribute.Key] = attributeObject;
-                }
-            }
+            AddAttributesFromAttributesDictionaryToLinkObject(transition.Attributes, linkObject);
 
             return linkObject;
+        }
+
+        private static void AddAttributesFromAttributesDictionaryToLinkObject(
+            IDictionary<string, CrichtonTransitionAttribute> attributesDictionary,
+            JObject linkObject)
+        {
+            if (attributesDictionary == null || !attributesDictionary.Any()) return;
+
+            var dataObject = linkObject["data"] = new JObject();
+
+            foreach (var attribute in attributesDictionary)
+            {
+                var attributeObject = new JObject();
+
+                if (!String.IsNullOrWhiteSpace(attribute.Value.JsonType))
+                {
+                    var typeValue = new StringBuilder(attribute.Value.JsonType);
+                    if (!String.IsNullOrWhiteSpace(attribute.Value.DataType))
+                    {
+                        typeValue.Append(":");
+                        typeValue.Append(attribute.Value.DataType);
+                    }
+                    attributeObject["type"] = typeValue.ToString();
+                }
+
+                if (!String.IsNullOrWhiteSpace(attribute.Value.ProfileUri))
+                {
+                    attributeObject["profile"] = attribute.Value.ProfileUri;
+                }
+
+                if (attribute.Value.Value != null)
+                {
+                    attributeObject["value"] = JToken.FromObject(attribute.Value.Value);
+                }
+
+                AddAttributesFromAttributesDictionaryToLinkObject(attribute.Value.Attributes, attributeObject);
+
+                dataObject[attribute.Key] = attributeObject;
+            }
         }
 
         public override CrichtonTransition GetTransitionFromLinkObject(JToken link, string rel)
@@ -116,33 +124,46 @@ namespace Crichton.Representors.Serializers
 
             if (data != null)
             {
-                transition.Attributes = new Dictionary<string, CrichtonTransitionAttribute>();
-
-                foreach (var dataProperty in ((JObject) data).Properties())
-                {
-                    var dataObject = data[dataProperty.Name];
-                    var type = dataObject["type"];
-                    var profileUri = dataObject["profile"];
-                    var value = dataObject["value"];
-
-                    var transitionAttribute = new CrichtonTransitionAttribute();
-
-                    if (type != null)
-                    {
-                        var splitType = type.Value<string>().Split(':');
-                        transitionAttribute.JsonType = splitType[0];
-                        if (splitType.Count() > 1) transitionAttribute.DataType = splitType[1];
-                    }
-
-                    if (profileUri != null) transitionAttribute.ProfileUri = profileUri.Value<string>();
-
-                    if (value != null) transitionAttribute.Value = JsonConvert.DeserializeObject(value.ToString());
-
-                    transition.Attributes[dataProperty.Name] = transitionAttribute;
-                }
+                transition.Attributes = GetAttributesDictionaryFromDataToken(data);
             }
 
             return transition;
+        }
+
+        private static Dictionary<string, CrichtonTransitionAttribute> GetAttributesDictionaryFromDataToken(JToken data)
+        {
+            var result = new Dictionary<string, CrichtonTransitionAttribute>();
+
+            foreach (var dataProperty in ((JObject) data).Properties())
+            {
+                var dataObject = data[dataProperty.Name];
+                var type = dataObject["type"];
+                var profileUri = dataObject["profile"];
+                var value = dataObject["value"];
+                var dataToken = dataObject["data"]; 
+
+                var transitionAttribute = new CrichtonTransitionAttribute();
+
+                if (type != null)
+                {
+                    var splitType = type.Value<string>().Split(':');
+                    transitionAttribute.JsonType = splitType[0];
+                    if (splitType.Count() > 1) transitionAttribute.DataType = splitType[1];
+                }
+
+                if (profileUri != null) transitionAttribute.ProfileUri = profileUri.Value<string>();
+
+                if (value != null) transitionAttribute.Value = JsonConvert.DeserializeObject(value.ToString());
+
+                if (dataToken != null)
+                {
+                    transitionAttribute.Attributes = GetAttributesDictionaryFromDataToken(dataToken);
+                }
+
+                result[dataProperty.Name] = transitionAttribute;
+            }
+
+            return result;
         }
     }
 }

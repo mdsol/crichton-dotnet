@@ -251,6 +251,36 @@ namespace Crichton.Representors.Tests.Serializers
         }
 
         [Test]
+        public void Serialize_AddsNestedAttributesAsData()
+        {
+            Func<CrichtonTransition> transitionFunc = () =>
+            {
+                var attributes = Fixture.Create<IDictionary<string, CrichtonTransitionAttribute>>();
+                foreach (var attribute in attributes)
+                {
+                    attribute.Value.Attributes = Fixture.Create<IDictionary<string, CrichtonTransitionAttribute>>();
+                }
+                return new CrichtonTransition() { Rel = Fixture.Create<string>(), Attributes = attributes };
+            };
+
+            var representor = GetRepresentorWithTransitions(transitionFunc);
+            var result = JObject.Parse(sut.Serialize(representor));
+
+            foreach (var transition in representor.Transitions)
+            {
+                foreach (var attribute in transition.Attributes)
+                {
+                    foreach (var nestedAttribute in attribute.Value.Attributes)
+                    {
+                        var token = result["_links"][transition.Rel]["data"][attribute.Key]["data"][nestedAttribute.Key];
+                        Assert.AreEqual(nestedAttribute.Value.ProfileUri, token["profile"].Value<string>());
+                    }
+
+                }
+            }
+        }
+
+        [Test]
         public void DeserializeToNewBuilder_SetsTransitionsIncludingSingleMethod()
         {
             var href = Fixture.Create<string>();
@@ -528,6 +558,39 @@ namespace Crichton.Representors.Tests.Serializers
             Assert.AreEqual(rel, transition.Rel, rel);
             Assert.AreEqual(href, transition.Uri);
             Assert.AreEqual(value, transition.Attributes[attributeName].Value);
+        }
+
+        [Test]
+        public void DeserializeToNewBuilder_DeserializesNestedDataObjects()
+        {
+            var href = Fixture.Create<string>();
+            var attributeName = Fixture.Create<string>();
+            var nestedAttributeName = Fixture.Create<string>();
+            var profile = Fixture.Create<string>();
+            var rel = Fixture.Create<string>();
+            var json = @"
+            {{
+                ""_links"": {{
+                    ""{0}"": {{ ""href"" : ""{1}"", ""data"" : {{ ""{2}"" : {{ 
+                    ""data"" : {{
+                                ""{3}"" :
+                                    {{
+                                        ""profile"" : ""{4}""
+                                    }}
+                                }}
+                    }}}}}} 
+                }}
+            }}";
+
+            json = String.Format(json, rel, href, attributeName, nestedAttributeName, profile);
+
+            var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
+
+            var transition = (CrichtonTransition)(builder.GetArgumentsForCallsMadeOn(b => b.AddTransition(null))[0].First());
+
+            Assert.AreEqual(rel, transition.Rel, rel);
+            Assert.AreEqual(href, transition.Uri);
+            Assert.AreEqual(profile, transition.Attributes[attributeName].Attributes[nestedAttributeName].ProfileUri);
         }
     }
 }
