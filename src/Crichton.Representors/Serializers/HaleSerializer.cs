@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace Crichton.Representors.Serializers
@@ -172,9 +171,11 @@ namespace Crichton.Representors.Serializers
                 var dataObject = data[dataProperty.Name];
                 var type = dataObject["type"];
                 var profileUri = dataObject["profile"];
-                var value = dataObject["value"];
+                var value = dataObject["value"] as JValue;
                 var dataToken = dataObject["data"];
                 var scope = dataObject["scope"];
+
+                if (scope == null && matchingScope != null) continue;
 
                 if (scope != null)
                 {
@@ -192,7 +193,10 @@ namespace Crichton.Representors.Serializers
 
                 if (profileUri != null) transitionAttribute.ProfileUri = profileUri.Value<string>();
 
-                if (value != null) transitionAttribute.Value = JsonConvert.DeserializeObject(value.ToString());
+                if (value != null)
+                {
+                    transitionAttribute.Value = value.Value;
+                }
 
                 SetAttributesAndParametersOnAttributesContainer(dataToken, transitionAttribute);
 

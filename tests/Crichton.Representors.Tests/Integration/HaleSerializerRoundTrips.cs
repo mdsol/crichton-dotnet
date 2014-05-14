@@ -24,6 +24,12 @@ namespace Crichton.Representors.Tests.Integration
         {
             TestRoundTripFromJsonTestData("Hale\\AllLinkObjectPropertiesExceptData", serializer);
         }
+
+        [Test]
+        public void LinkObjectDataAttributes_RoundTrip()
+        {
+            TestRoundTripFromJsonTestData("Hale\\LinkObjectDataAttributes", serializer);
+        }
     
     }
 }
