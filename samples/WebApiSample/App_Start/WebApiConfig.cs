@@ -22,7 +22,7 @@ namespace WebApiSample
             );
 
             // Allow Crichton to Serialize IRepresentorBuilder responses
-            config.Formatters.Insert(0, new CrichtonRepresentorBuilderMediaTypeFormatter());
+            config.Formatters.Add(new CrichtonRepresentorBuilderMediaTypeFormatter());
         }
     }
 }

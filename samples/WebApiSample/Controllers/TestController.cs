@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using Crichton.Representors;
+using Crichton.WebApi;
 using WebApiSample.Models;
 
 namespace WebApiSample.Controllers
@@ -19,9 +20,9 @@ namespace WebApiSample.Controllers
         {
             var builder = new RepresentorBuilder();
 
-            builder.SetCollection(Data, d => "api/test/" + d.Id);
-            builder.SetSelfLink("api/test");
-            builder.AddTransition("friends","api/friends");
+            builder.SetCollection(Data, d => Url.Route("DefaultApi", new { controller = "test", id = d.Id }));
+            builder.SetSelfLinkToCurrentUrl(RequestContext);
+            builder.AddTranstionToRoute(RequestContext, "friends", "DefaultApi", new { controller = "friends" });
 
             return builder;
         }
@@ -33,7 +34,7 @@ namespace WebApiSample.Controllers
 
             var builder = new RepresentorBuilder();
             builder.SetAttributesFromObject(data);
-            builder.SetSelfLink("api/test/" + id);
+            builder.SetSelfLinkToCurrentUrl(RequestContext);
 
             return builder;
         }
