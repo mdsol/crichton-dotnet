@@ -15,3 +15,6 @@ _NCrunch_Crichton/
 *.ncrunchsolution
 *.ncrunchproject
 *.ncrunchsolution.user
+*.csproj.user
+samples/*/bin/*
+samples/*/obj/*
