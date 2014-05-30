@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
+using Crichton.WebApi;
 
 namespace WebApiSample
 {
@@ -19,6 +20,9 @@ namespace WebApiSample
                 routeTemplate: "api/{controller}/{id}",
                 defaults: new { id = RouteParameter.Optional }
             );
+
+            // Allow Crichton to Serialize IRepresentorBuilder responses
+            config.Formatters.Insert(0, new CrichtonRepresentorBuilderMediaTypeFormatter());
         }
     }
 }

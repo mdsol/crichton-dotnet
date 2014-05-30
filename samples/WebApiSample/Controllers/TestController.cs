@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using Crichton.Representors;
 using WebApiSample.Models;
 
 namespace WebApiSample.Controllers
@@ -14,15 +15,27 @@ namespace WebApiSample.Controllers
             new List<ExampleModel> { new ExampleModel() { Id = 1, Name = "Chad" }, new ExampleModel() { Id = 2, Name = "Jordi" } };
 
         // GET api/test
-        public IEnumerable<ExampleModel> Get()
+        public IRepresentorBuilder Get()
         {
-            return Data;
+            var builder = new RepresentorBuilder();
+
+            builder.SetCollection(Data, d => "api/test/" + d.Id);
+            builder.SetSelfLink("api/test");
+            builder.AddTransition("friends","api/friends");
+
+            return builder;
         }
 
         // GET api/test/5
-        public ExampleModel Get(int id)
+        public IRepresentorBuilder Get(int id)
         {
-            return Data.Single(d => d.Id == id);
+            var data = Data.Single(d => d.Id == id);
+
+            var builder = new RepresentorBuilder();
+            builder.SetAttributesFromObject(data);
+            builder.SetSelfLink("api/test/" + id);
+
+            return builder;
         }
 
         // POST api/test

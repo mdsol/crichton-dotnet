@@ -20,6 +20,7 @@ namespace Crichton.Representors
             Transitions = new List<CrichtonTransition>();
             EmbeddedResources = new Dictionary<string, IList<CrichtonRepresentor>>();
             Collection = new List<CrichtonRepresentor>();
+            Attributes = new JObject();
         }
 
         public T ToObject<T>()
