@@ -9,6 +9,9 @@ using WebApiSample.Models;
 
 namespace WebApiSample.Controllers
 {
+    /// <summary>
+    /// Alternative controller that uses BuilderDescriptors to create Hypermedia responses
+    /// </summary>
     public class FriendsController : ApiController
     {
         private static readonly IReadOnlyList<FriendModel> Data =

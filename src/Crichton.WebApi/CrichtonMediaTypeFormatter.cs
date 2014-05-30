@@ -6,11 +6,8 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Text;
 using System.Threading.Tasks;
 using System.Net.Http.Formatting;
-using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Hosting;
 using Crichton.Representors;
@@ -28,9 +25,9 @@ namespace Crichton.WebApi
                 {"application/hale+json", new HaleSerializer()}
             });
 
-        private readonly List<IBuilderDescriptor> Descriptors = new List<IBuilderDescriptor>();
+        private readonly List<IBuilderDescriptor> descriptors = new List<IBuilderDescriptor>();
 
-        private HttpRequestMessage requestMessage;
+        private readonly HttpRequestMessage requestMessage;
 
         public CrichtonMediaTypeFormatter(params IBuilderDescriptor[] descriptors) : this(null, descriptors)
         {
@@ -40,7 +37,7 @@ namespace Crichton.WebApi
         {
             this.requestMessage = requestMessage;
 
-            Descriptors.AddRange(descriptors);
+            this.descriptors.AddRange(descriptors);
 
             foreach (var serializer in Serializers)
             {
@@ -55,12 +52,12 @@ namespace Crichton.WebApi
 
         public override bool CanWriteType(Type type)
         {
-            return type == typeof (IRepresentorBuilder) || Descriptors.Any(d => d.SupportsType(type));
+            return type == typeof (IRepresentorBuilder) || descriptors.Any(d => d.SupportsType(type));
         }
 
         public override MediaTypeFormatter GetPerRequestFormatterInstance(Type type, HttpRequestMessage request, MediaTypeHeaderValue mediaType)
         {
-            return new CrichtonMediaTypeFormatter(request, Descriptors.ToArray());
+            return new CrichtonMediaTypeFormatter(request, descriptors.ToArray());
         }
 
         public override async Task WriteToStreamAsync(Type type, object value, Stream writeStream, HttpContent content, TransportContext transportContext)
@@ -75,7 +72,7 @@ namespace Crichton.WebApi
             else if (requestMessage != null)
             {
                 // Support a matching Descriptor
-                var matchingDescriptor = Descriptors.Single(d => d.SupportsType(type));
+                var matchingDescriptor = descriptors.Single(d => d.SupportsType(type));
 
                 var requestContext = (HttpRequestContext)requestMessage.Properties[HttpPropertyKeys.RequestContextKey];
                 var builder = matchingDescriptor.BuildForType(type, value, requestContext);

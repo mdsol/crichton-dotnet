@@ -11,10 +11,17 @@ using WebApiSample.Models;
 
 namespace WebApiSample.Controllers
 {
+    /// <summary>
+    /// Example controller that returns IRepresentorBuilders that have had methods on it called.
+    /// </summary>
     public class TestController : ApiController
     {
         private static readonly IReadOnlyList<ExampleModel> Data = 
-            new List<ExampleModel> { new ExampleModel() { Id = 1, Name = "Chad" }, new ExampleModel() { Id = 2, Name = "Jordi" } };
+            new List<ExampleModel>
+            {
+                new ExampleModel() { Id = 1, Name = "Chad" }, 
+                new ExampleModel() { Id = 2, Name = "Jordi" }
+            };
 
         // GET api/test
         public IRepresentorBuilder Get()
