@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Crichton.Representors;
 using Crichton.WebApi;
+using Crichton.WebApi.Extensions;
 using WebApiSample.Models;
 
 namespace WebApiSample.Controllers
@@ -18,7 +19,7 @@ namespace WebApiSample.Controllers
         // GET api/test
         public IRepresentorBuilder Get()
         {
-            var builder = new RepresentorBuilder();
+            var builder = new RepresentorBuilder(); // should use DI to inject an instance of this in.
 
             builder.SetCollection(Data, d => Url.Route("DefaultApi", new { controller = "test", id = d.Id }));
             builder.SetSelfLinkToCurrentUrl(RequestContext);

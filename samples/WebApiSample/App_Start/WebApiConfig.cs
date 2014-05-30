@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
 using Crichton.WebApi;
+using WebApiSample.BuilderDescriptors;
 
 namespace WebApiSample
 {
@@ -21,8 +22,8 @@ namespace WebApiSample
                 defaults: new { id = RouteParameter.Optional }
             );
 
-            // Allow Crichton to Serialize IRepresentorBuilder responses
-            config.Formatters.Add(new CrichtonRepresentorBuilderMediaTypeFormatter());
+            // Allow Crichton to Serialize IRepresentorBuilder responses and all Descriptors
+            config.Formatters.Add(new CrichtonMediaTypeFormatter(new FriendModelBuilderDescriptor(), new FriendModelEnumerableBuilderDescriptor()));
         }
     }
 }
