@@ -29,9 +29,12 @@ namespace Crichton.Representors.Serializers
             }
 
             // add a root property for each property on data
-            foreach (var property in representor.Attributes.Properties().Where(p => !ReservedAttributes.Contains(p.Name)))
+            if (representor.Attributes != null)
             {
-                jObject.Add(property.Name, property.Value);
+                foreach (var property in representor.Attributes.Properties().Where(p => !ReservedAttributes.Contains(p.Name)))
+                {
+                    jObject.Add(property.Name, property.Value);
+                }
             }
 
             // embedded resources and Collections both require _embedded

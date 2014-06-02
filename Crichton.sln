@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30324.0
+VisualStudioVersion = 12.0.30501.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crichton.Representors", "src\Crichton.Representors\Crichton.Representors.csproj", "{E9B71D6B-E1FA-4EC7-B35A-C1C666D69D22}"
 EndProject
@@ -14,6 +14,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{2CEA92
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 		.nuget\packages.config = .nuget\packages.config
 	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{D6743BEF-DEB8-4DA7-BAF4-67CBB45A7369}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApiSample", "samples\WebApiSample\WebApiSample.csproj", "{B43F6B58-D2C6-489E-872D-8500C4E37DEE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crichton.WebApi", "src\Crichton.WebApi\Crichton.WebApi.csproj", "{369DA6A6-9D76-4535-B5EB-DB14ECCCC23C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Server", "Server", "{602B9331-63F0-46E8-B988-20B7C1A7AB1B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,8 +37,20 @@ Global
 		{B5258B16-32DB-4A32-9742-AA5E6C6DE4AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B5258B16-32DB-4A32-9742-AA5E6C6DE4AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B5258B16-32DB-4A32-9742-AA5E6C6DE4AA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B43F6B58-D2C6-489E-872D-8500C4E37DEE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B43F6B58-D2C6-489E-872D-8500C4E37DEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B43F6B58-D2C6-489E-872D-8500C4E37DEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B43F6B58-D2C6-489E-872D-8500C4E37DEE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{369DA6A6-9D76-4535-B5EB-DB14ECCCC23C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{369DA6A6-9D76-4535-B5EB-DB14ECCCC23C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{369DA6A6-9D76-4535-B5EB-DB14ECCCC23C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{369DA6A6-9D76-4535-B5EB-DB14ECCCC23C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{B43F6B58-D2C6-489E-872D-8500C4E37DEE} = {D6743BEF-DEB8-4DA7-BAF4-67CBB45A7369}
+		{369DA6A6-9D76-4535-B5EB-DB14ECCCC23C} = {602B9331-63F0-46E8-B988-20B7C1A7AB1B}
 	EndGlobalSection
 EndGlobal
