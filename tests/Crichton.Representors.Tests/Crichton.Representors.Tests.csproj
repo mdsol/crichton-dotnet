@@ -94,6 +94,9 @@
     <Content Include="Integration\TestData\Hal\SimpleLinksAndAttributes.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="Integration\TestData\Hale\LinkObjectDataAttributes.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Integration\TestData\Hale\AllLinkObjectPropertiesExceptData.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

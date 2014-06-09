@@ -9,7 +9,7 @@ namespace Crichton.Representors
         Resource = 2
     }
 
-    public class CrichtonTransition
+    public class CrichtonTransition : IAttributesContainer
     {
         public string Rel { get; set; }
         public string Uri { get; set; }
@@ -25,6 +25,13 @@ namespace Crichton.Representors
         public string[] MediaTypesAccepted { get; set; }
         public TransitionRenderMethod RenderMethod { get; set; }
         public string Target { get; set; }
-        public IList<CrichtonTransitionAttribute> Attributes { get; set; } 
+        public IDictionary<string, CrichtonTransitionAttribute> Attributes { get; set; }
+        public IDictionary<string, CrichtonTransitionAttribute> Parameters { get; set; }
+
+        public CrichtonTransition()
+        {
+            Attributes = new Dictionary<string, CrichtonTransitionAttribute>();
+            Parameters = new Dictionary<string, CrichtonTransitionAttribute>();
+        }
     }
 }
