@@ -42,7 +42,7 @@ The HAL+JSON Serializer is complete apart from CURIEs.
 
 ##### HALE+JSON
 
-The HALE+JSON Serializer supports everything the HAL+JSON Serializer does, as defined in the spec at https://github.com/mdsol/hale/blob/master/README.md. It is implemented by ```HaleSerializer```.
+The HALE+JSON Serializer supports everything the HAL+JSON Serializer does above. HALE+JSON is defined by the spec at https://github.com/mdsol/hale/blob/master/README.md. It is implemented by ```HaleSerializer```.
 
 Spec | Support
 --- | ---
