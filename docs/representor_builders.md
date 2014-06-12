@@ -103,6 +103,25 @@ representors | An enumerable of CrichtonRepresentors
 ##### ```void SetCollection<T>(IEnumerable<T> collection, Func<T, string> selfLinkFunc)```
 Sets the CrichtonRepresentor you are building to be a collection instead of a single object.
 
+Example use:
+
+```csharp
+
+public class MyObject {
+    public int Id { get; set;}
+    public string Name { get; set;}
+}
+
+var myObjectCollection = new List<MyObject> { 
+    new MyObject { Id = 1, Name = "Brian"}
+    new MyObject { Id = 2, Name = "Terrance"}
+};
+
+IRepresentorBuilder builder = new RepresentorBuilder();
+builder.SetCollection(myObjectCollection, o => "api/objects/" + o.Id);
+
+```
+
 Param | Description
 --- | ---
 Type T | The type of the object contained in the collection, such as a Model or ViewModel type
