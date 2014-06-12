@@ -81,7 +81,7 @@ Spec | Support
 7.1.1.1. String values | ❌
 7.1.1.2. Link Object values | ❌
 
-The HALE+JSON Serializer is not complete. Likely 5.2 Contraint Properties will be implemented next.
+The HALE+JSON Serializer is not complete. Likely 5.2 Constraint Properties will be implemented next.
 
 ##### Other formats
 
