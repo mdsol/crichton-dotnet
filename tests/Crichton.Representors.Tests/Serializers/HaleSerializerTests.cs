@@ -35,6 +35,12 @@ namespace Crichton.Representors.Tests.Serializers
         }
 
         [Test]
+        public void HasCorrectContentType()
+        {
+            Assert.AreEqual("application/vnd.hale+json", sut.ContentType);
+        }
+
+        [Test]
         public void Serialize_AddsSingleMethodAttributeForEachTransition()
         {
             var representor = GetRepresentorWithTransitions(() => new CrichtonTransition() { Rel = Fixture.Create<string>(), Methods = new []{ Fixture.Create<string>() } });
