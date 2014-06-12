@@ -11,6 +11,8 @@ namespace Crichton.Representors.Serializers
         private static readonly Dictionary<TransitionRenderMethod, string>
             RenderMethodMappings = new Dictionary<TransitionRenderMethod, string> { { TransitionRenderMethod.Resource, "resource" }, { TransitionRenderMethod.Embed, "embed" } };
 
+        public override string ContentType { get { return "application/vnd.hale+json"; } }
+
         public override JObject CreateLinkObjectFromTransition(CrichtonTransition transition)
         {
             var linkObject = base.CreateLinkObjectFromTransition(transition);
