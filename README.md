@@ -12,6 +12,8 @@ NOTE: THIS IS UNDER HEAVY DEV AND IS NOT READY TO BE USED YET
 
 This is the core library, containing Serializers and Hypermedia Representors.
 
+* [RepresentorBuilder][].
+
 #### Hypermedia format support
 
 ##### HAL+JSON
@@ -98,3 +100,4 @@ Copyright (c) 2014 Medidata Solutions Worldwide. Licensed under MIT. See [LICENS
 
 [CONTRIBUTING]: CONTRIBUTING.md
 [LICENSE]: LICENSE.md
+[RepresentorBuilder]: docs/representor_builder.md
