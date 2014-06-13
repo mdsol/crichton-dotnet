@@ -1,4 +1,5 @@
-﻿using Ploeh.AutoFixture;
+﻿using System.Linq;
+using Ploeh.AutoFixture;
 using Ploeh.AutoFixture.AutoRhinoMock;
 
 namespace Crichton.Representors.Tests
@@ -9,7 +10,10 @@ namespace Crichton.Representors.Tests
 
         public IFixture GetFixture()
         {
-            return new Fixture().Customize(new MultipleCustomization()).Customize(new AutoRhinoMockCustomization());
+            var fixture = new Fixture().Customize(new MultipleCustomization()).Customize(new AutoRhinoMockCustomization());
+            fixture.Behaviors.Remove(fixture.Behaviors.OfType<ThrowingRecursionBehavior>().Single());
+            fixture.Behaviors.Add(new OmitOnRecursionBehavior());
+            return fixture;
         }
     }
 }

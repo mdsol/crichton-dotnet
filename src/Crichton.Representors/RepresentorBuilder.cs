@@ -35,14 +35,16 @@ namespace Crichton.Representors
             representor.Attributes = JObject.FromObject(data);
         }
 
-        public void AddTransition(string rel, string uri)
+        public void AddTransition(CrichtonTransition transition)
         {
-            AddTransition(rel, uri, null);
+            representor.Transitions.Add(transition);
         }
 
-        public void AddTransition(string rel, string uri, string title)
+        public void AddTransition(string rel, string uri = null, string title = null, string type = null, bool uriIsTemplated = false, 
+            string depreciationUri = null, string name = null, string profileUri = null, string languageTag = null)
         {
-            representor.Transitions.Add(new CrichtonTransition() { Rel = rel, Uri = uri, Title = title });
+            representor.Transitions.Add(new CrichtonTransition { Rel = rel, Uri = uri, Title = title, Type = type, 
+                UriIsTemplated = uriIsTemplated, DepreciationUri = depreciationUri, Name = name, ProfileUri = profileUri, LanguageTag = languageTag});
         }
 
         public void AddEmbeddedResource(string key, CrichtonRepresentor resource)
@@ -51,6 +53,23 @@ namespace Crichton.Representors
                 representor.EmbeddedResources[key] = new List<CrichtonRepresentor>();
 
             representor.EmbeddedResources[key].Add(resource);
+        }
+
+        public void SetCollection(IEnumerable<CrichtonRepresentor> representors)
+        {
+            foreach(var representorInCollection in representors)
+                representor.Collection.Add(representorInCollection);
+        }
+
+        public void SetCollection<T>(IEnumerable<T> collection, Func<T, string> selfLinkFunc)
+        {
+            foreach (var item in collection)
+            {
+                var newRepresentor = new CrichtonRepresentor {SelfLink = selfLinkFunc(item)};
+                newRepresentor.SetAttributesFromObject(item);
+
+                representor.Collection.Add(newRepresentor);
+            }
         }
     }
 }

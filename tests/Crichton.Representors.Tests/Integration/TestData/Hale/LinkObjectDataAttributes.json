@@ -1,0 +1,42 @@
+﻿{
+   "_links":{
+      "self":{
+         "href":"http://example.org/api/user/ed"
+      },
+      "testrel":{
+         "href":"http://example.org/api/user/test",
+         "data" : {
+             "searchname" : {
+                 "scope" : "href",
+                 "type" : "string:text"
+             }
+         }
+      }
+   },
+   "some-property":123,
+   "_embedded":{
+      "embedded1":{
+         "_links":{
+            "self":{
+               "href":"http://nice.com"
+            },
+            "testrel":{
+               "href":"http://example.org/api/user/test",
+               "data" : {
+                   "name" : {
+                       "value" : 1234,
+                       "data" : {
+                           "lastname" :
+                               {
+                               "value" : "Albers",
+                               "profile" : "http://nice-profile-hypermedia.com/hypermedia"
+                           }
+                       }
+                    }
+               }
+            }
+         },
+         "some-property":1234
+      }
+   }
+}

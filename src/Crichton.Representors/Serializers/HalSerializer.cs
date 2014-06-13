@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 
@@ -9,6 +10,8 @@ namespace Crichton.Representors.Serializers
         private static readonly string[] ReservedAttributes = {"_links", "_embedded"};
         private static readonly string[] ReservedLinkRels = {"self"};
 
+        public virtual string ContentType { get { return "application/hal+json"; } }
+
         public string Serialize(CrichtonRepresentor representor)
         {
             var jObject = CreateJObjectForRepresentor(representor);
@@ -16,15 +19,15 @@ namespace Crichton.Representors.Serializers
             return jObject.ToString();
         }
 
-        private static JObject CreateJObjectForRepresentor(CrichtonRepresentor representor)
+        private JObject CreateJObjectForRepresentor(CrichtonRepresentor representor)
         {
             var jObject = new JObject();
 
-            if (!String.IsNullOrWhiteSpace(representor.SelfLink)) AddLink(jObject, "self", representor.SelfLink, null);
+            if (!String.IsNullOrWhiteSpace(representor.SelfLink)) AddLinkFromTransition(jObject, new CrichtonTransition { Rel = "self", Uri = representor.SelfLink });
 
             foreach (var transition in representor.Transitions.Where(t => !ReservedLinkRels.Contains(t.Rel)))
             {
-                AddLink(jObject, transition.Rel, transition.Uri, transition.Title);
+                AddLinkFromTransition(jObject, transition);
             }
 
             // add a root property for each property on data
@@ -33,61 +36,78 @@ namespace Crichton.Representors.Serializers
                 jObject.Add(property.Name, property.Value);
             }
 
-            // create embedded resources
-            if (representor.EmbeddedResources.Any())
+            // embedded resources and Collections both require _embedded
+            if (representor.EmbeddedResources.Any() || representor.Collection.Any())
             {
                 var embeddedJObject = new JObject();
+                jObject.Add("_embedded", embeddedJObject);
 
+                // create embedded resources
                 foreach (var embeddedResourceKey in representor.EmbeddedResources.Keys)
                 {
                     var list = representor.EmbeddedResources[embeddedResourceKey];
-                    if (list.Count == 1)
-                    {
-                        // single embedded resources are resources
-                        embeddedJObject.Add(embeddedResourceKey, CreateJObjectForRepresentor(list.Single()));
-                    } 
-                    else if (list.Count > 1)
-                    {
-                        // multiple embedded resources are an array of resources
-                        var array = new JArray();
-                        foreach (var resource in list)
-                        {
-                            array.Add(CreateJObjectForRepresentor(resource));
-                        }
-                        embeddedJObject.Add(embeddedResourceKey, array);
-                    }
+                    AddRepresentorsToEmbedded(list, embeddedJObject, embeddedResourceKey);
                 }
 
-                jObject.Add("_embedded", embeddedJObject);
+                // add Collection objects to _embedded.items
+                AddRepresentorsToEmbedded(representor.Collection.ToList(), embeddedJObject, "items");
             }
 
             return jObject;
         }
 
-        private static void AddLink(JObject document, string rel, string href, string title)
+        private void AddRepresentorsToEmbedded(IList<CrichtonRepresentor> list, JObject embeddedJObject, string embeddedResourceKey)
+        {
+            if (list.Count == 1)
+            {
+                // single embedded resources are resources
+                embeddedJObject.Add(embeddedResourceKey, CreateJObjectForRepresentor(list.Single()));
+            }
+            else if (list.Count > 1)
+            {
+                // multiple embedded resources are an array of resources
+                var array = new JArray();
+                foreach (var resource in list)
+                {
+                    array.Add(CreateJObjectForRepresentor(resource));
+                }
+                embeddedJObject.Add(embeddedResourceKey, array);
+            }
+        }
+
+        private void AddLinkFromTransition(JObject document, CrichtonTransition transition)
         {
             if (document["_links"] == null) document.Add("_links", new JObject());
 
-            var existingRel = document["_links"][rel];
+            var existingRel = document["_links"][transition.Rel];
             if (existingRel == null)
             {
                 var jobject = (JObject) document["_links"];
-                var linkObject = new JObject {{"href", href}};
-                if (!String.IsNullOrWhiteSpace(title)) linkObject["title"] = title;
-                jobject.Add(rel, linkObject);
+                jobject.Add(transition.Rel, CreateLinkObjectFromTransition(transition));
             }
             else
             {
                 // we already have a ref. Need to convert this to an array if not already.
                 var array = existingRel as JArray ?? new JArray {existingRel};
-                var linkObject = new JObject { { "href", href } };
-                if (!String.IsNullOrWhiteSpace(title)) linkObject["title"] = title;
-                array.Add(linkObject);
+                array.Add(CreateLinkObjectFromTransition(transition));
 
                 // override the existing _links > rel
-                document["_links"][rel] = array;
-
+                document["_links"][transition.Rel] = array;
             }
+        }
+
+        public virtual JObject CreateLinkObjectFromTransition(CrichtonTransition transition)
+        {
+            var linkObject = new JObject {{"href", transition.Uri}};
+            if (!String.IsNullOrWhiteSpace(transition.Title)) linkObject["title"] = transition.Title;
+            if (!String.IsNullOrWhiteSpace(transition.Type)) linkObject["type"] = transition.Type;
+            if (transition.UriIsTemplated) linkObject["templated"] = true;
+            if (!String.IsNullOrWhiteSpace(transition.DepreciationUri)) linkObject["deprecation"] = transition.DepreciationUri;
+            if (!String.IsNullOrWhiteSpace(transition.Name)) linkObject["name"] = transition.Name;
+            if (!String.IsNullOrWhiteSpace(transition.ProfileUri)) linkObject["profile"] = transition.ProfileUri;
+            if (!String.IsNullOrWhiteSpace(transition.LanguageTag)) linkObject["hreflang"] = transition.LanguageTag;
+
+            return linkObject;
         }
 
         public IRepresentorBuilder DeserializeToNewBuilder(string message, Func<IRepresentorBuilder> builderFactoryMethod)
@@ -124,23 +144,41 @@ namespace Crichton.Representors.Serializers
 
             foreach (var property in embedded.Properties())
             {
-                var propertyAsArray = embedded[property.Name] as JArray;
-                if (propertyAsArray != null)
+                var propertyJObject = embedded[property.Name];
+
+                if (property.Name == "items") // collections use the "items" embedded resource key by convention
                 {
-                    // multiple items in same embedded resource key as an array
-                    foreach (var item in propertyAsArray.OfType<JObject>())
-                    {
-                        var builderResult = BuildRepresentorBuilderFromJObject(builderFactoryMethod, item);
-                        currentBuilder.AddEmbeddedResource(property.Name, builderResult.ToRepresentor());
-                    }
+                    currentBuilder.SetCollection(GetRepresentorsFromEmbeddedJObject(builderFactoryMethod, propertyJObject));
                 }
                 else
                 {
-                    // single item under resource key
-                    var builderResult = BuildRepresentorBuilderFromJObject(builderFactoryMethod, (JObject)embedded[property.Name]);
-                    currentBuilder.AddEmbeddedResource(property.Name, builderResult.ToRepresentor());
+                    foreach (var representor in GetRepresentorsFromEmbeddedJObject(builderFactoryMethod, propertyJObject))
+                    {
+                        currentBuilder.AddEmbeddedResource(property.Name, representor);
+                    }
                 }
             }
+        }
+
+        private IEnumerable<CrichtonRepresentor> GetRepresentorsFromEmbeddedJObject(Func<IRepresentorBuilder> builderFactoryMethod, JToken propertyJToken)
+        {
+            var representorsInCollection = new List<CrichtonRepresentor>();
+            var propertyAsArray = propertyJToken as JArray;
+            if (propertyAsArray != null)
+            {
+                // multiple items in same embedded resource an array
+                representorsInCollection.AddRange(propertyAsArray.OfType<JObject>()
+                    .Select(item => BuildRepresentorBuilderFromJObject(builderFactoryMethod, item))
+                    .Select(builderResult => builderResult.ToRepresentor()));
+            }
+            else
+            {
+                // single item as embedded resource
+                var builderResult = BuildRepresentorBuilderFromJObject(builderFactoryMethod,
+                    (JObject)propertyJToken);
+                representorsInCollection.Add(builderResult.ToRepresentor());
+            }
+            return representorsInCollection;
         }
 
         private static void SetSelfLinkIfPresent(JObject document, IRepresentorBuilder builder)
@@ -152,7 +190,7 @@ namespace Crichton.Representors.Serializers
             builder.SetSelfLink(document["_links"]["self"]["href"].Value<string>());
         }
 
-        private static void CreateTransitions(JObject document, IRepresentorBuilder builder)
+        private void CreateTransitions(JObject document, IRepresentorBuilder builder)
         {
             if (document["_links"] == null) return;
 
@@ -163,28 +201,46 @@ namespace Crichton.Representors.Serializers
                 var array = document["_links"][rel] as JArray;
                 if (array == null)
                 {
-                    if (document["_links"][rel]["href"] != null)
-                    {
-                        var title = document["_links"][rel]["title"];
-
-                        // single link for this rel only
-                        builder.AddTransition(rel, document["_links"][rel]["href"].Value<string>(), (title == null) ? null : title.Value<string>());
-                    }
+                    // single link for this rel only
+                    builder.AddTransition(GetTransitionFromLinkObject(document["_links"][rel], rel));
                 }
                 else
                 {
                     // create a transition for each array element
                     foreach (var link in array)
                     {
-                        if (link["href"] != null)
-                        {
-                            var title = link["title"];
-
-                            builder.AddTransition(rel, link["href"].Value<string>(), (title == null) ? null : title.Value<string>());
-                        }
+                         builder.AddTransition(GetTransitionFromLinkObject(link, rel));
                     }
                 }
             }
+        }
+
+        public virtual CrichtonTransition GetTransitionFromLinkObject(JToken link, string rel)
+        {
+            var href = link["href"];
+            var title = link["title"];
+            var type = link["type"];
+            var templatedField = link["templated"];
+            var deprecated = link["deprecation"];
+            var name = link["name"];
+            var profile = link["profile"];
+            var hreflang = link["hreflang"];
+            var templated = templatedField != null && (bool) templatedField;
+
+            var transition = new CrichtonTransition
+            {
+                Rel = rel,
+                Uri = (href == null) ? null : href.Value<string>(),
+                Title = (title == null) ? null : title.Value<string>(),
+                Type = (type == null) ? null : type.Value<string>(),
+                UriIsTemplated = templated,
+                DepreciationUri = (deprecated == null) ? null : deprecated.Value<string>(),
+                Name = (name == null) ? null : name.Value<string>(),
+                ProfileUri = (profile == null) ? null : profile.Value<string>(),
+                LanguageTag = (hreflang == null) ? null : hreflang.Value<string>()
+            };
+
+            return transition;
         }
     }
 }

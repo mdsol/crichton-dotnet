@@ -1,16 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Crichton.Representors
 {
-    public class CrichtonTransitionAttribute
+    public class CrichtonTransitionAttribute : IAttributesContainer
     {
-        public string Name { get; set; }
-        public string Default { get; set; }
-        public string Description { get; set; }
-        public string Type { get; set; }
-        public Type DataType { get; set; }
-        public string Constraints { get; set; }
-        public IList<string> Options { get; set; } 
+        public object Value { get; set; }
+        public string ProfileUri { get; set; }
+        public string JsonType { get; set; }
+        public string DataType { get; set; }
+        public IList<string> Options { get; set; }
+        public IDictionary<string, CrichtonTransitionAttribute> Attributes { get; set; }
+        public IDictionary<string, CrichtonTransitionAttribute> Parameters { get; set; }
+
+        public CrichtonTransitionAttribute()
+        {
+            Attributes = new Dictionary<string, CrichtonTransitionAttribute>();
+            Parameters = new Dictionary<string, CrichtonTransitionAttribute>();
+        }
     }
 }

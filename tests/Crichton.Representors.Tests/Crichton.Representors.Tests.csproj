@@ -71,14 +71,41 @@
   <ItemGroup>
     <Compile Include="CrichtonRepresentorTests.cs" />
     <Compile Include="ExampleDataObject.cs" />
+    <Compile Include="Integration\HaleSerializerRoundTrips.cs" />
     <Compile Include="Integration\HalSerializerRoundTrips.cs" />
+    <Compile Include="Integration\RoundTripTests.cs" />
     <Compile Include="RepresentorBuilderTests.cs" />
+    <Compile Include="Serializers\HaleSerializerTests.cs" />
     <Compile Include="Serializers\HalSerializerTests.cs" />
     <Compile Include="TestWithFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <Content Include="Integration\TestData\Hal\ComplexEmbeddedResources.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Integration\TestData\Hal\MultipleLinksSameRelation.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Integration\TestData\Hal\SelfLinkOnly.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Integration\TestData\Hal\SimpleLinksAndAttributes.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <None Include="Integration\TestData\Hale\LinkObjectDataAttributes.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Integration\TestData\Hale\AllLinkObjectPropertiesExceptData.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Integration\TestData\Hal\AllLinkObjectProperties.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Integration\TestData\Hal\WormholeSample.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
