@@ -12,6 +12,8 @@ NOTE: THIS IS UNDER HEAVY DEV AND IS NOT READY TO BE USED YET
 
 This is the core library, containing Serializers and Hypermedia Representors.
 
+* [RepresentorBuilder][].
+
 #### Hypermedia format support
 
 ##### HAL+JSON
@@ -79,7 +81,7 @@ Spec | Support
 7.1.1.1. String values | ❌
 7.1.1.2. Link Object values | ❌
 
-The HALE+JSON Serializer is not complete. Likely 5.2 Contraint Properties will be implemented next.
+The HALE+JSON Serializer is not complete. Likely 5.2 Constraint Properties will be implemented next.
 
 ##### Other formats
 
@@ -98,3 +100,4 @@ Copyright (c) 2014 Medidata Solutions Worldwide. Licensed under MIT. See [LICENS
 
 [CONTRIBUTING]: CONTRIBUTING.md
 [LICENSE]: LICENSE.md
+[RepresentorBuilder]: docs/representor_builder.md

@@ -24,6 +24,12 @@ namespace Crichton.Representors.Tests.Serializers
         }
 
         [Test]
+        public void HasCorrectContentType()
+        {
+            Assert.AreEqual("application/hal+json", sut.ContentType);
+        }
+
+        [Test]
         public void Serialize_SelfLinkIsSet()
         {
             var representor = Fixture.Create<CrichtonRepresentor>();

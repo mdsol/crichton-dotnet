@@ -10,6 +10,8 @@ namespace Crichton.Representors.Serializers
         private static readonly string[] ReservedAttributes = {"_links", "_embedded"};
         private static readonly string[] ReservedLinkRels = {"self"};
 
+        public virtual string ContentType { get { return "application/hal+json"; } }
+
         public string Serialize(CrichtonRepresentor representor)
         {
             var jObject = CreateJObjectForRepresentor(representor);
