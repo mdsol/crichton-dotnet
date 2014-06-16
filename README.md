@@ -96,6 +96,7 @@ Copyright (c) 2014 Medidata Solutions Worldwide. Licensed under MIT. See [LICENS
 ## Authors
 
 * [Ed Andersen](https://github.com/edandersen) - [@edandersen](https://twitter.com/edandersen)
+* [Kenya Matsumoto](https://github.com/kenyamat)
 * Based on the work by [Mark W. Foster](https://github.com/fosdev)
 
 [CONTRIBUTING]: CONTRIBUTING.md
