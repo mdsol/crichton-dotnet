@@ -14,6 +14,11 @@ namespace Crichton.Representors.Serializers
 
         public string Serialize(CrichtonRepresentor representor)
         {
+            if (representor == null)
+            {
+                throw new ArgumentNullException("representor");
+            }
+
             var jObject = CreateJObjectForRepresentor(representor);
 
             return jObject.ToString();
@@ -99,7 +104,7 @@ namespace Crichton.Representors.Serializers
             }
         }
 
-        public virtual JObject CreateLinkObjectFromTransition(CrichtonTransition transition)
+        protected virtual JObject CreateLinkObjectFromTransition(CrichtonTransition transition)
         {
             var linkObject = new JObject { { "href", transition.Uri } };
             if (!String.IsNullOrWhiteSpace(transition.Title)) linkObject["title"] = transition.Title;
@@ -115,6 +120,16 @@ namespace Crichton.Representors.Serializers
 
         public IRepresentorBuilder DeserializeToNewBuilder(string message, Func<IRepresentorBuilder> builderFactoryMethod)
         {
+            if (message == null)
+            {
+                throw new ArgumentNullException("message");
+            }
+
+            if (builderFactoryMethod == null)
+            {
+                throw new ArgumentNullException("builderFactoryMethod");
+            }
+
             var document = JObject.Parse(message);
 
             var builder = BuildRepresentorBuilderFromJObject(builderFactoryMethod, document);
@@ -218,7 +233,7 @@ namespace Crichton.Representors.Serializers
             }
         }
 
-        public virtual CrichtonTransition GetTransitionFromLinkObject(JToken link, string rel)
+        protected virtual CrichtonTransition GetTransitionFromLinkObject(JToken link, string rel)
         {
             var href = link["href"];
             var title = link["title"];

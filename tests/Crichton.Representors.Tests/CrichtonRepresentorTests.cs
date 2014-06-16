@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using System;
+using FluentAssertions;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using Ploeh.AutoFixture;
@@ -40,6 +41,13 @@ namespace Crichton.Representors.Tests
                 Assert.AreEqual(expectedJObject[property.Name], sut.Attributes[property.Name]);
             }
 
+        }
+
+        [Test]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void SetAttributesFromObject_SetsAttributesWithNull()
+        {
+            sut.SetAttributesFromObject(null);
         }
 
         [Test]

@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
@@ -42,6 +39,13 @@ namespace Crichton.Representors.Tests
         }
 
         [Test]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void SetSelfLink_SetsSelfLinkWithNull()
+        {
+            sut.SetSelfLink(null);
+        }
+
+        [Test]
         public void SetAttributes_SetsRepresentorAttributes()
         {
             var attributes = new JObject();
@@ -49,6 +53,13 @@ namespace Crichton.Representors.Tests
             var result = sut.ToRepresentor();
 
             Assert.AreEqual(attributes, result.Attributes);
+        }
+
+        [Test]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void SetAttributes_SetsRepresentorAttributesWithNull()
+        {
+            sut.SetAttributes(null);
         }
 
         [Test]
@@ -68,6 +79,13 @@ namespace Crichton.Representors.Tests
         }
 
         [Test]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void SetAttributesFromObject_SetsDataWithNull()
+        {
+            sut.SetAttributesFromObject(null);
+        }
+
+        [Test]
         public void AddTransition_AddsCrichtonTransitionObjectOnce()
         {
             var transition = Fixture.Create<CrichtonTransition>();
@@ -77,6 +95,13 @@ namespace Crichton.Representors.Tests
 
             Assert.IsNotNull(result.Transitions.SingleOrDefault(t => t == transition));
 
+        }
+
+        [Test]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void AddTransition_AddsTransitionWithNull()
+        {
+            sut.AddTransition(null);
         }
 
         [Test]
@@ -90,6 +115,15 @@ namespace Crichton.Representors.Tests
 
             result.Transitions.Should().ContainSingle(t => t.Rel == rel && t.Uri == uri);
 
+        }
+
+        [Test]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void AddTransition_AddsRelWithNull()
+        {
+            var uri = Fixture.Create<string>();
+
+            sut.AddTransition(null, uri);
         }
 
         [Test]
@@ -194,6 +228,24 @@ namespace Crichton.Representors.Tests
         }
 
         [Test]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void AddEmbeddedResource_AddsKeyWithNull()
+        {
+            var resource = Fixture.Create<CrichtonRepresentor>();
+
+            sut.AddEmbeddedResource(null, resource);
+        }
+
+        [Test]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void AddEmbeddedResource_AddsEmbeddedWithNull()
+        {
+            var key = Fixture.Create<string>();
+
+            sut.AddEmbeddedResource(key, null);
+        }
+
+        [Test]
         public void SetCollection_SetsCollectionDataWithSelfLinks()
         {
             var examples = Fixture.Create<IList<ExampleDataObject>>();
@@ -211,6 +263,24 @@ namespace Crichton.Representors.Tests
         }
 
         [Test]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void SetCollection_SetsCollectionWithNull()
+        {
+            Func<ExampleDataObject, string> selfLinkFunc = e => "self-link-" + e.Id;
+
+            sut.SetCollection(null, selfLinkFunc);
+        }
+
+        [Test]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void SetCollection_SetsSelfLinkFuncWithNull()
+        {
+            var examples = Fixture.Create<IList<ExampleDataObject>>();
+
+            sut.SetCollection(examples, null);
+        }
+
+        [Test]
         public void SetCollection_SetsRepresentors()
         {
             var representors = Fixture.CreateMany<CrichtonRepresentor>().ToList();
@@ -220,6 +290,13 @@ namespace Crichton.Representors.Tests
             var result = sut.ToRepresentor();
 
             CollectionAssert.AreEquivalent(representors, result.Collection);
+        }
+
+        [Test]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void SetCollection_SetsRepresentorsWithNull()
+        {
+            sut.SetCollection(null);
         }
     }
 }

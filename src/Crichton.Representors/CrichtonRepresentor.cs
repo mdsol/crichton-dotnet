@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 
 namespace Crichton.Representors
@@ -29,6 +30,11 @@ namespace Crichton.Representors
 
         public void SetAttributesFromObject(object data)
         {
+            if (data == null)
+            {
+                throw new ArgumentNullException("data");
+            }
+
             Attributes = JObject.FromObject(data);
         }
     }

@@ -248,6 +248,13 @@ namespace Crichton.Representors.Tests.Serializers
         }
 
         [Test]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void Serialize_SetsRepresentorWithNull()
+        {
+            sut.Serialize(null);
+        }
+
+        [Test]
         public void DeserializeToNewBuilder_SetsSelfLinkOnBuilder()
         {
             var href = Fixture.Create<string>();
@@ -689,6 +696,30 @@ namespace Crichton.Representors.Tests.Serializers
 
             Assert.AreEqual(1, calledCollection.Count());
 
+        }
+
+        [Test]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void DeserializeToNewBuilder_SetsMessageWithNull()
+        {
+            sut.DeserializeToNewBuilder(null, builderFactoryMethod);
+        }
+
+        [Test]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void DeserializeToNewBuilder_SetsMethodWithNull()
+        {
+            var href = Fixture.Create<string>();
+            var json = @"
+            {{
+                ""_links"": {{
+                    ""self"": {{
+                        ""href"": ""{0}""
+                                }}
+                }}
+            }}";
+
+            var builder = sut.DeserializeToNewBuilder(json, null);
         }
 
     }
