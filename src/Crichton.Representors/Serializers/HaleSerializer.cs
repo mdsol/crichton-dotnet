@@ -13,7 +13,7 @@ namespace Crichton.Representors.Serializers
 
         public override string ContentType { get { return "application/vnd.hale+json"; } }
 
-        public override JObject CreateLinkObjectFromTransition(CrichtonTransition transition)
+        protected override JObject CreateLinkObjectFromTransition(CrichtonTransition transition)
         {
             var linkObject = base.CreateLinkObjectFromTransition(transition);
 
@@ -116,7 +116,7 @@ namespace Crichton.Representors.Serializers
             }
         }
 
-        public override CrichtonTransition GetTransitionFromLinkObject(JToken link, string rel)
+        protected override CrichtonTransition GetTransitionFromLinkObject(JToken link, string rel)
         {
             var transition = base.GetTransitionFromLinkObject(link, rel);
 
