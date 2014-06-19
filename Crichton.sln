@@ -30,6 +30,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{33AC81D7-2
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crichton.Representors.Benchmark", "tools\Crichton.Representors.Benchmark\Crichton.Representors.Benchmark.csproj", "{301AA1A7-7891-4794-9EC4-6F915740BE47}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{305C89FD-C818-492E-B304-206871804593}"
+	ProjectSection(SolutionItems) = preProject
+		benchmark.bat = benchmark.bat
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,5 +56,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{301AA1A7-7891-4794-9EC4-6F915740BE47} = {305C89FD-C818-492E-B304-206871804593}
 	EndGlobalSection
 EndGlobal
