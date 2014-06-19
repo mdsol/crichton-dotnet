@@ -14,4 +14,4 @@ Sample command:
     Crichton.Representors.Benchmark.exe deserializer --filepath "tests\Crichton.Representors.Tests\Integration\TestData\Hal\AllLinkObjectProperties.json"
 ```
 
-You can find a sample batch file(run.bat) in the project root.
+You can find a sample batch file(benchmark.bat) in the project root.
