@@ -35,6 +35,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{305C89FD
 		benchmark.bat = benchmark.bat
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crichton.Client", "src\Crichton.Client\Crichton.Client.csproj", "{1903F029-4111-4E17-8224-012F46D269F5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crichton.Client.Tests", "tests\Crichton.Client.Tests\Crichton.Client.Tests.csproj", "{09B73237-4871-43A8-9335-C47288163F74}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -53,6 +57,14 @@ Global
 		{301AA1A7-7891-4794-9EC4-6F915740BE47}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{301AA1A7-7891-4794-9EC4-6F915740BE47}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{301AA1A7-7891-4794-9EC4-6F915740BE47}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1903F029-4111-4E17-8224-012F46D269F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1903F029-4111-4E17-8224-012F46D269F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1903F029-4111-4E17-8224-012F46D269F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1903F029-4111-4E17-8224-012F46D269F5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{09B73237-4871-43A8-9335-C47288163F74}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09B73237-4871-43A8-9335-C47288163F74}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09B73237-4871-43A8-9335-C47288163F74}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{09B73237-4871-43A8-9335-C47288163F74}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

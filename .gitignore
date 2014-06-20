@@ -16,3 +16,7 @@ _NCrunch_Crichton/
 *.ncrunchproject
 *.ncrunchsolution.user
 samples/*
+tools*/bin/*
+docs/*.html
+tools/*/bin/*
+tools/*/obj/*
