@@ -5,4 +5,3 @@ set MSBuildDirPath=C:\Windows\Microsoft.NET\Framework\v4.0.30319\
 
 tools\Crichton.Representors.Benchmark\bin\Release\Crichton.Representors.Benchmark.exe deserializer ^
     --iterations 5 --filepath tests\Crichton.Representors.Tests\Integration\TestData\Hal\AllLinkObjectProperties.json
-pause
