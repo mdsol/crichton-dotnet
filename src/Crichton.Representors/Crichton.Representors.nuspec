@@ -4,7 +4,7 @@
     <id>Crichton.Representors</id>
     <title>Crichton Hypermedia Representors</title>
     <version>0.1.6-alpha</version> <!-- why not just use $version$? Because NuGet 2.8.1 has a bug with PCLs: https://nuget.codeplex.com/workitem/4013 -->
-    <authors>Ed Andersen</authors>
+    <authors>Ed Andersen, Kenya Matsumoto</authors>
     <copyright>Medidata Solutions</copyright>
     <licenseUrl>https://github.com/mdsol/crichton-dotnet/blob/develop/LICENSE.md</licenseUrl>
     <projectUrl>https://github.com/mdsol/crichton-dotnet</projectUrl>
