@@ -17,7 +17,6 @@ using System.Security;
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: NeutralResourcesLanguage("en")]
-[assembly: AllowPartiallyTrustedCallers]
 
 // Version information for an assembly consists of the following four values:
 //
