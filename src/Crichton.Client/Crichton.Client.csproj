@@ -49,9 +49,14 @@
     <Compile Include="CrichtonClient.cs" />
     <Compile Include="HypermediaQuery.cs" />
     <Compile Include="IHypermediaQuery.cs" />
-    <Compile Include="IQueryStep.cs" />
+    <Compile Include="QuerySteps\IQueryStep.cs" />
     <Compile Include="ITransitionRequestor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QuerySteps\NavigateToRelativeUrlQueryStep.cs" />
+    <Compile Include="QuerySteps\NavigateToRepresentorQueryStep.cs" />
+    <Compile Include="QuerySteps\NavigateToSelfLinkQueryStep.cs" />
+    <Compile Include="QuerySteps\NavigateToTransitionQueryStep.cs" />
+    <Compile Include="QuerySteps\PostToTransitionQueryStep.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Threading.Tasks">

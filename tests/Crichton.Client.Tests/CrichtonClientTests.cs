@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Crichton.Client.QuerySteps;
 using Crichton.Representors;
 using Crichton.Representors.Serializers;
 using NUnit.Framework;
@@ -65,6 +67,18 @@ namespace Crichton.Client.Tests
             var result = await sut.ExecuteQueryAsync(query);
 
             Assert.AreEqual(representor, result);
+        }
+
+        [Test]
+        public async Task CreateQuery_SetsFirstStepAsNavigateToRepresentorQueryStep()
+        {
+            var representor = Fixture.Create<CrichtonRepresentor>();
+            var result = sut.CreateQuery(representor);
+
+            var step = (NavigateToRepresentorQueryStep)result.Steps.Single();
+
+            Assert.AreEqual(representor, await step.ExecuteAsync(null,null));
+            
         }
 
     }
