@@ -48,6 +48,9 @@
   <ItemGroup>
     <Compile Include="CrichtonClient.cs" />
     <Compile Include="HypermediaQuery.cs" />
+    <Compile Include="IHypermediaQuery.cs" />
+    <Compile Include="IQueryStep.cs" />
+    <Compile Include="ITransitionRequestor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
