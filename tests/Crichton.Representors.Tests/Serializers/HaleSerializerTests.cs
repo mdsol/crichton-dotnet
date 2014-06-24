@@ -169,6 +169,23 @@ namespace Crichton.Representors.Tests.Serializers
                 foreach (var attribute in transition.Attributes)
                 {
                     Assert.AreEqual(attribute.Value.JsonType, result["_links"][transition.Rel]["data"][attribute.Key]["type"].Value<string>());
+
+                    var attr = result["_links"][transition.Rel]["data"][attribute.Key];
+                    var options = attr["options"].Values<string>().ToList();
+
+                    Assert.AreEqual(attribute.Value.Constraint.Options.Count, options.Count);
+                    for (int i = 0; i < attribute.Value.Constraint.Options.Count; i++)
+                    {
+                        Assert.AreEqual(attribute.Value.Constraint.Options[i], options[i]);
+                    }
+
+                    Assert.AreEqual(attribute.Value.Constraint.IsIn, attr["in"].Value<bool?>());
+                    Assert.AreEqual(attribute.Value.Constraint.Min, attr["min"].Value<int?>());
+                    Assert.AreEqual(attribute.Value.Constraint.MinLength, attr["minlength"].Value<int?>());
+                    Assert.AreEqual(attribute.Value.Constraint.Max, attr["max"].Value<int?>());
+                    Assert.AreEqual(attribute.Value.Constraint.MaxLength, attr["maxlength"].Value<int?>());
+                    Assert.AreEqual(attribute.Value.Constraint.IsMulti, attr["multi"].Value<bool?>());
+                    Assert.AreEqual(attribute.Value.Constraint.IsRequired, attr["required"].Value<bool?>());
                 }
             }
         }
@@ -774,6 +791,86 @@ namespace Crichton.Representors.Tests.Serializers
             Assert.AreEqual(profile, transition.Attributes[attributeName].Parameters[nestedAttributeName].ProfileUri);
             Assert.AreEqual(profile, transition.Attributes[attributeName].Attributes[nestedAttributeName].ProfileUri);
       
+        }
+
+        [Test]
+        public void DeserializeToNewBuilder_DeserializeWithAllConstraints()
+        {
+            var option0 = Fixture.Create<string>();
+            var option1 = Fixture.Create<string>();
+            var isIn = Fixture.Create<bool>().ToString().ToLower();
+            var min = Fixture.Create<int>();
+            var minLength = Fixture.Create<int>();
+            var max = Fixture.Create<int>();
+            var maxLength = Fixture.Create<int>();
+            var pattern = Fixture.Create<string>();
+            var isMulti = Fixture.Create<bool>().ToString().ToLower();
+            var isRequired = Fixture.Create<bool>().ToString().ToLower();
+            var json = @"
+            {{
+                ""_links"": {{
+                    ""edit"": {{ 
+                        ""href"" : ""../{{?user_id}}"", 
+                        ""data"" : {{
+                            ""send_info"" : {{
+                                ""options"" : [ ""{0}"", ""{1}"" ],
+                                ""in"" : {2},
+                                ""min"" : {3},
+                                ""minlength"" : {4},
+                                ""max"" : {5},
+                                ""maxlength"" : {6},
+                                ""pattern"" : ""{7}"",
+                                ""multi"" : {8},
+                                ""required"" : {9}
+                            }}
+                        }}
+                    }} 
+                }}
+            }}";
+
+            json = String.Format(json, option0, option1, isIn, min, minLength, max, maxLength, pattern, isMulti, isRequired);
+
+            var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
+
+            var transition = (CrichtonTransition)(builder.GetArgumentsForCallsMadeOn(b => b.AddTransition(null))[0].First());
+            var constraints = transition.Attributes.First().Value.Constraint;
+
+            Assert.AreEqual(2, constraints.Options.Count);
+            Assert.AreEqual(option0, constraints.Options[0]);
+            Assert.AreEqual(option1, constraints.Options[1]);
+            Assert.AreEqual(isIn, constraints.IsIn.ToString().ToLower());
+            Assert.AreEqual(min, constraints.Min);
+            Assert.AreEqual(minLength, constraints.MinLength);
+            Assert.AreEqual(max, constraints.Max);
+            Assert.AreEqual(maxLength, constraints.MaxLength);
+            Assert.AreEqual(pattern, constraints.Pattern);
+            Assert.AreEqual(isMulti, constraints.IsMulti.ToString().ToLower());
+            Assert.AreEqual(isRequired, constraints.IsRequired.ToString().ToLower());
+        }
+
+        [Test]
+        public void DeserializeToNewBuilder_DeserializeConstraintsWithEmptyOptions()
+        {
+            var json = @"
+            {
+                ""_links"": {
+                    ""edit"": { 
+                        ""href"" : ""../{?user_id}"", 
+                        ""data"" : {
+                            ""send_info"" : {
+                                ""options"" : [],
+                            }
+                        }
+                    }
+                }
+            }";
+
+            var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
+
+            var transition = (CrichtonTransition)(builder.GetArgumentsForCallsMadeOn(b => b.AddTransition(null))[0].First());
+            var constraints = transition.Attributes.First().Value.Constraint;
+
+            Assert.AreEqual(0, constraints.Options.Count);
         }
     }
 }
