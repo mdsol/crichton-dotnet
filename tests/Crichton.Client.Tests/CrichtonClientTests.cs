@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Net.Http;
+using System.Threading.Tasks;
+using Crichton.Representors;
 using Crichton.Representors.Serializers;
 using NUnit.Framework;
+using Ploeh.AutoFixture;
 using Rhino.Mocks;
 
 namespace Crichton.Client.Tests
@@ -42,5 +45,27 @@ namespace Crichton.Client.Tests
         {
             Assert.AreEqual(serializer, sut.Serializer);
         }
+
+        [Test]
+        public void CreateQuery_ReturnsNewInstanceOfHypermediaQuery()
+        {
+            var result = sut.CreateQuery();
+
+            Assert.IsInstanceOf<HypermediaQuery>(result);
+        }
+
+        [Test]
+        public async Task ExecuteQueryAsync_ExecutesTheQueryAndReturnsTheResult()
+        {
+            var query = MockRepository.GenerateMock<IHypermediaQuery>();
+            var representor = Fixture.Create<CrichtonRepresentor>();
+
+            query.Stub(q => q.ExecuteAsync(sut)).Return(Task.FromResult(representor));
+
+            var result = await sut.ExecuteQueryAsync(query);
+
+            Assert.AreEqual(representor, result);
+        }
+
     }
 }
