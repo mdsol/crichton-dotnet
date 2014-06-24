@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Crichton.Client.QuerySteps;
 using Crichton.Representors;
 using Crichton.Representors.Serializers;
+using Newtonsoft.Json;
 
 namespace Crichton.Client
 {
@@ -40,9 +41,19 @@ namespace Crichton.Client
             return query.ExecuteAsync(this);
         }
 
-        public async Task<CrichtonRepresentor> RequestTransitionAsync(CrichtonTransition transition)
+        private async Task<CrichtonRepresentor> SendTransitionRequestAsync(CrichtonTransition transition,
+            HttpMethod httpMethod, object data)
         {
-            var requestMessage = new HttpRequestMessage(HttpMethod.Get, new Uri(transition.Uri, UriKind.RelativeOrAbsolute));
+            var requestMessage = new HttpRequestMessage
+            {
+                Method = httpMethod,
+                RequestUri = new Uri(transition.Uri, UriKind.RelativeOrAbsolute)
+            };
+
+            if (data != null)
+            {
+                requestMessage.Content = new StringContent(JsonConvert.SerializeObject(data));
+            }
 
             var result = await HttpClient.SendAsync(requestMessage);
 
@@ -53,9 +64,14 @@ namespace Crichton.Client
             return builder.ToRepresentor();
         }
 
-        public Task<CrichtonRepresentor> PostTransitionDataAsync(CrichtonTransition transition, object toSerializeToJson)
+        public Task<CrichtonRepresentor> RequestTransitionAsync(CrichtonTransition transition)
         {
-            throw new NotImplementedException();
+            return SendTransitionRequestAsync(transition, HttpMethod.Get, null);
+        }
+
+        public Task<CrichtonRepresentor> PostTransitionDataAsJsonAsync(CrichtonTransition transition, object toSerializeToJson)
+        {
+            return SendTransitionRequestAsync(transition, HttpMethod.Post, toSerializeToJson);
         }
     }
 }

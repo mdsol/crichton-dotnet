@@ -26,7 +26,7 @@ namespace Crichton.Client.QuerySteps
         {
             var transition = LocateTransition(currentRepresentor);
 
-            return transitionRequestor.PostTransitionDataAsync(transition, data);
+            return transitionRequestor.PostTransitionDataAsJsonAsync(transition, data);
         }
     }
 }

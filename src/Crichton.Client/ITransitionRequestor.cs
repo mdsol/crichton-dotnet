@@ -11,6 +11,6 @@ namespace Crichton.Client
     {
         Task<CrichtonRepresentor> RequestTransitionAsync(CrichtonTransition transition);
 
-        Task<CrichtonRepresentor> PostTransitionDataAsync(CrichtonTransition transition, object toSerializeToJson);
+        Task<CrichtonRepresentor> PostTransitionDataAsJsonAsync(CrichtonTransition transition, object toSerializeToJson);
     }
 }
