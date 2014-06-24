@@ -28,7 +28,6 @@ namespace Crichton.Client.Tests
             messageHandler = new FakeHttpMessageHandler();
             baseUri = new Uri("http://www.my-awesome-company.com");
             client = new HttpClient(messageHandler);
-            client.BaseAddress = baseUri;
             serializer = MockRepository.GenerateMock<ISerializer>();
 
             sut = new CrichtonClient(client, baseUri, serializer);
@@ -51,6 +50,12 @@ namespace Crichton.Client.Tests
         public void CTOR_SetsSerializer()
         {
             Assert.AreEqual(serializer, sut.Serializer);
+        }
+
+        [Test]
+        public void CTOR_SetsBaseUriOnHttpClient()
+        {
+            Assert.AreEqual(baseUri, client.BaseAddress);
         }
 
         [Test]

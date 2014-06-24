@@ -22,6 +22,8 @@ namespace Crichton.Client
             HttpClient = httpClient;
             Serializer = serializer;
             BaseUri = baseUri;
+
+            HttpClient.BaseAddress = baseUri;
         }
 
         public IHypermediaQuery CreateQuery()
