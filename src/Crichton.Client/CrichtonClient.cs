@@ -40,9 +40,17 @@ namespace Crichton.Client
             return query.ExecuteAsync(this);
         }
 
-        public Task<CrichtonRepresentor> RequestTransitionAsync(CrichtonTransition transition)
+        public async Task<CrichtonRepresentor> RequestTransitionAsync(CrichtonTransition transition)
         {
-            throw new NotImplementedException();
+            var requestMessage = new HttpRequestMessage(HttpMethod.Get, new Uri(transition.Uri, UriKind.RelativeOrAbsolute));
+
+            var result = await HttpClient.SendAsync(requestMessage);
+
+            var resultContentString = await result.Content.ReadAsStringAsync();
+
+            var builder = Serializer.DeserializeToNewBuilder(resultContentString, () => new RepresentorBuilder());
+
+            return builder.ToRepresentor();
         }
 
         public Task<CrichtonRepresentor> PostTransitionDataAsync(CrichtonTransition transition, object toSerializeToJson)
