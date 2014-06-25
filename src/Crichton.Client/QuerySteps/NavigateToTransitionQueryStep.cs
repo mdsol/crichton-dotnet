@@ -21,11 +21,11 @@ namespace Crichton.Client.QuerySteps
             selectionFunc = transitionSelectionFunc;
         }
 
-        public Task<CrichtonRepresentor> ExecuteAsync(CrichtonRepresentor currentRepresentor, ITransitionRequestor transitionRequestor)
+        public Task<CrichtonRepresentor> ExecuteAsync(CrichtonRepresentor currentRepresentor, ITransitionRequestHandler transitionRequestHandler)
         {
             var transition = LocateTransition(currentRepresentor);
 
-            return transitionRequestor.RequestTransitionAsync(transition);
+            return transitionRequestHandler.RequestTransitionAsync(transition);
         }
 
         internal CrichtonTransition LocateTransition(CrichtonRepresentor currentRepresentor)

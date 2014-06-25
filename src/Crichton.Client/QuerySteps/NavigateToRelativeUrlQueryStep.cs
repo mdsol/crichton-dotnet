@@ -16,10 +16,10 @@ namespace Crichton.Client.QuerySteps
             this.url = url;
         }
 
-        public Task<CrichtonRepresentor> ExecuteAsync(CrichtonRepresentor currentRepresentor, ITransitionRequestor transitionRequestor)
+        public Task<CrichtonRepresentor> ExecuteAsync(CrichtonRepresentor currentRepresentor, ITransitionRequestHandler transitionRequestHandler)
         {
             var transition = new CrichtonTransition() {Uri = url};
-            return transitionRequestor.RequestTransitionAsync(transition);
+            return transitionRequestHandler.RequestTransitionAsync(transition);
         }
     }
 }

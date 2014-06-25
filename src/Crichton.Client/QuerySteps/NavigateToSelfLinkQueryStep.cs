@@ -9,11 +9,11 @@ namespace Crichton.Client.QuerySteps
 {
     public class NavigateToSelfLinkQueryStep : IQueryStep
     {
-        public Task<CrichtonRepresentor> ExecuteAsync(CrichtonRepresentor currentRepresentor, ITransitionRequestor transitionRequestor)
+        public Task<CrichtonRepresentor> ExecuteAsync(CrichtonRepresentor currentRepresentor, ITransitionRequestHandler transitionRequestHandler)
         {
             var selfTransition = new CrichtonTransition() {Uri = currentRepresentor.SelfLink};
 
-            return transitionRequestor.RequestTransitionAsync(selfTransition);
+            return transitionRequestHandler.RequestTransitionAsync(selfTransition);
         }
     }
 }

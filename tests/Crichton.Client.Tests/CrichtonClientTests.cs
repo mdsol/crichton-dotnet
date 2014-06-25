@@ -21,6 +21,7 @@ namespace Crichton.Client.Tests
         private FakeHttpMessageHandler messageHandler;
         private Uri baseUri;
         private ISerializer serializer;
+        private ITransitionRequestHandler requestHandler;
 
         [SetUp]
         public void Init()
@@ -29,33 +30,23 @@ namespace Crichton.Client.Tests
             baseUri = new Uri("http://www.my-awesome-company.com");
             client = new HttpClient(messageHandler);
             serializer = MockRepository.GenerateMock<ISerializer>();
+            requestHandler = MockRepository.GenerateMock<ITransitionRequestHandler>();
 
-            sut = new CrichtonClient(client, baseUri, serializer);
+            sut = new CrichtonClient(requestHandler);
             Fixture = GetFixture();
         }
 
         [Test]
-        public void CTOR_SetsHttpClient()
+        public void CTOR_SetsTransitionRequestHandler()
         {
-            Assert.AreEqual(client, sut.HttpClient);
+            Assert.AreEqual(requestHandler, sut.TransitionRequestHandler);
         }
 
         [Test]
-        public void CTOR_SetsBaseUri()
+        public void CTOR_SetsHttpClientTransitionRequestHandlerWhenNotSpecified()
         {
-            Assert.AreEqual(baseUri, sut.BaseUri);
-        }
-
-        [Test]
-        public void CTOR_SetsSerializer()
-        {
-            Assert.AreEqual(serializer, sut.Serializer);
-        }
-
-        [Test]
-        public void CTOR_SetsBaseUriOnHttpClient()
-        {
-            Assert.AreEqual(baseUri, client.BaseAddress);
+            sut = new CrichtonClient(baseUri, serializer);
+            Assert.IsInstanceOf<HttpClientTransitionRequestHandler>(sut.TransitionRequestHandler);
         }
 
         [Test]
@@ -72,7 +63,7 @@ namespace Crichton.Client.Tests
             var query = MockRepository.GenerateMock<IHypermediaQuery>();
             var representor = Fixture.Create<CrichtonRepresentor>();
 
-            query.Stub(q => q.ExecuteAsync(sut)).Return(Task.FromResult(representor));
+            query.Stub(q => q.ExecuteAsync(requestHandler)).Return(Task.FromResult(representor));
 
             var result = await sut.ExecuteQueryAsync(query);
 
@@ -89,56 +80,6 @@ namespace Crichton.Client.Tests
 
             Assert.AreEqual(representor, await step.ExecuteAsync(null,null));
             
-        }
-
-        [Test]
-        public async Task RequestTransitionAsync_CallsSendAsyncWithRequestMessageForSimpleTransition()
-        {
-            const string relativeUri = "api/sausages/1";
-            var transition = new CrichtonTransition {Uri = relativeUri};
-            var representorResult = Fixture.Create<CrichtonRepresentor>();
-            var representorAsJson = Fixture.Create<string>();
-            var representorBuilder = MockRepository.GenerateMock<IRepresentorBuilder>();
-            representorBuilder.Stub(r => r.ToRepresentor()).Return(representorResult);
-            serializer.Stub(
-                s =>
-                    s.DeserializeToNewBuilder(Arg<string>.Is.Equal(representorAsJson),
-                        Arg<Func<IRepresentorBuilder>>.Is.Anything)).IgnoreArguments().Return(representorBuilder);
-
-            var combinedUrl = new Uri(baseUri + relativeUri, UriKind.RelativeOrAbsolute);
-
-            messageHandler.Condition = m => m.Method == HttpMethod.Get && m.RequestUri == combinedUrl;
-            messageHandler.Response = representorAsJson;
-            messageHandler.ResponseStatusCode = HttpStatusCode.OK;
-
-            var result = await sut.RequestTransitionAsync(transition);
-
-            Assert.AreEqual(representorResult, result);
-        }
-
-        [Test]
-        public async Task PostTransitionDataAsJsonAsync_PostsJsonRepresentationOfObject()
-        {
-            var testObject = new {id = 2, name = "bratwurst"};
-            var testObjectJson = JsonConvert.SerializeObject(testObject);
-
-            const string relativeUri = "api/sausages";
-            var transition = new CrichtonTransition { Uri = relativeUri };
-            var representorResult = Fixture.Create<CrichtonRepresentor>();
-            var representorAsJson = Fixture.Create<string>();
-            var representorBuilder = MockRepository.GenerateMock<IRepresentorBuilder>();
-            representorBuilder.Stub(r => r.ToRepresentor()).Return(representorResult);
-            serializer.Stub(s => s.DeserializeToNewBuilder(Arg<string>.Is.Equal(representorAsJson), Arg<Func<IRepresentorBuilder>>.Is.Anything)).IgnoreArguments().Return(representorBuilder);
-
-            var combinedUrl = new Uri(baseUri + relativeUri, UriKind.RelativeOrAbsolute);
-
-            messageHandler.Condition = m => m.Method == HttpMethod.Post && m.RequestUri == combinedUrl && m.Content.ReadAsStringAsync().Result == testObjectJson;
-            messageHandler.Response = representorAsJson;
-            messageHandler.ResponseStatusCode = HttpStatusCode.OK;
-
-            var result = await sut.PostTransitionDataAsJsonAsync(transition, testObject);
-
-            Assert.AreEqual(representorResult, result);
         }
 
     }

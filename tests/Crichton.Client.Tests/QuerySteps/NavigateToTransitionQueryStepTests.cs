@@ -27,7 +27,7 @@ namespace Crichton.Client.Tests.QuerySteps
             var transition = representor.Transitions.First();
             var rel = transition.Rel;
 
-            var requestor = MockRepository.GenerateMock<ITransitionRequestor>();
+            var requestor = MockRepository.GenerateMock<ITransitionRequestHandler>();
             requestor.Stub(r => r.RequestTransitionAsync(transition)).Return(Task.FromResult(expected));
 
             var sut = new NavigateToTransitionQueryStep(rel);
@@ -49,7 +49,7 @@ namespace Crichton.Client.Tests.QuerySteps
             transition.Rel = rel;
             transition.Name = name;
 
-            var requestor = MockRepository.GenerateMock<ITransitionRequestor>();
+            var requestor = MockRepository.GenerateMock<ITransitionRequestHandler>();
             requestor.Stub(r => r.RequestTransitionAsync(transition)).Return(Task.FromResult(expected));
 
             var sut = new NavigateToTransitionQueryStep(t => t.Rel == rel && t.Name == name);

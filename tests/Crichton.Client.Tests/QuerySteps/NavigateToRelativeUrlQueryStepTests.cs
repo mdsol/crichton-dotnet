@@ -26,8 +26,8 @@ namespace Crichton.Client.Tests.QuerySteps
             var expected = Fixture.Create<CrichtonRepresentor>();
             var url = Fixture.Create<string>();
 
-            var requestor = MockRepository.GenerateMock<ITransitionRequestor>();
-            requestor.Stub(r => r.RequestTransitionAsync(Arg<CrichtonTransition>.Matches(t => t.Uri ==url))).Return(Task.FromResult(expected));
+            var requestor = MockRepository.GenerateMock<ITransitionRequestHandler>();
+            requestor.Stub(r => r.RequestTransitionAsync(Arg<CrichtonTransition>.Matches(t => t.Uri == url), Arg<object>.Is.Null)).Return(Task.FromResult(expected));
 
             var sut = new NavigateToRelativeUrlQueryStep(url);
 

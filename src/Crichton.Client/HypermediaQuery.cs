@@ -22,14 +22,14 @@ namespace Crichton.Client
             Steps.Add(step);
         }
 
-        public async Task<CrichtonRepresentor> ExecuteAsync(ITransitionRequestor requestor)
+        public async Task<CrichtonRepresentor> ExecuteAsync(ITransitionRequestHandler requestHandler)
         {
             CrichtonRepresentor representor = null;
 
             // ReSharper disable once LoopCanBeConvertedToQuery
             foreach (var step in Steps)
             {
-                representor = await step.ExecuteAsync(representor, requestor);
+                representor = await step.ExecuteAsync(representor, requestHandler);
             }
 
             return representor;

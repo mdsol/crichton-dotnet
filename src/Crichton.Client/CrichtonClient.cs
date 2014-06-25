@@ -11,19 +11,19 @@ using Newtonsoft.Json;
 
 namespace Crichton.Client
 {
-    public class CrichtonClient : ITransitionRequestor
+    public class CrichtonClient
     {
-        public HttpClient HttpClient { get; private set; }
-        public ISerializer Serializer { get; private set; }
-        public Uri BaseUri { get; private set; }
+        public ITransitionRequestHandler TransitionRequestHandler { get; private set; }
 
-        public CrichtonClient(HttpClient httpClient, Uri baseUri, ISerializer serializer)
+        public CrichtonClient(ITransitionRequestHandler transitionRequestHandler = null)
         {
-            HttpClient = httpClient;
-            Serializer = serializer;
-            BaseUri = baseUri;
+            TransitionRequestHandler = transitionRequestHandler;
+        }
 
-            HttpClient.BaseAddress = baseUri;
+        public CrichtonClient(Uri baseAddress, ISerializer serializer)
+        {
+            var httpClient = new HttpClient {BaseAddress = baseAddress};
+            TransitionRequestHandler = new HttpClientTransitionRequestHandler(httpClient, serializer);
         }
 
         public IHypermediaQuery CreateQuery()
@@ -40,40 +40,7 @@ namespace Crichton.Client
 
         public Task<CrichtonRepresentor> ExecuteQueryAsync(IHypermediaQuery query)
         {
-            return query.ExecuteAsync(this);
-        }
-
-        private async Task<CrichtonRepresentor> SendTransitionRequestAsync(CrichtonTransition transition,
-            HttpMethod httpMethod, object data)
-        {
-            var requestMessage = new HttpRequestMessage
-            {
-                Method = httpMethod,
-                RequestUri = new Uri(transition.Uri, UriKind.RelativeOrAbsolute)
-            };
-
-            if (data != null)
-            {
-                requestMessage.Content = new StringContent(JsonConvert.SerializeObject(data));
-            }
-
-            var result = await HttpClient.SendAsync(requestMessage);
-
-            var resultContentString = await result.Content.ReadAsStringAsync();
-
-            var builder = Serializer.DeserializeToNewBuilder(resultContentString, () => new RepresentorBuilder());
-
-            return builder.ToRepresentor();
-        }
-
-        public Task<CrichtonRepresentor> RequestTransitionAsync(CrichtonTransition transition)
-        {
-            return SendTransitionRequestAsync(transition, HttpMethod.Get, null);
-        }
-
-        public Task<CrichtonRepresentor> PostTransitionDataAsJsonAsync(CrichtonTransition transition, object toSerializeToJson)
-        {
-            return SendTransitionRequestAsync(transition, HttpMethod.Post, toSerializeToJson);
+            return query.ExecuteAsync(TransitionRequestHandler);
         }
     }
 }

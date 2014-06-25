@@ -22,11 +22,11 @@ namespace Crichton.Client.QuerySteps
             this.data = data;
         }
 
-        public Task<CrichtonRepresentor> ExecuteAsync(CrichtonRepresentor currentRepresentor, ITransitionRequestor transitionRequestor)
+        public Task<CrichtonRepresentor> ExecuteAsync(CrichtonRepresentor currentRepresentor, ITransitionRequestHandler transitionRequestHandler)
         {
             var transition = LocateTransition(currentRepresentor);
 
-            return transitionRequestor.PostTransitionDataAsJsonAsync(transition, data);
+            return transitionRequestHandler.RequestTransitionAsync(transition, data);
         }
     }
 }

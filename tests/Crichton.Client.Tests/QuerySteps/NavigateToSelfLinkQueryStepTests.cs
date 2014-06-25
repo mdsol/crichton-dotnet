@@ -25,8 +25,8 @@ namespace Crichton.Client.Tests.QuerySteps
             var representor = Fixture.Create<CrichtonRepresentor>();
             var expected = Fixture.Create<CrichtonRepresentor>();
 
-            var requestor = MockRepository.GenerateMock<ITransitionRequestor>();
-            requestor.Stub(r => r.RequestTransitionAsync(Arg<CrichtonTransition>.Matches(t => t.Uri == representor.SelfLink))).Return(Task.FromResult(expected));
+            var requestor = MockRepository.GenerateMock<ITransitionRequestHandler>();
+            requestor.Stub(r => r.RequestTransitionAsync(Arg<CrichtonTransition>.Matches(t => t.Uri == representor.SelfLink), Arg<object>.Is.Null)).Return(Task.FromResult(expected));
 
             var sut = new NavigateToSelfLinkQueryStep();
 

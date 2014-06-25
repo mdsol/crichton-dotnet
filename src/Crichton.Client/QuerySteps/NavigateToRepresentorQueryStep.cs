@@ -16,7 +16,7 @@ namespace Crichton.Client.QuerySteps
             this.representor = representor;
         }
 
-        public async Task<CrichtonRepresentor> ExecuteAsync(CrichtonRepresentor currentRepresentor, ITransitionRequestor transitionRequestor)
+        public async Task<CrichtonRepresentor> ExecuteAsync(CrichtonRepresentor currentRepresentor, ITransitionRequestHandler transitionRequestHandler)
         {
             return representor;
         }
