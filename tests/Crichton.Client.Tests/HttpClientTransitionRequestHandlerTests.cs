@@ -93,5 +93,31 @@ namespace Crichton.Client.Tests
 
             Assert.AreEqual(representorResult, result);
         }
+
+        [Test]
+        public async Task RequestTransitionAsync_SupportsCustomHttpMethodInTransition()
+        {
+            const string relativeUri = "api/sausages/1";
+            const string httpMethod = "Put";
+            var transition = new CrichtonTransition { Uri = relativeUri, Methods = new []{httpMethod} };
+            var representorResult = Fixture.Create<CrichtonRepresentor>();
+            var representorAsJson = Fixture.Create<string>();
+            var representorBuilder = MockRepository.GenerateMock<IRepresentorBuilder>();
+            representorBuilder.Stub(r => r.ToRepresentor()).Return(representorResult);
+            serializer.Stub(
+                s =>
+                    s.DeserializeToNewBuilder(Arg<string>.Is.Equal(representorAsJson),
+                        Arg<Func<IRepresentorBuilder>>.Is.Anything)).IgnoreArguments().Return(representorBuilder);
+
+            var combinedUrl = new Uri(baseUri + relativeUri, UriKind.RelativeOrAbsolute);
+
+            messageHandler.Condition = m => m.Method == HttpMethod.Put && m.RequestUri == combinedUrl;
+            messageHandler.Response = representorAsJson;
+            messageHandler.ResponseStatusCode = HttpStatusCode.OK;
+
+            var result = await sut.RequestTransitionAsync(transition);
+
+            Assert.AreEqual(representorResult, result);
+        }
     }
 }
