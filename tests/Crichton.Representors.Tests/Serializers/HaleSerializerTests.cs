@@ -169,23 +169,6 @@ namespace Crichton.Representors.Tests.Serializers
                 foreach (var attribute in transition.Attributes)
                 {
                     Assert.AreEqual(attribute.Value.JsonType, result["_links"][transition.Rel]["data"][attribute.Key]["type"].Value<string>());
-
-                    var attr = result["_links"][transition.Rel]["data"][attribute.Key];
-                    var options = attr["options"].Values<string>().ToList();
-
-                    Assert.AreEqual(attribute.Value.Constraint.Options.Count, options.Count);
-                    for (int i = 0; i < attribute.Value.Constraint.Options.Count; i++)
-                    {
-                        Assert.AreEqual(attribute.Value.Constraint.Options[i], options[i]);
-                    }
-
-                    Assert.AreEqual(attribute.Value.Constraint.IsIn, attr["in"].Value<bool?>());
-                    Assert.AreEqual(attribute.Value.Constraint.Min, attr["min"].Value<int?>());
-                    Assert.AreEqual(attribute.Value.Constraint.MinLength, attr["minlength"].Value<int?>());
-                    Assert.AreEqual(attribute.Value.Constraint.Max, attr["max"].Value<int?>());
-                    Assert.AreEqual(attribute.Value.Constraint.MaxLength, attr["maxlength"].Value<int?>());
-                    Assert.AreEqual(attribute.Value.Constraint.IsMulti, attr["multi"].Value<bool?>());
-                    Assert.AreEqual(attribute.Value.Constraint.IsRequired, attr["required"].Value<bool?>());
                 }
             }
         }
