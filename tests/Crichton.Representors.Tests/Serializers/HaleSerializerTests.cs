@@ -169,6 +169,23 @@ namespace Crichton.Representors.Tests.Serializers
                 foreach (var attribute in transition.Attributes)
                 {
                     Assert.AreEqual(attribute.Value.JsonType, result["_links"][transition.Rel]["data"][attribute.Key]["type"].Value<string>());
+
+                    var attr = result["_links"][transition.Rel]["data"][attribute.Key];
+                    var options = attr["options"].Values<string>().ToList();
+
+                    Assert.AreEqual(attribute.Value.Constraint.Options.Count, options.Count);
+                    for (int i = 0; i < attribute.Value.Constraint.Options.Count; i++)
+                    {
+                        Assert.AreEqual(attribute.Value.Constraint.Options[i], options[i]);
+                    }
+
+                    Assert.AreEqual(attribute.Value.Constraint.IsIn, attr["in"].Value<bool?>());
+                    Assert.AreEqual(attribute.Value.Constraint.Min, attr["min"].Value<int?>());
+                    Assert.AreEqual(attribute.Value.Constraint.MinLength, attr["minlength"].Value<int?>());
+                    Assert.AreEqual(attribute.Value.Constraint.Max, attr["max"].Value<int?>());
+                    Assert.AreEqual(attribute.Value.Constraint.MaxLength, attr["maxlength"].Value<int?>());
+                    Assert.AreEqual(attribute.Value.Constraint.IsMulti, attr["multi"].Value<bool?>());
+                    Assert.AreEqual(attribute.Value.Constraint.IsRequired, attr["required"].Value<bool?>());
                 }
             }
         }
@@ -361,6 +378,282 @@ namespace Crichton.Representors.Tests.Serializers
                         Assert.AreEqual(nestedAttribute.Value.ProfileUri, token["profile"].Value<string>());
                         Assert.AreEqual("href", token["scope"].Value<string>());
                     }
+                }
+            }
+        }
+
+        [Test]
+        public void Serialize_AddsOptionsConstraintForEachTransition()
+        {
+            Func<CrichtonTransition> transitionFunc = () =>
+            {
+                var attributes = Fixture.Create<IDictionary<string, CrichtonTransitionAttribute>>();
+                foreach (var attribute in attributes)
+                {
+                    attribute.Value.Constraint = new CrichtonTransitionAttributeConstraint
+                    {
+                        Options = Fixture.Create<IList<string>>()
+                    };
+
+                }
+                return new CrichtonTransition() { Rel = Fixture.Create<string>(), Attributes = attributes };
+            };
+
+            var representor = GetRepresentorWithTransitions(transitionFunc);
+            var result = JObject.Parse(sut.Serialize(representor));
+
+            foreach (var transition in representor.Transitions)
+            {
+                foreach (var attribute in transition.Attributes)
+                {
+                    var attr = result["_links"][transition.Rel]["data"][attribute.Key];
+                    var options = attr["options"].Values<string>().ToList();
+
+                    Assert.AreEqual(attribute.Value.Constraint.Options.Count, options.Count);
+                    for (int i = 0; i < attribute.Value.Constraint.Options.Count; i++)
+                    {
+                        Assert.AreEqual(attribute.Value.Constraint.Options[i], options[i]);
+                    }
+                }
+            }
+        }
+
+        [Test]
+        public void Serialize_AddsInConstraintForEachTransition()
+        {
+            Func<CrichtonTransition> transitionFunc = () =>
+            {
+                var attributes = Fixture.Create<IDictionary<string, CrichtonTransitionAttribute>>();
+                foreach (var attribute in attributes)
+                {
+                    attribute.Value.Constraint = new CrichtonTransitionAttributeConstraint
+                    {
+                        IsIn = Fixture.Create<bool?>()
+                    };
+
+                }
+                return new CrichtonTransition() { Rel = Fixture.Create<string>(), Attributes = attributes };
+            };
+
+            var representor = GetRepresentorWithTransitions(transitionFunc);
+            var result = JObject.Parse(sut.Serialize(representor));
+
+            foreach (var transition in representor.Transitions)
+            {
+                foreach (var attribute in transition.Attributes)
+                {
+                    var token = result["_links"][transition.Rel]["data"][attribute.Key]["in"];
+                    Assert.AreEqual(attribute.Value.Constraint.IsIn, token.Value<bool?>());
+                }
+            }
+        }
+
+        [Test]
+        public void Serialize_AddsMinConstraintForEachTransition()
+        {
+            Func<CrichtonTransition> transitionFunc = () =>
+            {
+                var attributes = Fixture.Create<IDictionary<string, CrichtonTransitionAttribute>>();
+                foreach (var attribute in attributes)
+                {
+                    attribute.Value.Constraint = new CrichtonTransitionAttributeConstraint
+                    {
+                        Min = Fixture.Create<int?>()
+                    };
+
+                }
+                return new CrichtonTransition() { Rel = Fixture.Create<string>(), Attributes = attributes };
+            };
+
+            var representor = GetRepresentorWithTransitions(transitionFunc);
+            var result = JObject.Parse(sut.Serialize(representor));
+
+            foreach (var transition in representor.Transitions)
+            {
+                foreach (var attribute in transition.Attributes)
+                {
+                    var token = result["_links"][transition.Rel]["data"][attribute.Key]["min"];
+                    Assert.AreEqual(attribute.Value.Constraint.Min, token.Value<int?>());
+                }
+            }
+        }
+
+        [Test]
+        public void Serialize_AddsMinLengthConstraintForEachTransition()
+        {
+            Func<CrichtonTransition> transitionFunc = () =>
+            {
+                var attributes = Fixture.Create<IDictionary<string, CrichtonTransitionAttribute>>();
+                foreach (var attribute in attributes)
+                {
+                    attribute.Value.Constraint = new CrichtonTransitionAttributeConstraint
+                    {
+                        MinLength = Fixture.Create<int?>()
+                    };
+
+                }
+                return new CrichtonTransition() { Rel = Fixture.Create<string>(), Attributes = attributes };
+            };
+
+            var representor = GetRepresentorWithTransitions(transitionFunc);
+            var result = JObject.Parse(sut.Serialize(representor));
+
+            foreach (var transition in representor.Transitions)
+            {
+                foreach (var attribute in transition.Attributes)
+                {
+                    var token = result["_links"][transition.Rel]["data"][attribute.Key]["minlength"];
+                    Assert.AreEqual(attribute.Value.Constraint.MinLength, token.Value<int?>());
+                }
+            }
+        }
+
+        [Test]
+        public void Serialize_AddsMaxConstraintForEachTransition()
+        {
+            Func<CrichtonTransition> transitionFunc = () =>
+            {
+                var attributes = Fixture.Create<IDictionary<string, CrichtonTransitionAttribute>>();
+                foreach (var attribute in attributes)
+                {
+                    attribute.Value.Constraint = new CrichtonTransitionAttributeConstraint
+                    {
+                        Max = Fixture.Create<int?>()
+                    };
+
+                }
+                return new CrichtonTransition() { Rel = Fixture.Create<string>(), Attributes = attributes };
+            };
+
+            var representor = GetRepresentorWithTransitions(transitionFunc);
+            var result = JObject.Parse(sut.Serialize(representor));
+
+            foreach (var transition in representor.Transitions)
+            {
+                foreach (var attribute in transition.Attributes)
+                {
+                    var token = result["_links"][transition.Rel]["data"][attribute.Key]["max"];
+                    Assert.AreEqual(attribute.Value.Constraint.Max, token.Value<int?>());
+                }
+            }
+        }
+
+        [Test]
+        public void Serialize_AddsMaxLengthConstraintForEachTransition()
+        {
+            Func<CrichtonTransition> transitionFunc = () =>
+            {
+                var attributes = Fixture.Create<IDictionary<string, CrichtonTransitionAttribute>>();
+                foreach (var attribute in attributes)
+                {
+                    attribute.Value.Constraint = new CrichtonTransitionAttributeConstraint
+                    {
+                        MaxLength = Fixture.Create<int?>()
+                    };
+
+                }
+                return new CrichtonTransition() { Rel = Fixture.Create<string>(), Attributes = attributes };
+            };
+
+            var representor = GetRepresentorWithTransitions(transitionFunc);
+            var result = JObject.Parse(sut.Serialize(representor));
+
+            foreach (var transition in representor.Transitions)
+            {
+                foreach (var attribute in transition.Attributes)
+                {
+                    var token = result["_links"][transition.Rel]["data"][attribute.Key]["maxlength"];
+                    Assert.AreEqual(attribute.Value.Constraint.MaxLength, token.Value<int?>());
+                }
+            }
+        }
+
+        [Test]
+        public void Serialize_AddsPatternConstraintForEachTransition()
+        {
+            Func<CrichtonTransition> transitionFunc = () =>
+            {
+                var attributes = Fixture.Create<IDictionary<string, CrichtonTransitionAttribute>>();
+                foreach (var attribute in attributes)
+                {
+                    attribute.Value.Constraint = new CrichtonTransitionAttributeConstraint
+                    {
+                        Pattern = Fixture.Create<string>()
+                    };
+
+                }
+                return new CrichtonTransition() { Rel = Fixture.Create<string>(), Attributes = attributes };
+            };
+
+            var representor = GetRepresentorWithTransitions(transitionFunc);
+            var result = JObject.Parse(sut.Serialize(representor));
+
+            foreach (var transition in representor.Transitions)
+            {
+                foreach (var attribute in transition.Attributes)
+                {
+                    var token = result["_links"][transition.Rel]["data"][attribute.Key]["pattern"];
+                    Assert.AreEqual(attribute.Value.Constraint.Pattern, token.Value<string>());
+                }
+            }
+        }
+
+        [Test]
+        public void Serialize_AddMultiConstraintForEachTransition()
+        {
+            Func<CrichtonTransition> transitionFunc = () =>
+            {
+                var attributes = Fixture.Create<IDictionary<string, CrichtonTransitionAttribute>>();
+                foreach (var attribute in attributes)
+                {
+                    attribute.Value.Constraint = new CrichtonTransitionAttributeConstraint
+                    {
+                        IsMulti = Fixture.Create<bool?>()
+                    };
+
+                }
+                return new CrichtonTransition() { Rel = Fixture.Create<string>(), Attributes = attributes };
+            };
+
+            var representor = GetRepresentorWithTransitions(transitionFunc);
+            var result = JObject.Parse(sut.Serialize(representor));
+
+            foreach (var transition in representor.Transitions)
+            {
+                foreach (var attribute in transition.Attributes)
+                {
+                    var token = result["_links"][transition.Rel]["data"][attribute.Key]["multi"];
+                    Assert.AreEqual(attribute.Value.Constraint.IsMulti, token.Value<bool?>());
+                }
+            }
+        }
+
+        [Test]
+        public void Serialize_AddRequiredConstraintForEachTransition()
+        {
+            Func<CrichtonTransition> transitionFunc = () =>
+            {
+                var attributes = Fixture.Create<IDictionary<string, CrichtonTransitionAttribute>>();
+                foreach (var attribute in attributes)
+                {
+                    attribute.Value.Constraint = new CrichtonTransitionAttributeConstraint
+                    {
+                        IsRequired = Fixture.Create<bool?>()
+                    };
+
+                }
+                return new CrichtonTransition() { Rel = Fixture.Create<string>(), Attributes = attributes };
+            };
+
+            var representor = GetRepresentorWithTransitions(transitionFunc);
+            var result = JObject.Parse(sut.Serialize(representor));
+
+            foreach (var transition in representor.Transitions)
+            {
+                foreach (var attribute in transition.Attributes)
+                {
+                    var token = result["_links"][transition.Rel]["data"][attribute.Key]["required"];
+                    Assert.AreEqual(attribute.Value.Constraint.IsRequired, token.Value<bool?>());
                 }
             }
         }
@@ -775,5 +1068,279 @@ namespace Crichton.Representors.Tests.Serializers
             Assert.AreEqual(profile, transition.Attributes[attributeName].Attributes[nestedAttributeName].ProfileUri);
       
         }
+
+        [Test]
+        public void DeserializeToNewBuilder_DeserializeOptionsConstraint()
+        {
+            var option0 = Fixture.Create<string>();
+            var option1 = Fixture.Create<string>();
+            var json = @"
+            {{
+                ""_links"": {{
+                    ""edit"": {{ 
+                        ""href"" : ""../{{?user_id}}"", 
+                        ""data"" : {{
+                            ""send_info"" : {{
+                                ""options"" : [ ""{0}"", ""{1}"" ]
+                            }}
+                        }}
+                    }} 
+                }}
+            }}";
+
+            json = String.Format(json, option0, option1);
+
+            var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
+            var transition = (CrichtonTransition)(builder.GetArgumentsForCallsMadeOn(b => b.AddTransition(null))[0].First());
+            var constraints = transition.Attributes.First().Value.Constraint;
+
+            Assert.AreEqual(2, constraints.Options.Count);
+            Assert.AreEqual(option0, constraints.Options[0]);
+            Assert.AreEqual(option1, constraints.Options[1]);
+        }
+
+        [Test]
+        public void DeserializeToNewBuilder_DeserializeEmptyOptionsConstraint()
+        {
+            var json = @"
+            {
+                ""_links"": {
+                    ""edit"": { 
+                        ""href"" : ""../{?user_id}"", 
+                        ""data"" : {
+                            ""send_info"" : {
+                                ""options"" : [],
+                            }
+                        }
+                    }
+                }
+            }";
+
+            var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
+
+            var transition = (CrichtonTransition)(builder.GetArgumentsForCallsMadeOn(b => b.AddTransition(null))[0].First());
+            var constraints = transition.Attributes.First().Value.Constraint;
+
+            Assert.AreEqual(0, constraints.Options.Count);
+        }
+
+        [Test]
+        public void DeserializeToNewBuilder_DeserializeInConstraint()
+        {
+            var isIn = Fixture.Create<bool>().ToString().ToLower();
+            var json = @"
+            {{
+                ""_links"": {{
+                    ""edit"": {{ 
+                        ""href"" : ""../{{?user_id}}"", 
+                        ""data"" : {{
+                            ""send_info"" : {{
+                                ""in"" : {0}
+                            }}
+                        }}
+                    }} 
+                }}
+            }}";
+
+            json = String.Format(json, isIn);
+
+            var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
+            var transition = (CrichtonTransition)(builder.GetArgumentsForCallsMadeOn(b => b.AddTransition(null))[0].First());
+            var constraints = transition.Attributes.First().Value.Constraint;
+
+            Assert.AreEqual(isIn, constraints.IsIn.ToString().ToLower());
+        }
+
+        [Test]
+        public void DeserializeToNewBuilder_DeserializeMinConstraint()
+        {
+            var min = Fixture.Create<int>();
+            var json = @"
+            {{
+                ""_links"": {{
+                    ""edit"": {{ 
+                        ""href"" : ""../{{?user_id}}"", 
+                        ""data"" : {{
+                            ""send_info"" : {{
+                                ""min"" : {0}
+                            }}
+                        }}
+                    }} 
+                }}
+            }}";
+
+            json = String.Format(json, min);
+
+            var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
+            var transition = (CrichtonTransition)(builder.GetArgumentsForCallsMadeOn(b => b.AddTransition(null))[0].First());
+            var constraints = transition.Attributes.First().Value.Constraint;
+
+            Assert.AreEqual(min, constraints.Min);
+        }
+
+        [Test]
+        public void DeserializeToNewBuilder_DeserializeMinLengthConstraint()
+        {
+            var minLength = Fixture.Create<int>();
+            var json = @"
+            {{
+                ""_links"": {{
+                    ""edit"": {{ 
+                        ""href"" : ""../{{?user_id}}"", 
+                        ""data"" : {{
+                            ""send_info"" : {{
+                                ""minlength"" : {0}
+                            }}
+                        }}
+                    }} 
+                }}
+            }}";
+
+            json = String.Format(json, minLength);
+
+            var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
+
+            var transition = (CrichtonTransition)(builder.GetArgumentsForCallsMadeOn(b => b.AddTransition(null))[0].First());
+            var constraints = transition.Attributes.First().Value.Constraint;
+
+            Assert.AreEqual(minLength, constraints.MinLength);
+        }
+
+        [Test]
+        public void DeserializeToNewBuilder_DeserializeMaxConstraint()
+        {
+            var max = Fixture.Create<int>();
+            var json = @"
+            {{
+                ""_links"": {{
+                    ""edit"": {{ 
+                        ""href"" : ""../{{?user_id}}"", 
+                        ""data"" : {{
+                            ""send_info"" : {{
+                                ""max"" : {0}
+                            }}
+                        }}
+                    }} 
+                }}
+            }}";
+
+            json = String.Format(json, max);
+
+            var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
+            var transition = (CrichtonTransition)(builder.GetArgumentsForCallsMadeOn(b => b.AddTransition(null))[0].First());
+            var constraints = transition.Attributes.First().Value.Constraint;
+
+            Assert.AreEqual(max, constraints.Max);
+        }
+
+        [Test]
+        public void DeserializeToNewBuilder_DeserializeMaxLengthConstraint()
+        {
+            var maxLength = Fixture.Create<int>();
+            var json = @"
+            {{
+                ""_links"": {{
+                    ""edit"": {{ 
+                        ""href"" : ""../{{?user_id}}"", 
+                        ""data"" : {{
+                            ""send_info"" : {{
+                                ""maxlength"" : {0}
+                            }}
+                        }}
+                    }} 
+                }}
+            }}";
+
+            json = String.Format(json, maxLength);
+
+            var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
+
+            var transition = (CrichtonTransition)(builder.GetArgumentsForCallsMadeOn(b => b.AddTransition(null))[0].First());
+            var constraints = transition.Attributes.First().Value.Constraint;
+
+            Assert.AreEqual(maxLength, constraints.MaxLength);
+        }
+
+        [Test]
+        public void DeserializeToNewBuilder_DeserializePatternConstraint()
+        {
+            var pattern = Fixture.Create<string>();
+            var json = @"
+            {{
+                ""_links"": {{
+                    ""edit"": {{ 
+                        ""href"" : ""../{{?user_id}}"", 
+                        ""data"" : {{
+                            ""send_info"" : {{
+                                ""pattern"" : ""{0}""
+                            }}
+                        }}
+                    }} 
+                }}
+            }}";
+
+            json = String.Format(json, pattern);
+
+            var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
+            var transition = (CrichtonTransition)(builder.GetArgumentsForCallsMadeOn(b => b.AddTransition(null))[0].First());
+            var constraints = transition.Attributes.First().Value.Constraint;
+
+            Assert.AreEqual(pattern, constraints.Pattern);
+        }
+
+        public void DeserializeToNewBuilder_DeserializeMultiConstraint()
+        {
+            var isMulti = Fixture.Create<bool>().ToString().ToLower();
+            var json = @"
+            {{
+                ""_links"": {{
+                    ""edit"": {{ 
+                        ""href"" : ""../{{?user_id}}"", 
+                        ""data"" : {{
+                            ""send_info"" : {{
+                                ""multi"" : {0},
+                            }}
+                        }}
+                    }} 
+                }}
+            }}";
+
+            json = String.Format(json, isMulti);
+
+            var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
+            var transition = (CrichtonTransition)(builder.GetArgumentsForCallsMadeOn(b => b.AddTransition(null))[0].First());
+            var constraints = transition.Attributes.First().Value.Constraint;
+
+            Assert.AreEqual(isMulti, constraints.IsMulti.ToString().ToLower());
+        }
+
+        [Test]
+        public void DeserializeToNewBuilder_DeserializeRequiredConstraint()
+        {
+            var isRequired = Fixture.Create<bool>().ToString().ToLower();
+            var json = @"
+            {{
+                ""_links"": {{
+                    ""edit"": {{ 
+                        ""href"" : ""../{{?user_id}}"", 
+                        ""data"" : {{
+                            ""send_info"" : {{
+                                ""required"" : {0}
+                            }}
+                        }}
+                    }} 
+                }}
+            }}";
+
+            json = String.Format(json, isRequired);
+
+            var builder = sut.DeserializeToNewBuilder(json, builderFactoryMethod);
+
+            var transition = (CrichtonTransition)(builder.GetArgumentsForCallsMadeOn(b => b.AddTransition(null))[0].First());
+            var constraints = transition.Attributes.First().Value.Constraint;
+
+            Assert.AreEqual(isRequired, constraints.IsRequired.ToString().ToLower());
+        }
+
     }
 }

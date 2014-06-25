@@ -29,7 +29,16 @@
                            "lastname" :
                                {
                                "value" : "Albers",
-                               "profile" : "http://nice-profile-hypermedia.com/hypermedia"
+                               "profile" : "http://nice-profile-hypermedia.com/hypermedia",
+                               "options" : [ "yes", "no", "maybe"],
+                               "in" : true,
+                               "min" : 140,
+                               "minlength" : 22,
+                               "max" : 238,
+                               "maxlength" : 196,
+                               "pattern" : ".*",
+                               "multi" : false,
+                               "required" : true
                            }
                        }
                     }
