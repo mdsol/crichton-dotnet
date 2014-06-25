@@ -15,7 +15,7 @@ namespace Crichton.Client
     {
         public ITransitionRequestHandler TransitionRequestHandler { get; private set; }
 
-        public CrichtonClient(ITransitionRequestHandler transitionRequestHandler = null)
+        public CrichtonClient(ITransitionRequestHandler transitionRequestHandler)
         {
             TransitionRequestHandler = transitionRequestHandler;
         }
@@ -24,6 +24,11 @@ namespace Crichton.Client
         {
             var httpClient = new HttpClient {BaseAddress = baseAddress};
             TransitionRequestHandler = new HttpClientTransitionRequestHandler(httpClient, serializer);
+        }
+
+        public CrichtonClient(HttpClient client, ISerializer serializer)
+        {
+            TransitionRequestHandler = new HttpClientTransitionRequestHandler(client, serializer);
         }
 
         public IHypermediaQuery CreateQuery()

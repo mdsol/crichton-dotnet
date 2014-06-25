@@ -50,6 +50,17 @@ namespace Crichton.Client.Tests
         }
 
         [Test]
+        public void CTOR_UsesProvidedHttpClient()
+        {
+            client.BaseAddress = baseUri;
+            sut = new CrichtonClient(client, serializer);
+
+            var handler = (HttpClientTransitionRequestHandler) sut.TransitionRequestHandler;
+
+            Assert.AreEqual(client, handler.HttpClient);
+        }
+
+        [Test]
         public void CreateQuery_ReturnsNewInstanceOfHypermediaQuery()
         {
             var result = sut.CreateQuery();
