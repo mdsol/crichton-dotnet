@@ -4,22 +4,31 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Crichton.Client.QuerySteps;
 using Crichton.Representors;
 using Crichton.Representors.Serializers;
+using Newtonsoft.Json;
 
 namespace Crichton.Client
 {
-    public class CrichtonClient : ITransitionRequestor
+    public class CrichtonClient
     {
-        public HttpClient HttpClient { get; private set; }
-        public ISerializer Serializer { get; private set; }
-        public Uri BaseUri { get; private set; }
+        public ITransitionRequestHandler TransitionRequestHandler { get; private set; }
 
-        public CrichtonClient(HttpClient httpClient, Uri baseUri, ISerializer serializer)
+        public CrichtonClient(ITransitionRequestHandler transitionRequestHandler)
         {
-            HttpClient = httpClient;
-            Serializer = serializer;
-            BaseUri = baseUri;
+            TransitionRequestHandler = transitionRequestHandler;
+        }
+
+        public CrichtonClient(Uri baseAddress, ISerializer serializer)
+        {
+            var httpClient = new HttpClient {BaseAddress = baseAddress};
+            TransitionRequestHandler = new HttpClientTransitionRequestHandler(httpClient, serializer);
+        }
+
+        public CrichtonClient(HttpClient client, ISerializer serializer)
+        {
+            TransitionRequestHandler = new HttpClientTransitionRequestHandler(client, serializer);
         }
 
         public IHypermediaQuery CreateQuery()
@@ -27,9 +36,16 @@ namespace Crichton.Client
             return new HypermediaQuery();
         }
 
+        public IHypermediaQuery CreateQuery(CrichtonRepresentor representor)
+        {
+            var query = new HypermediaQuery();
+            query.AddStep(new NavigateToRepresentorQueryStep(representor));
+            return query;
+        }
+
         public Task<CrichtonRepresentor> ExecuteQueryAsync(IHypermediaQuery query)
         {
-            return query.ExecuteAsync(this);
+            return query.ExecuteAsync(TransitionRequestHandler);
         }
     }
 }

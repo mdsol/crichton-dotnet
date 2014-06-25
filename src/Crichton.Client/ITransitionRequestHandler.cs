@@ -7,8 +7,8 @@ using Crichton.Representors;
 
 namespace Crichton.Client
 {
-    public interface IQueryStep
+    public interface ITransitionRequestHandler
     {
-        Task<CrichtonRepresentor> ExecuteAsync(CrichtonRepresentor currentRepresentor, ITransitionRequestor transitionRequestor);
+        Task<CrichtonRepresentor> RequestTransitionAsync(CrichtonTransition transition, object toSerializeToJson = null);
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Crichton.Client.QuerySteps;
 using Crichton.Representors;
 using NUnit.Framework;
 using Ploeh.AutoFixture;
@@ -40,7 +41,7 @@ namespace Crichton.Client.Tests
         [Test]
         public async Task ExecuteAsync_ReturnsResultOfChainedCallsToSteps()
         {
-            var requestor = Fixture.Create<ITransitionRequestor>();
+            var requestor = Fixture.Create<ITransitionRequestHandler>();
             var step1 = MockRepository.GenerateMock<IQueryStep>();
             var step1Result = Fixture.Create<CrichtonRepresentor>();
             step1.Stub(s => s.ExecuteAsync(null, requestor)).Return(Task.FromResult(step1Result));

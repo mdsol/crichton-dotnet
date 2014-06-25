@@ -37,6 +37,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Newtonsoft.Json.6.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="nunit.framework">
       <HintPath>..\..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
     </Reference>
@@ -69,8 +73,15 @@
   </Choose>
   <ItemGroup>
     <Compile Include="CrichtonClientTests.cs" />
+    <Compile Include="FakeHttpMessageHandler.cs" />
+    <Compile Include="HttpClientTransitionRequestHandlerTests.cs" />
     <Compile Include="HypermediaQueryTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QuerySteps\NavigateToRelativeUrlQueryStepTests.cs" />
+    <Compile Include="QuerySteps\NavigateToRepresentorQueryStepTests.cs" />
+    <Compile Include="QuerySteps\NavigateToSelfLinkQueryStepTests.cs" />
+    <Compile Include="QuerySteps\NavigateToTransitionQueryStepTests.cs" />
+    <Compile Include="QuerySteps\PostToTransitionQueryStepTests.cs" />
     <Compile Include="TestWithFixture.cs" />
   </ItemGroup>
   <ItemGroup>
