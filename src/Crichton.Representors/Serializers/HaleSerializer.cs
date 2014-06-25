@@ -110,6 +110,51 @@ namespace Crichton.Representors.Serializers
                     attributeObject["scope"] = scope;
                 }
 
+                if (attribute.Value.Constraint.Options != null)
+                {
+                    attributeObject["options"] = JArray.FromObject(attribute.Value.Constraint.Options);
+                }
+
+                if (attribute.Value.Constraint.IsIn != null)
+                {
+                    attributeObject["in"] = attribute.Value.Constraint.IsIn;
+                }
+
+                if (attribute.Value.Constraint.Min != null)
+                {
+                    attributeObject["min"] = attribute.Value.Constraint.Min;
+                }
+
+                if (attribute.Value.Constraint.MinLength != null)
+                {
+                    attributeObject["minlength"] = attribute.Value.Constraint.MinLength;
+                }
+
+                if (attribute.Value.Constraint.Max != null)
+                {
+                    attributeObject["max"] = attribute.Value.Constraint.Max;
+                }
+
+                if (attribute.Value.Constraint.MaxLength != null)
+                {
+                    attributeObject["maxlength"] = attribute.Value.Constraint.MaxLength;
+                }
+
+                if (attribute.Value.Constraint.Pattern != null)
+                {
+                    attributeObject["pattern"] = attribute.Value.Constraint.Pattern;
+                }
+
+                if (attribute.Value.Constraint.IsMulti != null)
+                {
+                    attributeObject["multi"] = attribute.Value.Constraint.IsMulti;
+                }
+
+                if (attribute.Value.Constraint.IsRequired != null)
+                {
+                    attributeObject["required"] = attribute.Value.Constraint.IsRequired;
+                }
+
                 AddAttributeesFromAttributesContainerToLinkObject(attribute.Value, attributeObject);
 
                 dataObject[attribute.Key] = attributeObject;
@@ -201,6 +246,20 @@ namespace Crichton.Representors.Serializers
                 }
 
                 SetAttributesAndParametersOnAttributesContainer(dataToken, transitionAttribute);
+
+                bool parseResult;
+                transitionAttribute.Constraint = new CrichtonTransitionAttributeConstraint
+                {
+                    Options = dataObject["options"] != null ? dataObject["options"].Values<string>().ToList<string>() : null,
+                    IsIn = dataObject["in"] != null && bool.TryParse(dataObject["in"].Value<string>(), out parseResult) ? parseResult : (bool?)null,
+                    Min = dataObject["min"] != null ? dataObject["min"].Value<int>() : (int?)null,
+                    MinLength = dataObject["minlength"] != null ? dataObject["minlength"].Value<int>() : (int?)null,
+                    Max = dataObject["max"] != null ? dataObject["max"].Value<int>() : (int?)null,
+                    MaxLength = dataObject["maxlength"] != null ? dataObject["maxlength"].Value<int>() : (int?)null,
+                    Pattern = dataObject["pattern"] != null ? dataObject["pattern"].Value<string>() : null,
+                    IsMulti = dataObject["multi"] != null && bool.TryParse(dataObject["multi"].Value<string>(), out parseResult) ? parseResult : (bool?)null,
+                    IsRequired = dataObject["required"] != null && bool.TryParse(dataObject["required"].Value<string>(), out parseResult) ? parseResult : (bool?)null,
+                };
 
                 result[dataProperty.Name] = transitionAttribute;
             }

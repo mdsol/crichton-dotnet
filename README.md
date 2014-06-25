@@ -61,16 +61,16 @@ Spec | Support
 5.1.3. scope | ✔
 5.1.4. profile | ✔
 5.1.5. value | ✔
-5.2 Constraint Properties | ❌
-5.2.1. options | ❌
-5.2.2. in | ❌
-5.2.3. min | ❌
-5.2.4. minlength | ❌
-5.2.5. max | ❌
-5.2.6. maxlength | ❌
-5.2.7. pattern | ❌
-5.2.8. multi | ❌
-5.2.9 required | ❌
+5.2 Constraint Properties | ✔
+5.2.1. options | ✔
+5.2.2. in | ✔
+5.2.3. min | ✔
+5.2.4. minlength | ✔
+5.2.5. max | ✔
+5.2.6. maxlength | ✔
+5.2.7. pattern | ✔
+5.2.8. multi | ✔
+5.2.9 required | ✔
 5.3 Constraint Extensions | ❌
 6. Resource Objects | ❌
 6.1. Reserved Properties | ❌
@@ -102,3 +102,4 @@ Copyright (c) 2014 Medidata Solutions Worldwide. Licensed under MIT. See [LICENS
 [CONTRIBUTING]: CONTRIBUTING.md
 [LICENSE]: LICENSE.md
 [RepresentorBuilder]: docs/representor_builder.md
+[BenchmarkTool]: docs/representor_benchmark_tool.md
