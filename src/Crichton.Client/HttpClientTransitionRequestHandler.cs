@@ -51,7 +51,7 @@ namespace Crichton.Client
 
             var result = await HttpClient.SendAsync(requestMessage);
 
-            var resultContentString = result.Content.ReadAsStringAsync().Result;
+            var resultContentString = await result.Content.ReadAsStringAsync();
 
             var builder = Serializer.DeserializeToNewBuilder(resultContentString, () => new RepresentorBuilder());
 
