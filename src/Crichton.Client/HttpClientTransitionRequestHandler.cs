@@ -53,7 +53,6 @@ namespace Crichton.Client
 
             var resultContentString = await result.Content.ReadAsStringAsync();
 
-            // this line is being ignored by DotCover code coverage analysis -- why..?
             var builder = Serializer.DeserializeToNewBuilder(resultContentString, () => new RepresentorBuilder());
 
             return builder.ToRepresentor();
