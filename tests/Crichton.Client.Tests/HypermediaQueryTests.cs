@@ -57,5 +57,21 @@ namespace Crichton.Client.Tests
 
             Assert.AreEqual(step2Result, result);
         }
+
+        [Test]
+        public void Clone_CreatesReturnsANewQueryWithTheSameSteps()
+        {
+            sut.Steps.AddMany(() => Fixture.Create<IQueryStep>(), Fixture.Create<int>());
+
+            var result = sut.Clone();
+
+            Assert.AreNotEqual(result, sut, "Should be a new IHypermediaQuery");
+            Assert.AreNotSame(result.Steps, sut.Steps, "Should be a new List instance of Steps.");
+
+            Assert.IsInstanceOf<HypermediaQuery>(result);
+
+            CollectionAssert.AreEqual(sut.Steps, result.Steps);
+
+        }
     }
 }

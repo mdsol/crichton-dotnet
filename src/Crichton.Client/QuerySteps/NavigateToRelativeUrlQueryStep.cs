@@ -9,16 +9,16 @@ namespace Crichton.Client.QuerySteps
 {
     public class NavigateToRelativeUrlQueryStep : IQueryStep
     {
-        private string url;
+        public string Url { get; private set; }
 
         public NavigateToRelativeUrlQueryStep(string url)
         {
-            this.url = url;
+            this.Url = url;
         }
 
         public Task<CrichtonRepresentor> ExecuteAsync(CrichtonRepresentor currentRepresentor, ITransitionRequestHandler transitionRequestHandler)
         {
-            var transition = new CrichtonTransition() {Uri = url};
+            var transition = new CrichtonTransition() {Uri = Url};
             return transitionRequestHandler.RequestTransitionAsync(transition);
         }
     }

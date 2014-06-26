@@ -20,3 +20,4 @@ tools*/bin/*
 docs/*.html
 tools/*/bin/*
 tools/*/obj/*
+TestResults/*
