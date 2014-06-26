@@ -5,14 +5,14 @@ using Newtonsoft.Json.Linq;
 
 namespace Crichton.Representors.Serializers
 {
-    public class HalSerializer : ISerializer
+    public class HalSerializer : JsonSerializer
     {
-        private static readonly string[] ReservedAttributes = { "_links", "_embedded" };
+        public override IEnumerable<string> IgnoredAttributes { get { return new string[] { "_links", "_embedded" }; } }
         private static readonly string[] ReservedLinkRels = { "self" };
 
-        public virtual string ContentType { get { return "application/hal+json"; } }
+        public override string ContentType { get { return "application/hal+json"; } }
 
-        public string Serialize(CrichtonRepresentor representor)
+        public override string Serialize(CrichtonRepresentor representor)
         {
             if (representor == null)
             {
@@ -26,22 +26,13 @@ namespace Crichton.Representors.Serializers
 
         private JObject CreateJObjectForRepresentor(CrichtonRepresentor representor)
         {
-            var jObject = new JObject();
+            var jObject = SerializeToJObject(representor);
 
             if (!String.IsNullOrWhiteSpace(representor.SelfLink)) AddLinkFromTransition(jObject, new CrichtonTransition { Rel = "self", Uri = representor.SelfLink });
 
             foreach (var transition in representor.Transitions.Where(t => !ReservedLinkRels.Contains(t.Rel)))
             {
                 AddLinkFromTransition(jObject, transition);
-            }
-
-            // add a root property for each property on data
-            if (representor.Attributes != null)
-            {
-                foreach (var property in representor.Attributes.Properties().Where(p => !ReservedAttributes.Contains(p.Name)))
-                {
-                    jObject.Add(property.Name, property.Value);
-                }
             }
 
             // embedded resources and Collections both require _embedded
@@ -118,7 +109,7 @@ namespace Crichton.Representors.Serializers
             return linkObject;
         }
 
-        public IRepresentorBuilder DeserializeToNewBuilder(string message, Func<IRepresentorBuilder> builderFactoryMethod)
+        public override IRepresentorBuilder DeserializeToNewBuilder(string message, Func<IRepresentorBuilder> builderFactoryMethod)
         {
             if (message == null)
             {
@@ -148,7 +139,7 @@ namespace Crichton.Representors.Serializers
             CreateEmbeddedResources(document, builder, builderFactoryMethod);
 
             // set builder attributes to be that of root properties in message
-            builder.SetAttributes(document);
+            SetAttributes(document, builder);
 
             return builder;
         }

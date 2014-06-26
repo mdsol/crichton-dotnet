@@ -1,0 +1,40 @@
+﻿{
+   "_links":{
+      "self":{
+         "href":"http://example.org/api/user/matthew"
+      }
+   },
+   "id":"matthew",
+   "name":"Matthew Weier O\"Phinney",
+   "_embedded":{
+      "contacts":[
+         {
+            "_links":{
+               "self":{
+                  "href":"http://example.org/api/user/mac_nibblet"
+               }
+            },
+            "id":"mac_nibblet",
+            "name":"Antoine Hedgecock"
+         },
+         {
+            "_links":{
+               "self":{
+                  "href":"http://example.org/api/user/spiffyjr"
+               }
+            },
+            "id":"spiffyjr",
+            "name":"Kyle Spraggs"
+         }
+      ],
+      "website":{
+         "_links":{
+            "self":{
+               "href":"http://example.org/api/locations/mwop"
+            }
+         },
+         "id":"mwop",
+         "url":"http://www.mwop.net"
+      }
+   }
+}

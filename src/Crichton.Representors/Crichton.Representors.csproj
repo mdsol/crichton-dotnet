@@ -48,6 +48,7 @@
     <Compile Include="Serializers\HaleSerializer.cs" />
     <Compile Include="Serializers\HalSerializer.cs" />
     <Compile Include="Serializers\ISerializer.cs" />
+    <Compile Include="Serializers\JsonSerializer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Crichton.Representors.nuspec">
