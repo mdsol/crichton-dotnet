@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using Crichton.Representors;
@@ -114,6 +115,34 @@ namespace Crichton.Client.Tests
             var combinedUrl = new Uri(baseUri + relativeUri, UriKind.RelativeOrAbsolute);
 
             messageHandler.Condition = m => m.Method == HttpMethod.Put && m.RequestUri == combinedUrl;
+            messageHandler.Response = representorAsJson;
+            messageHandler.ResponseStatusCode = HttpStatusCode.OK;
+
+            var result = await sut.RequestTransitionAsync(transition);
+
+            Assert.AreEqual(representorResult, result);
+        }
+
+        [Test]
+        public async Task RequestTransitionAsync_AddsAcceptHeaderFromContentTypeOnSerializer()
+        {
+            const string relativeUri = "api/sausages/1";
+            const string mediaType = "application/vnd.json+sausage";
+            var transition = new CrichtonTransition { Uri = relativeUri };
+            var representorResult = Fixture.Create<CrichtonRepresentor>();
+            var representorAsJson = Fixture.Create<string>();
+            var representorBuilder = MockRepository.GenerateMock<IRepresentorBuilder>();
+            representorBuilder.Stub(r => r.ToRepresentor()).Return(representorResult);
+            serializer.Stub(
+                s =>
+                    s.DeserializeToNewBuilder(Arg<string>.Is.Equal(representorAsJson),
+                        Arg<Func<IRepresentorBuilder>>.Matches(m => m().GetType() == typeof(RepresentorBuilder))))
+                        .Return(representorBuilder);
+            serializer.Stub(s => s.ContentType).Return(mediaType);
+
+            var combinedUrl = new Uri(baseUri + relativeUri, UriKind.RelativeOrAbsolute);
+
+            messageHandler.Condition = m => m.Method == HttpMethod.Get && m.RequestUri == combinedUrl && m.Headers.Accept.Contains(new MediaTypeWithQualityHeaderValue(mediaType));
             messageHandler.Response = representorAsJson;
             messageHandler.ResponseStatusCode = HttpStatusCode.OK;
 

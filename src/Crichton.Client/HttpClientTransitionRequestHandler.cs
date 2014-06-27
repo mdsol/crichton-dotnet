@@ -49,6 +49,9 @@ namespace Crichton.Client
                 requestMessage.Method = new HttpMethod(transition.Methods.First().ToUpperInvariant());
             }
 
+            // add Accept header
+            requestMessage.Headers.Accept.ParseAdd(Serializer.ContentType);
+
             var result = await HttpClient.SendAsync(requestMessage);
 
             var resultContentString = await result.Content.ReadAsStringAsync();
