@@ -26,7 +26,7 @@ namespace Crichton.Representors.Serializers
 
         private JObject CreateJObjectForRepresentor(CrichtonRepresentor representor)
         {
-            var jObject = SerializeToJObject(representor);
+            var jObject = SerializeAttributesToJObject(representor);
 
             if (!String.IsNullOrWhiteSpace(representor.SelfLink)) AddLinkFromTransition(jObject, new CrichtonTransition { Rel = "self", Uri = representor.SelfLink });
 

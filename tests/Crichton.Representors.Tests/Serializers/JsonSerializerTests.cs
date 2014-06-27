@@ -66,7 +66,7 @@ namespace Crichton.Representors.Tests.Serializers
             var representor = Fixture.Create<CrichtonRepresentor>();
             var json = @"
             {
-                ""_links"": {
+                ""data"": {
                     ""self"": {
                         ""not-href"": ""blah""
                                 }
@@ -125,7 +125,7 @@ namespace Crichton.Representors.Tests.Serializers
             var href = Fixture.Create<string>();
             var json = @"
             {
-                ""_links"": {
+                ""data"": {
                     ""self"": {
                         ""not-href"": ""blah""
                                 }
@@ -153,7 +153,7 @@ namespace Crichton.Representors.Tests.Serializers
             var href = Fixture.Create<string>();
             var json = @"
             {{
-                ""_links"": {{
+                ""data"": {{
                     ""self"": {{
                         ""href"": ""{0}""
                                 }}

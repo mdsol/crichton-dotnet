@@ -17,10 +17,10 @@ namespace Crichton.Representors.Serializers
                 throw new ArgumentNullException("representor");
             }
 
-            return SerializeToJObject(representor).ToString();
+            return SerializeAttributesToJObject(representor).ToString();
         }
 
-        protected JObject SerializeToJObject(CrichtonRepresentor representor)
+        protected JObject SerializeAttributesToJObject(CrichtonRepresentor representor)
         {
             var jObject = new JObject();
 
