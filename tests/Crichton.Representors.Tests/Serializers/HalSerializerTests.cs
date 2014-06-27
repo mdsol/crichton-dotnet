@@ -235,7 +235,7 @@ namespace Crichton.Representors.Tests.Serializers
         public void Serialize_SetsCollectionToItemsEmbeddedResource()
         {
             var representor = Fixture.Create<CrichtonRepresentor>();
-            representor.Collection.AddMany(() => Fixture.Create<CrichtonRepresentor>(), Fixture.Create<int>());
+            representor.Collection.AddMany(() => Fixture.Create<CrichtonRepresentor>(), Fixture.Create<int>() + 1);
 
             var result = JObject.Parse(sut.Serialize(representor));
 

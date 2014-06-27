@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using NUnit.Framework;
 using Ploeh.AutoFixture;
 using Rhino.Mocks;
+using Rhino.Mocks.Constraints;
 
 namespace Crichton.Client.Tests
 {
@@ -56,7 +57,8 @@ namespace Crichton.Client.Tests
             serializer.Stub(
                 s =>
                     s.DeserializeToNewBuilder(Arg<string>.Is.Equal(representorAsJson),
-                        Arg<Func<IRepresentorBuilder>>.Is.Anything)).IgnoreArguments().Return(representorBuilder);
+                        Arg<Func<IRepresentorBuilder>>.Matches(m => m().GetType() == typeof(RepresentorBuilder))))
+                        .Return(representorBuilder);
 
             var combinedUrl = new Uri(baseUri + relativeUri, UriKind.RelativeOrAbsolute);
 
@@ -81,7 +83,7 @@ namespace Crichton.Client.Tests
             var representorAsJson = Fixture.Create<string>();
             var representorBuilder = MockRepository.GenerateMock<IRepresentorBuilder>();
             representorBuilder.Stub(r => r.ToRepresentor()).Return(representorResult);
-            serializer.Stub(s => s.DeserializeToNewBuilder(Arg<string>.Is.Equal(representorAsJson), Arg<Func<IRepresentorBuilder>>.Is.Anything)).IgnoreArguments().Return(representorBuilder);
+            serializer.Stub(s => s.DeserializeToNewBuilder(Arg<string>.Is.Equal(representorAsJson), Arg<Func<IRepresentorBuilder>>.Matches(m => m().GetType() == typeof(RepresentorBuilder)))).Return(representorBuilder);
 
             var combinedUrl = new Uri(baseUri + relativeUri, UriKind.RelativeOrAbsolute);
 
@@ -107,7 +109,7 @@ namespace Crichton.Client.Tests
             serializer.Stub(
                 s =>
                     s.DeserializeToNewBuilder(Arg<string>.Is.Equal(representorAsJson),
-                        Arg<Func<IRepresentorBuilder>>.Is.Anything)).IgnoreArguments().Return(representorBuilder);
+                        Arg<Func<IRepresentorBuilder>>.Matches(m => m().GetType() == typeof(RepresentorBuilder)))).Return(representorBuilder);
 
             var combinedUrl = new Uri(baseUri + relativeUri, UriKind.RelativeOrAbsolute);
 
