@@ -17,6 +17,11 @@ namespace Crichton.Client
             Steps = new List<IQueryStep>();
         }
 
+        private HypermediaQuery(IEnumerable<IQueryStep> steps)
+        {
+            Steps = steps.ToList();
+        }
+
         public void AddStep(IQueryStep step)
         {
             Steps.Add(step);
@@ -33,6 +38,11 @@ namespace Crichton.Client
             }
 
             return representor;
+        }
+
+        public IHypermediaQuery Clone()
+        {
+            return new HypermediaQuery(this.Steps);
         }
     }
 }

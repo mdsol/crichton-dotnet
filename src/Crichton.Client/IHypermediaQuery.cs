@@ -10,5 +10,6 @@ namespace Crichton.Client
         IList<IQueryStep> Steps { get; }
         void AddStep(IQueryStep step);
         Task<CrichtonRepresentor> ExecuteAsync(ITransitionRequestHandler requestHandler);
+        IHypermediaQuery Clone();
     }
 }

@@ -28,7 +28,7 @@ namespace Crichton.Client.QuerySteps
             return transitionRequestHandler.RequestTransitionAsync(transition);
         }
 
-        internal CrichtonTransition LocateTransition(CrichtonRepresentor currentRepresentor)
+        public CrichtonTransition LocateTransition(CrichtonRepresentor currentRepresentor)
         {
             var transition = currentRepresentor.Transitions.Single(selectionFunc);
             return transition;
