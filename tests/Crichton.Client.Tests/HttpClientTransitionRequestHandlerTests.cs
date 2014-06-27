@@ -150,5 +150,48 @@ namespace Crichton.Client.Tests
 
             Assert.AreEqual(representorResult, result);
         }
+
+        [Test]
+        public async Task RequestTransitionAsync_UsesAllTransitionRequestFiltersBeforeSendingRequest()
+        {
+            const string relativeUri = "api/sausages/1";
+            var transition = new CrichtonTransition { Uri = relativeUri };
+            var representorResult = Fixture.Create<CrichtonRepresentor>();
+            var representorAsJson = Fixture.Create<string>();
+            var representorBuilder = MockRepository.GenerateMock<IRepresentorBuilder>();
+            representorBuilder.Stub(r => r.ToRepresentor()).Return(representorResult);
+            serializer.Stub(
+                s =>
+                    s.DeserializeToNewBuilder(Arg<string>.Is.Equal(representorAsJson),
+                        Arg<Func<IRepresentorBuilder>>.Matches(m => m().GetType() == typeof(RepresentorBuilder))))
+                        .Return(representorBuilder);
+
+            var requestFilter = MockRepository.GenerateMock<ITransitionRequestFilter>();
+            var requestFilter2 = MockRepository.GenerateMock<ITransitionRequestFilter>();
+
+            sut.AddRequestFilter(requestFilter);
+            sut.AddRequestFilter(requestFilter2);
+
+            var combinedUrl = new Uri(baseUri + relativeUri, UriKind.RelativeOrAbsolute);
+
+            messageHandler.Condition = m => m.Method == HttpMethod.Get && m.RequestUri == combinedUrl;
+            messageHandler.Response = representorAsJson;
+            messageHandler.ResponseStatusCode = HttpStatusCode.OK;
+
+            await sut.RequestTransitionAsync(transition);
+
+            requestFilter.AssertWasCalled(r => r.Execute(Arg<HttpRequestMessage>.Is.Anything));
+            // get the httprequestmessage that was passed to first filter
+            var message = (HttpRequestMessage)(requestFilter.GetArgumentsForCallsMadeOn(r => r.Execute(Arg<HttpRequestMessage>.Is.Anything))[0][0]);
+            // make sure the second filter was called with the same message as the first
+            requestFilter2.AssertWasCalled(r => r.Execute(message));
+        }
+
+        [Test]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void AddRequestFilter_ThrowsArgumentNullExceptionForNull()
+        {
+            sut.AddRequestFilter(null);
+        }
     }
 }

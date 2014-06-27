@@ -15,6 +15,8 @@ namespace Crichton.Client
         public HttpClient HttpClient { get; private set; }
         public ISerializer Serializer { get; private set; }
 
+        private readonly IList<ITransitionRequestFilter> filters = new List<ITransitionRequestFilter>(); 
+
         public HttpClientTransitionRequestHandler(HttpClient client, ISerializer serializer)
         {
             if (client.BaseAddress == null)
@@ -27,6 +29,13 @@ namespace Crichton.Client
         }
 
         private static readonly string[] ValidHttpMethods = new[] { "get", "post", "put", "options", "head", "delete", "trace" };
+
+        public void AddRequestFilter(ITransitionRequestFilter filter)
+        {
+            if (filter == null) throw new ArgumentNullException("filter");
+
+            filters.Add(filter);
+        }
 
         public async Task<CrichtonRepresentor> RequestTransitionAsync(CrichtonTransition transition, object toSerializeToJson = null)
         {
@@ -51,6 +60,12 @@ namespace Crichton.Client
 
             // add Accept header
             requestMessage.Headers.Accept.ParseAdd(Serializer.ContentType);
+
+            // run all request filters
+            foreach (var filter in filters)
+            {
+                filter.Execute(requestMessage);
+            }
 
             var result = await HttpClient.SendAsync(requestMessage);
 
