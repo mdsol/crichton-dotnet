@@ -49,6 +49,7 @@
     <Compile Include="CrichtonClient.cs" />
     <Compile Include="HttpClientTransitionRequestHandler.cs" />
     <Compile Include="HypermediaQuery.cs" />
+    <Compile Include="HypermediaQueryExtensions.cs" />
     <Compile Include="IHypermediaQuery.cs" />
     <Compile Include="QuerySteps\IQueryStep.cs" />
     <Compile Include="ITransitionRequestHandler.cs" />

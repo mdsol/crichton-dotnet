@@ -9,16 +9,16 @@ namespace Crichton.Client.QuerySteps
 {
     public class NavigateToRepresentorQueryStep : IQueryStep
     {
-        private CrichtonRepresentor representor;
+        public CrichtonRepresentor Representor { get; private set; }
 
         public NavigateToRepresentorQueryStep(CrichtonRepresentor representor)
         {
-            this.representor = representor;
+            this.Representor = representor;
         }
 
         public async Task<CrichtonRepresentor> ExecuteAsync(CrichtonRepresentor currentRepresentor, ITransitionRequestHandler transitionRequestHandler)
         {
-            return representor;
+            return Representor;
         }
     }
 }

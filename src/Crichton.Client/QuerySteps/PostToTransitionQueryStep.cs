@@ -9,24 +9,24 @@ namespace Crichton.Client.QuerySteps
 {
     public class PostToTransitionQueryStep : NavigateToTransitionQueryStep
     {
-        private readonly object data;
+        public object Data { get; private set; }
 
         public PostToTransitionQueryStep(string rel, object data) : base(rel)
         {
-            this.data = data;
+            this.Data = data;
         }
 
         public PostToTransitionQueryStep(Func<CrichtonTransition, bool> transitionSelectorFunc, object data)
             : base(transitionSelectorFunc)
         {
-            this.data = data;
+            this.Data = data;
         }
 
         public Task<CrichtonRepresentor> ExecuteAsync(CrichtonRepresentor currentRepresentor, ITransitionRequestHandler transitionRequestHandler)
         {
             var transition = LocateTransition(currentRepresentor);
 
-            return transitionRequestHandler.RequestTransitionAsync(transition, data);
+            return transitionRequestHandler.RequestTransitionAsync(transition, Data);
         }
     }
 }
