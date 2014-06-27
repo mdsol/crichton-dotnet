@@ -72,11 +72,13 @@
     <Compile Include="CrichtonRepresentorTests.cs" />
     <Compile Include="ExampleDataObject.cs" />
     <Compile Include="Integration\HaleSerializerRoundTrips.cs" />
+    <Compile Include="Integration\JsonSerializerRoundTrips.cs" />
     <Compile Include="Integration\HalSerializerRoundTrips.cs" />
     <Compile Include="Integration\RoundTripTests.cs" />
     <Compile Include="RepresentorBuilderTests.cs" />
     <Compile Include="Serializers\HaleSerializerTests.cs" />
     <Compile Include="Serializers\HalSerializerTests.cs" />
+    <Compile Include="Serializers\JsonSerializerTests.cs" />
     <Compile Include="TestWithFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -104,6 +106,15 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Integration\TestData\Hal\WormholeSample.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Integration\TestData\Json\ComplexResources.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Integration\TestData\Json\NestedAttributes.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Integration\TestData\Json\SimpleAttributes.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
