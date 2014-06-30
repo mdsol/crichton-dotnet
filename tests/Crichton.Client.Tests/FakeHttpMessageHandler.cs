@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,8 +15,8 @@ namespace Crichton.Client.Tests
     {
         public string Response { get; set; }
         public HttpStatusCode ResponseStatusCode { get; set; }
-        public Func<HttpRequestMessage, bool> Condition { get; set; } 
-
+        public Func<HttpRequestMessage, bool> Condition { get; set; }
+        public string ContentType { get; set; }
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
@@ -38,6 +39,11 @@ namespace Crichton.Client.Tests
                 StatusCode = ResponseStatusCode,
                 Content = httpContent
             };
+
+            if (ContentType != null)
+            {
+                response.Content.Headers.ContentType = new MediaTypeHeaderValue(ContentType);
+            }
 
             return response;
         }

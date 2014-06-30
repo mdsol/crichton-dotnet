@@ -15,6 +15,8 @@ namespace Crichton.Client
         public HttpClient HttpClient { get; private set; }
         public ISerializer Serializer { get; private set; }
 
+        private readonly IList<ITransitionRequestFilter> filters = new List<ITransitionRequestFilter>(); 
+
         public HttpClientTransitionRequestHandler(HttpClient client, ISerializer serializer)
         {
             if (client.BaseAddress == null)
@@ -27,6 +29,13 @@ namespace Crichton.Client
         }
 
         private static readonly string[] ValidHttpMethods = new[] { "get", "post", "put", "options", "head", "delete", "trace" };
+
+        public void AddRequestFilter(ITransitionRequestFilter filter)
+        {
+            if (filter == null) throw new ArgumentNullException("filter");
+
+            filters.Add(filter);
+        }
 
         public async Task<CrichtonRepresentor> RequestTransitionAsync(CrichtonTransition transition, object toSerializeToJson = null)
         {
@@ -49,7 +58,27 @@ namespace Crichton.Client
                 requestMessage.Method = new HttpMethod(transition.Methods.First().ToUpperInvariant());
             }
 
+            // add Accept header
+            requestMessage.Headers.Accept.ParseAdd(Serializer.ContentType);
+
+            // run all request filters
+            foreach (var filter in filters)
+            {
+                filter.Execute(requestMessage);
+            }
+
             var result = await HttpClient.SendAsync(requestMessage);
+
+            // will throw HttpRequestException if the request fails
+            result.EnsureSuccessStatusCode();
+
+            if (result.Content.Headers.ContentType.MediaType != Serializer.ContentType)
+            {
+                throw new InvalidOperationException(String.Format("Response from {0} was requested with Accept header {1} but the response was {2}.", 
+                    requestMessage.RequestUri, 
+                    Serializer.ContentType, 
+                    result.Content.Headers.ContentType.MediaType));
+            }
 
             var resultContentString = await result.Content.ReadAsStringAsync();
 
