@@ -69,6 +69,9 @@ namespace Crichton.Client
 
             var result = await HttpClient.SendAsync(requestMessage);
 
+            // will throw HttpRequestException if the request fails
+            result.EnsureSuccessStatusCode();
+
             var resultContentString = await result.Content.ReadAsStringAsync();
 
             var builder = Serializer.DeserializeToNewBuilder(resultContentString, () => new RepresentorBuilder());

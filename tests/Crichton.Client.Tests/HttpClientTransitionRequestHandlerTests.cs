@@ -73,6 +73,22 @@ namespace Crichton.Client.Tests
         }
 
         [Test]
+        [ExpectedException(typeof(HttpRequestException))]
+        public async Task RequestTransitionAsync_ThrowsHttpExceptionForNonHttpSuccessCode()
+        {
+            const string relativeUri = "api/sausages/1";
+            var transition = new CrichtonTransition { Uri = relativeUri };
+
+            var combinedUrl = new Uri(baseUri + relativeUri, UriKind.RelativeOrAbsolute);
+
+            messageHandler.Condition = m => m.Method == HttpMethod.Get && m.RequestUri == combinedUrl;
+            messageHandler.Response = "oh no";
+            messageHandler.ResponseStatusCode = HttpStatusCode.InternalServerError;
+
+            await sut.RequestTransitionAsync(transition);
+        }
+
+        [Test]
         public async Task PostTransitionDataAsJsonAsync_PostsJsonRepresentationOfObject()
         {
             var testObject = new { id = 2, name = "bratwurst" };
