@@ -47,8 +47,19 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CrichtonClient.cs" />
+    <Compile Include="HttpClientTransitionRequestHandler.cs" />
     <Compile Include="HypermediaQuery.cs" />
+    <Compile Include="HypermediaQueryExtensions.cs" />
+    <Compile Include="IHypermediaQuery.cs" />
+    <Compile Include="ITransitionRequestFilter.cs" />
+    <Compile Include="QuerySteps\IQueryStep.cs" />
+    <Compile Include="ITransitionRequestHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QuerySteps\NavigateToRelativeUrlQueryStep.cs" />
+    <Compile Include="QuerySteps\NavigateToRepresentorQueryStep.cs" />
+    <Compile Include="QuerySteps\NavigateToSelfLinkQueryStep.cs" />
+    <Compile Include="QuerySteps\NavigateToTransitionQueryStep.cs" />
+    <Compile Include="QuerySteps\PostToTransitionQueryStep.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Threading.Tasks">
@@ -56,6 +67,9 @@
     </Reference>
     <Reference Include="Microsoft.Threading.Tasks.Extensions">
       <HintPath>..\..\packages\Microsoft.Bcl.Async.1.0.168\lib\portable-net40+sl4+win8+wp71+wpa81\Microsoft.Threading.Tasks.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\packages\Newtonsoft.Json.6.0.3\lib\portable-net40+sl4+wp7+win8\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System.IO">
       <HintPath>..\..\packages\Microsoft.Bcl.1.1.9\lib\portable-net40+sl5+win8+wp8+wpa81\System.IO.dll</HintPath>
