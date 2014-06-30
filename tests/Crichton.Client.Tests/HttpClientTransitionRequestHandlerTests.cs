@@ -18,6 +18,7 @@ namespace Crichton.Client.Tests
 {
     public class HttpClientTransitionRequestHandlerTests : TestWithFixture
     {
+        private const string DefaultMediaType = "application/vnd.json+sausage";
         private HttpClientTransitionRequestHandler sut;
 
         private HttpClient client;
@@ -55,6 +56,7 @@ namespace Crichton.Client.Tests
             var representorAsJson = Fixture.Create<string>();
             var representorBuilder = MockRepository.GenerateMock<IRepresentorBuilder>();
             representorBuilder.Stub(r => r.ToRepresentor()).Return(representorResult);
+            serializer.Stub(s => s.ContentType).Return(DefaultMediaType);
             serializer.Stub(
                 s =>
                     s.DeserializeToNewBuilder(Arg<string>.Is.Equal(representorAsJson),
@@ -66,6 +68,7 @@ namespace Crichton.Client.Tests
             messageHandler.Condition = m => m.Method == HttpMethod.Get && m.RequestUri == combinedUrl;
             messageHandler.Response = representorAsJson;
             messageHandler.ResponseStatusCode = HttpStatusCode.OK;
+            messageHandler.ContentType = DefaultMediaType;
 
             var result = await sut.RequestTransitionAsync(transition);
 
@@ -89,17 +92,49 @@ namespace Crichton.Client.Tests
         }
 
         [Test]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public async Task RequestTransitionAsync_ThrowsInvalidOperationExceptionIfResponseContentTypeDoesNotMatchSerializer()
+        {
+            const string relativeUri = "api/sausages/1";
+            const string mediaType2 = "application/vnd.json+banana";
+            var transition = new CrichtonTransition { Uri = relativeUri };
+            var representorResult = Fixture.Create<CrichtonRepresentor>();
+            var representorAsJson = Fixture.Create<string>();
+            var representorBuilder = MockRepository.GenerateMock<IRepresentorBuilder>();
+            representorBuilder.Stub(r => r.ToRepresentor()).Return(representorResult);
+            serializer.Stub(s => s.ContentType).Return(DefaultMediaType);
+            serializer.Stub(
+                s =>
+                    s.DeserializeToNewBuilder(Arg<string>.Is.Equal(representorAsJson),
+                        Arg<Func<IRepresentorBuilder>>.Matches(m => m().GetType() == typeof(RepresentorBuilder))))
+                        .Return(representorBuilder);
+
+            var combinedUrl = new Uri(baseUri + relativeUri, UriKind.RelativeOrAbsolute);
+
+            messageHandler.Condition = m => m.Method == HttpMethod.Get && m.RequestUri == combinedUrl && m.Headers.Accept.Contains(new MediaTypeWithQualityHeaderValue(DefaultMediaType));
+            messageHandler.Response = representorAsJson;
+            messageHandler.ResponseStatusCode = HttpStatusCode.OK;
+            messageHandler.ContentType = mediaType2;
+
+            var result = await sut.RequestTransitionAsync(transition);
+
+            Assert.AreEqual(representorResult, result);
+        }
+
+        [Test]
         public async Task PostTransitionDataAsJsonAsync_PostsJsonRepresentationOfObject()
         {
             var testObject = new { id = 2, name = "bratwurst" };
             var testObjectJson = JsonConvert.SerializeObject(testObject);
 
             const string relativeUri = "api/sausages";
+
             var transition = new CrichtonTransition { Uri = relativeUri };
             var representorResult = Fixture.Create<CrichtonRepresentor>();
             var representorAsJson = Fixture.Create<string>();
             var representorBuilder = MockRepository.GenerateMock<IRepresentorBuilder>();
             representorBuilder.Stub(r => r.ToRepresentor()).Return(representorResult);
+            serializer.Stub(s => s.ContentType).Return(DefaultMediaType);
             serializer.Stub(s => s.DeserializeToNewBuilder(Arg<string>.Is.Equal(representorAsJson), Arg<Func<IRepresentorBuilder>>.Matches(m => m().GetType() == typeof(RepresentorBuilder)))).Return(representorBuilder);
 
             var combinedUrl = new Uri(baseUri + relativeUri, UriKind.RelativeOrAbsolute);
@@ -107,6 +142,7 @@ namespace Crichton.Client.Tests
             messageHandler.Condition = m => m.Method == HttpMethod.Post && m.RequestUri == combinedUrl && m.Content.ReadAsStringAsync().Result == testObjectJson;
             messageHandler.Response = representorAsJson;
             messageHandler.ResponseStatusCode = HttpStatusCode.OK;
+            messageHandler.ContentType = DefaultMediaType;
 
             var result = await sut.RequestTransitionAsync(transition, testObject);
 
@@ -123,6 +159,7 @@ namespace Crichton.Client.Tests
             var representorAsJson = Fixture.Create<string>();
             var representorBuilder = MockRepository.GenerateMock<IRepresentorBuilder>();
             representorBuilder.Stub(r => r.ToRepresentor()).Return(representorResult);
+            serializer.Stub(s => s.ContentType).Return(DefaultMediaType);
             serializer.Stub(
                 s =>
                     s.DeserializeToNewBuilder(Arg<string>.Is.Equal(representorAsJson),
@@ -133,6 +170,7 @@ namespace Crichton.Client.Tests
             messageHandler.Condition = m => m.Method == HttpMethod.Put && m.RequestUri == combinedUrl;
             messageHandler.Response = representorAsJson;
             messageHandler.ResponseStatusCode = HttpStatusCode.OK;
+            messageHandler.ContentType = DefaultMediaType;
 
             var result = await sut.RequestTransitionAsync(transition);
 
@@ -149,6 +187,7 @@ namespace Crichton.Client.Tests
             var representorAsJson = Fixture.Create<string>();
             var representorBuilder = MockRepository.GenerateMock<IRepresentorBuilder>();
             representorBuilder.Stub(r => r.ToRepresentor()).Return(representorResult);
+            serializer.Stub(s => s.ContentType).Return(DefaultMediaType);
             serializer.Stub(
                 s =>
                     s.DeserializeToNewBuilder(Arg<string>.Is.Equal(representorAsJson),
@@ -161,6 +200,7 @@ namespace Crichton.Client.Tests
             messageHandler.Condition = m => m.Method == HttpMethod.Get && m.RequestUri == combinedUrl && m.Headers.Accept.Contains(new MediaTypeWithQualityHeaderValue(mediaType));
             messageHandler.Response = representorAsJson;
             messageHandler.ResponseStatusCode = HttpStatusCode.OK;
+            messageHandler.ContentType = DefaultMediaType;
 
             var result = await sut.RequestTransitionAsync(transition);
 
@@ -176,6 +216,7 @@ namespace Crichton.Client.Tests
             var representorAsJson = Fixture.Create<string>();
             var representorBuilder = MockRepository.GenerateMock<IRepresentorBuilder>();
             representorBuilder.Stub(r => r.ToRepresentor()).Return(representorResult);
+            serializer.Stub(s => s.ContentType).Return(DefaultMediaType);
             serializer.Stub(
                 s =>
                     s.DeserializeToNewBuilder(Arg<string>.Is.Equal(representorAsJson),
@@ -193,6 +234,7 @@ namespace Crichton.Client.Tests
             messageHandler.Condition = m => m.Method == HttpMethod.Get && m.RequestUri == combinedUrl;
             messageHandler.Response = representorAsJson;
             messageHandler.ResponseStatusCode = HttpStatusCode.OK;
+            messageHandler.ContentType = DefaultMediaType;
 
             await sut.RequestTransitionAsync(transition);
 

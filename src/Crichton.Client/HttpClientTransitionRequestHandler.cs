@@ -72,6 +72,14 @@ namespace Crichton.Client
             // will throw HttpRequestException if the request fails
             result.EnsureSuccessStatusCode();
 
+            if (result.Content.Headers.ContentType.MediaType != Serializer.ContentType)
+            {
+                throw new InvalidOperationException(String.Format("Response from {0} was requested with Accept header {1} but the response was {2}.", 
+                    requestMessage.RequestUri, 
+                    Serializer.ContentType, 
+                    result.Content.Headers.ContentType.MediaType));
+            }
+
             var resultContentString = await result.Content.ReadAsStringAsync();
 
             var builder = Serializer.DeserializeToNewBuilder(resultContentString, () => new RepresentorBuilder());
