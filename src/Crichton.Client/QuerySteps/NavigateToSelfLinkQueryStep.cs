@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Crichton.Representors;
 
@@ -11,6 +8,9 @@ namespace Crichton.Client.QuerySteps
     {
         public Task<CrichtonRepresentor> ExecuteAsync(CrichtonRepresentor currentRepresentor, ITransitionRequestHandler transitionRequestHandler)
         {
+            if (currentRepresentor == null) { throw new ArgumentNullException("currentRepresentor"); }
+            if (transitionRequestHandler == null) { throw new ArgumentNullException("transitionRequestHandler"); }
+
             var selfTransition = new CrichtonTransition() {Uri = currentRepresentor.SelfLink};
 
             return transitionRequestHandler.RequestTransitionAsync(selfTransition);

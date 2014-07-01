@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Crichton.Client.QuerySteps;
 using Crichton.Representors;
@@ -20,6 +17,13 @@ namespace Crichton.Client.Tests.QuerySteps
         }
 
         [Test]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void CTOR_SetsNullUrl()
+        {
+            var sut = new NavigateToRelativeUrlQueryStep(null);
+        }
+
+        [Test]
         public async Task ExecuteAsync_RequestsTransitionWithRelativeUrlAsUrl()
         {
             var representor = Fixture.Create<CrichtonRepresentor>();
@@ -34,6 +38,30 @@ namespace Crichton.Client.Tests.QuerySteps
             var result = await sut.ExecuteAsync(representor, requestor);
 
             Assert.AreEqual(expected, result);
+        }
+
+        [Test]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public async Task ExecuteAsync_SetsNullRepresentor()
+        {
+            var url = Fixture.Create<string>();
+            var requestor = MockRepository.GenerateMock<ITransitionRequestHandler>();
+
+            var sut = new NavigateToRelativeUrlQueryStep(url);
+
+            var result = await sut.ExecuteAsync(null, requestor);
+        }
+
+        [Test]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public async Task ExecuteAsync_SetsNullHandler()
+        {
+            var url = Fixture.Create<string>();
+            var representor = Fixture.Create<CrichtonRepresentor>();
+
+            var sut = new NavigateToRelativeUrlQueryStep(url);
+
+            var result = await sut.ExecuteAsync(representor, null);
         }
     }
 }
