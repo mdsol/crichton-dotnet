@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Threading.Tasks;
 using Crichton.Representors;
@@ -11,23 +12,20 @@ namespace Crichton.Client.QuerySteps
 
         public NavigateToTransitionQueryStep(string rel)
         {
-            if (rel == null) { throw new ArgumentNullException("rel"); }
+            Contract.Requires<ArgumentNullException>(rel != null, "rel must not be null");
 
             selectionFunc = transition => transition.Rel == rel;
         }
 
         public NavigateToTransitionQueryStep(Func<CrichtonTransition, bool> transitionSelectionFunc)
         {
-            if (transitionSelectionFunc == null) { throw new ArgumentNullException("transitionSelectionFunc"); }
+            Contract.Requires<ArgumentNullException>(transitionSelectionFunc != null, "transitionSelectionFunc must not be null");
 
             selectionFunc = transitionSelectionFunc;
         }
 
-        public Task<CrichtonRepresentor> ExecuteAsync(CrichtonRepresentor currentRepresentor, ITransitionRequestHandler transitionRequestHandler)
+        public virtual Task<CrichtonRepresentor> ExecuteAsync(CrichtonRepresentor currentRepresentor, ITransitionRequestHandler transitionRequestHandler)
         {
-            if (currentRepresentor == null) { throw new ArgumentNullException("currentRepresentor"); }
-            if (transitionRequestHandler == null) { throw new ArgumentNullException("transitionRequestHandler"); }
-
             var transition = LocateTransition(currentRepresentor);
 
             return transitionRequestHandler.RequestTransitionAsync(transition);
@@ -35,7 +33,7 @@ namespace Crichton.Client.QuerySteps
 
         public CrichtonTransition LocateTransition(CrichtonRepresentor currentRepresentor)
         {
-            if (currentRepresentor == null) { throw new ArgumentNullException("currentRepresentor"); }
+            Contract.Requires<ArgumentNullException>(currentRepresentor != null, "currentRepresentor must not be null");
 
             var transition = currentRepresentor.Transitions.Single(selectionFunc);
             return transition;

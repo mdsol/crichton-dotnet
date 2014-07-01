@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Crichton.Client.QuerySteps;
@@ -22,15 +21,11 @@ namespace Crichton.Client
 
         public void AddStep(IQueryStep step)
         {
-            if (step == null) { throw new ArgumentNullException("step"); }
-
             Steps.Add(step);
         }
 
         public async Task<CrichtonRepresentor> ExecuteAsync(ITransitionRequestHandler requestHandler)
         {
-            if (requestHandler == null) { throw new ArgumentNullException("requestHandler"); }
-
             CrichtonRepresentor representor = null;
 
             // ReSharper disable once LoopCanBeConvertedToQuery

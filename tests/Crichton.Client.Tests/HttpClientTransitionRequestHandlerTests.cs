@@ -36,28 +36,6 @@ namespace Crichton.Client.Tests
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentException))]
-        public void CTOR_ThrowsInvalidOperationExceptionWhenBaseAddressIsNotSetInHttpClient()
-        {
-            client.BaseAddress = null;
-            sut = new HttpClientTransitionRequestHandler(client, serializer);
-        }
-
-        [Test]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void CTOR_SetsNullHttpClient()
-        {
-            sut = new HttpClientTransitionRequestHandler(null, serializer);
-        }
-
-        [Test]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void CTOR_SetsNullSerializer()
-        {
-            sut = new HttpClientTransitionRequestHandler(client, null);
-        }
-
-        [Test]
         public async Task RequestTransitionAsync_CallsSendAsyncWithRequestMessageForSimpleTransition()
         {
             const string relativeUri = "api/sausages/1";
@@ -253,20 +231,6 @@ namespace Crichton.Client.Tests
             var message = (HttpRequestMessage)(requestFilter.GetArgumentsForCallsMadeOn(r => r.Execute(Arg<HttpRequestMessage>.Is.Anything))[0][0]);
             // make sure the second filter was called with the same message as the first
             requestFilter2.AssertWasCalled(r => r.Execute(message));
-        }
-
-        [Test]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public async Task RequestTransitionAsync_SetsNullTransition()
-        {
-            var result = await sut.RequestTransitionAsync(null);
-        }
-
-        [Test]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void AddRequestFilter_ThrowsArgumentNullExceptionForNull()
-        {
-            sut.AddRequestFilter(null);
         }
     }
 }

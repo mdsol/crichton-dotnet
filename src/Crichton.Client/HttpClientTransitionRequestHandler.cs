@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -18,9 +19,9 @@ namespace Crichton.Client
 
         public HttpClientTransitionRequestHandler(HttpClient client, ISerializer serializer)
         {
-            if (client == null) { throw new ArgumentNullException("client"); }
-            if (client.BaseAddress == null) { throw new ArgumentException("BaseAddress must be set on HttpClient."); }
-            if (serializer == null) { throw new ArgumentNullException("serializer"); }
+            Contract.Requires<ArgumentNullException>(client != null, "client must not be null");
+            Contract.Requires<ArgumentException>(client.BaseAddress != null, "client.BaseAddress must not be null");
+            Contract.Requires<ArgumentNullException>(serializer != null, "serializer must not be null");
 
             HttpClient = client;
             Serializer = serializer;
@@ -30,15 +31,11 @@ namespace Crichton.Client
 
         public void AddRequestFilter(ITransitionRequestFilter filter)
         {
-            if (filter == null) throw new ArgumentNullException("filter");
-
             filters.Add(filter);
         }
 
         public async Task<CrichtonRepresentor> RequestTransitionAsync(CrichtonTransition transition, object toSerializeToJson = null)
         {
-            if (transition == null) { throw new ArgumentNullException("transition"); }
-
             var requestMessage = new HttpRequestMessage
             {
                 RequestUri = new Uri(transition.Uri, UriKind.RelativeOrAbsolute)

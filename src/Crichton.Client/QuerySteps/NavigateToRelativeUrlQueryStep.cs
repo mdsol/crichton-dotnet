@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 using Crichton.Representors;
 
@@ -10,16 +11,13 @@ namespace Crichton.Client.QuerySteps
 
         public NavigateToRelativeUrlQueryStep(string url)
         {
-            if (url == null) { throw new ArgumentNullException("url"); }
+            Contract.Requires<ArgumentNullException>(url != null, "url must not be null");
 
             this.Url = url;
         }
 
         public Task<CrichtonRepresentor> ExecuteAsync(CrichtonRepresentor currentRepresentor, ITransitionRequestHandler transitionRequestHandler)
         {
-            if (currentRepresentor == null) { throw new ArgumentNullException("currentRepresentor"); }
-            if (transitionRequestHandler == null) { throw new ArgumentNullException("transitionRequestHandler"); }
-
             var transition = new CrichtonTransition() {Uri = Url};
             return transitionRequestHandler.RequestTransitionAsync(transition);
         }

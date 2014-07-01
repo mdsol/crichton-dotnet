@@ -14,21 +14,22 @@ namespace Crichton.Client
 
         public CrichtonClient(ITransitionRequestHandler transitionRequestHandler)
         {
-            
-            if (transitionRequestHandler == null) { throw new ArgumentNullException("transitionRequestHandler"); }
+            Contract.Requires<ArgumentNullException>(transitionRequestHandler != null, "transitionRequestHandler must not be null");
 
             TransitionRequestHandler = transitionRequestHandler;
         }
 
         public CrichtonClient(Uri baseAddress, ISerializer serializer) : this(new HttpClient{BaseAddress = baseAddress}, serializer)
         {
+            Contract.Requires<ArgumentNullException>(baseAddress != null, "baseAddress must not be null");
+            Contract.Requires<ArgumentNullException>(serializer != null, "serializer must not be null");
         }
 
         public CrichtonClient(HttpClient client, ISerializer serializer)
         {
-            if (client == null) { throw new ArgumentNullException("client"); }
-            if (client.BaseAddress == null) { throw new ArgumentException("HttpClient.BaseAddress must not be null."); }
-            if (serializer == null) { throw new ArgumentNullException("serializer"); }
+            Contract.Requires<ArgumentNullException>(client != null, "client must not be null");
+            Contract.Requires<ArgumentException>(client.BaseAddress != null, "client.BaseAddress must not be null");
+            Contract.Requires<ArgumentNullException>(serializer != null, "serializer must not be null");
 
             TransitionRequestHandler = new HttpClientTransitionRequestHandler(client, serializer);
         }
@@ -47,7 +48,7 @@ namespace Crichton.Client
 
         public Task<CrichtonRepresentor> ExecuteQueryAsync(IHypermediaQuery query)
         {
-            if (query == null) { throw new ArgumentNullException("query"); }
+            Contract.Requires<ArgumentNullException>(query != null, "query must not be null");
 
             return query.ExecuteAsync(TransitionRequestHandler);
         }

@@ -1,5 +1,4 @@
-﻿using System;
-using Crichton.Client.QuerySteps;
+﻿using Crichton.Client.QuerySteps;
 using Crichton.Representors;
 using NUnit.Framework;
 using Ploeh.AutoFixture;
@@ -70,13 +69,6 @@ namespace Crichton.Client.Tests
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void Follow_SetsNullRel()
-        {
-            var result = query.Follow(null);
-        }
-
-        [Test]
         public void FollowWithData_ReturnsClonedVersionOfHypermediaQuery()
         {
             var cloneQuery = Fixture.Create<IHypermediaQuery>();
@@ -108,24 +100,6 @@ namespace Crichton.Client.Tests
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void FollowWithData_SetsNullRel()
-        {
-            var data = new { id = 2, name = "Jordi" };
-
-            var result = query.FollowWithData(null, data);
-        }
-
-        [Test]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void FollowWithData_SetsNullData()
-        {
-            var rel = Fixture.Create<string>();
-
-            var result = query.FollowWithData(rel, null);
-        }
-
-        [Test]
         public void WithUrl_ReturnsClonedVersionOfHypermediaQuery()
         {
             var cloneQuery = Fixture.Create<IHypermediaQuery>();
@@ -147,13 +121,6 @@ namespace Crichton.Client.Tests
             query.WithUrl(url);
 
             cloneQuery.AssertWasCalled(q => q.AddStep(Arg<NavigateToRelativeUrlQueryStep>.Matches(a => a.Url == url)));
-        }
-
-        [Test]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void WithUrl_SetNullUrl()
-        {
-            query.WithUrl(null);
         }
 
         [Test]
@@ -180,13 +147,6 @@ namespace Crichton.Client.Tests
 
             cloneQuery.AssertWasCalled(
                 q => q.AddStep(Arg<NavigateToRepresentorQueryStep>.Matches(r => r.Representor == representor)));
-        }
-
-        [Test]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void WithRepresentor_SetNullRepresentor()
-        {
-            query.WithRepresentor(null);
         }
     }
 }

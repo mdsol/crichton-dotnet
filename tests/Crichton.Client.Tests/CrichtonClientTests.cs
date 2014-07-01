@@ -59,34 +59,6 @@ namespace Crichton.Client.Tests
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void CTOR_SetsNullHandler()
-        {
-            sut = new CrichtonClient(null);
-        }
-
-        [Test]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void CTOR_SetsNullSerializer()
-        {
-            sut = new CrichtonClient(baseUri, null);
-        }
-
-        [Test]
-        [ExpectedException(typeof(ArgumentException))]
-        public void CTOR_SetsNullBaseAddress()
-        {
-            sut = new CrichtonClient((Uri)null, serializer);
-        }
-
-        [Test]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void CTOR_SetsNullHttpClient()
-        {
-            sut = new CrichtonClient((HttpClient)null, serializer);
-        }
-
-        [Test]
         public void CreateQuery_ReturnsNewInstanceOfHypermediaQuery()
         {
             var result = sut.CreateQuery();
@@ -118,13 +90,6 @@ namespace Crichton.Client.Tests
             var result = await sut.ExecuteQueryAsync(query);
 
             Assert.AreEqual(representor, result);
-        }
-
-        [Test]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public async Task ExecuteQueryAsync_SetsNullQuery()
-        {
-            var result = await sut.ExecuteQueryAsync(null);
         }
     }
 }
