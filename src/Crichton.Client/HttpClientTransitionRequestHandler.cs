@@ -19,9 +19,9 @@ namespace Crichton.Client
 
         public HttpClientTransitionRequestHandler(HttpClient client, ISerializer serializer)
         {
-            Contract.Requires<ArgumentNullException>(client != null, "client must not be null");
-            Contract.Requires<ArgumentException>(client.BaseAddress != null, "client.BaseAddress must not be null");
-            Contract.Requires<ArgumentNullException>(serializer != null, "serializer must not be null");
+            Contract.Requires(client != null, "client must not be null");
+            Contract.Requires(client.BaseAddress != null, "client.BaseAddress must not be null");
+            Contract.Requires(serializer != null, "serializer must not be null");
 
             HttpClient = client;
             Serializer = serializer;

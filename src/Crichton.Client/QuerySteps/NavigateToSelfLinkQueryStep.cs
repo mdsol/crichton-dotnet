@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.Contracts;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Crichton.Representors;
 
 namespace Crichton.Client.QuerySteps

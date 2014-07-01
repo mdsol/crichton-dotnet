@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics.Contracts;
+﻿using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 using Crichton.Representors;
 
@@ -10,12 +9,12 @@ namespace Crichton.Client
     {
         public void AddRequestFilter(ITransitionRequestFilter filter)
         {
-            Contract.Requires<ArgumentNullException>(filter != null, "filter must not be null.");   
+            Contract.Requires(filter != null, "filter must not be null.");   
         }
 
         public Task<CrichtonRepresentor> RequestTransitionAsync(CrichtonTransition transition, object toSerializeToJson = null)
         {
-            Contract.Requires<ArgumentNullException>(transition != null, "transition must not be null.");
+            Contract.Requires(transition != null, "transition must not be null.");
             Contract.Ensures(Contract.Result<Task<CrichtonRepresentor>>() != null, "Return value must not be null.");
 
             return default(Task<CrichtonRepresentor>);

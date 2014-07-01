@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics.Contracts;
+﻿using System.Diagnostics.Contracts;
 using System.Net.Http;
 
 namespace Crichton.Client
@@ -9,7 +8,7 @@ namespace Crichton.Client
     {
         public void Execute(HttpRequestMessage httpRequestMessage)
         {
-            Contract.Requires<ArgumentNullException>(httpRequestMessage != null, "httpRequestMessage must not be null.");
+            Contract.Requires(httpRequestMessage != null, "httpRequestMessage must not be null.");
         }
     }
 }

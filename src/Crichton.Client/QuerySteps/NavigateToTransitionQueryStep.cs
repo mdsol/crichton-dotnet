@@ -12,14 +12,14 @@ namespace Crichton.Client.QuerySteps
 
         public NavigateToTransitionQueryStep(string rel)
         {
-            Contract.Requires<ArgumentNullException>(rel != null, "rel must not be null");
+            Contract.Requires(rel != null, "rel must not be null");
 
             selectionFunc = transition => transition.Rel == rel;
         }
 
         public NavigateToTransitionQueryStep(Func<CrichtonTransition, bool> transitionSelectionFunc)
         {
-            Contract.Requires<ArgumentNullException>(transitionSelectionFunc != null, "transitionSelectionFunc must not be null");
+            Contract.Requires(transitionSelectionFunc != null, "transitionSelectionFunc must not be null");
 
             selectionFunc = transitionSelectionFunc;
         }
@@ -33,7 +33,7 @@ namespace Crichton.Client.QuerySteps
 
         public CrichtonTransition LocateTransition(CrichtonRepresentor currentRepresentor)
         {
-            Contract.Requires<ArgumentNullException>(currentRepresentor != null, "currentRepresentor must not be null");
+            Contract.Requires(currentRepresentor != null, "currentRepresentor must not be null");
 
             var transition = currentRepresentor.Transitions.Single(selectionFunc);
             return transition;

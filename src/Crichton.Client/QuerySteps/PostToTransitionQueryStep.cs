@@ -11,8 +11,8 @@ namespace Crichton.Client.QuerySteps
 
         public PostToTransitionQueryStep(string rel, object data) : base(rel)
         {
-            Contract.Requires<ArgumentNullException>(rel != null, "rel must not be null");
-            Contract.Requires<ArgumentNullException>(data != null, "data must not be null");
+            Contract.Requires(rel != null, "rel must not be null");
+            Contract.Requires(data != null, "data must not be null");
 
             this.Data = data;
         }
@@ -20,8 +20,8 @@ namespace Crichton.Client.QuerySteps
         public PostToTransitionQueryStep(Func<CrichtonTransition, bool> transitionSelectorFunc, object data)
             : base(transitionSelectorFunc)
         {
-            Contract.Requires<ArgumentNullException>(transitionSelectorFunc != null, "transitionSelectorFunc must not be null");
-            Contract.Requires<ArgumentNullException>(data != null, "data must not be null");
+            Contract.Requires(transitionSelectorFunc != null, "transitionSelectorFunc must not be null");
+            Contract.Requires(data != null, "data must not be null");
 
             this.Data = data;
         }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics.Contracts;
+﻿using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 using Crichton.Representors;
 
@@ -11,7 +10,7 @@ namespace Crichton.Client.QuerySteps
 
         public NavigateToRelativeUrlQueryStep(string url)
         {
-            Contract.Requires<ArgumentNullException>(url != null, "url must not be null");
+            Contract.Requires(url != null, "url must not be null");
 
             this.Url = url;
         }

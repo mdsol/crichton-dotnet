@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 using Crichton.Client.QuerySteps;
@@ -21,12 +20,12 @@ namespace Crichton.Client
 
         public void AddStep(IQueryStep step)
         {
-            Contract.Requires<ArgumentNullException>(step != null, "step must not be null.");
+            Contract.Requires(step != null, "step must not be null.");
         }
 
         public Task<CrichtonRepresentor> ExecuteAsync(ITransitionRequestHandler requestHandler)
         {
-            Contract.Requires<ArgumentNullException>(requestHandler != null, "requestHandler must not be null.");
+            Contract.Requires(requestHandler != null, "requestHandler must not be null.");
             Contract.Ensures(Contract.Result<Task<CrichtonRepresentor>>() != null, "Return value must not be null.");
 
             return default(Task<CrichtonRepresentor>);
