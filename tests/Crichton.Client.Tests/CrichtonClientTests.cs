@@ -73,7 +73,7 @@ namespace Crichton.Client.Tests
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentNullException))]
+        [ExpectedException(typeof(ArgumentException))]
         public void CTOR_SetsNullBaseAddress()
         {
             sut = new CrichtonClient((Uri)null, serializer);
@@ -99,10 +99,11 @@ namespace Crichton.Client.Tests
         {
             var representor = Fixture.Create<CrichtonRepresentor>();
             var result = sut.CreateQuery(representor);
+            var requestor = MockRepository.GenerateMock<ITransitionRequestHandler>();
 
             var step = (NavigateToRepresentorQueryStep)result.Steps.Single();
 
-            Assert.AreEqual(representor, await step.ExecuteAsync(null, null));
+            Assert.AreEqual(representor, await step.ExecuteAsync(representor, requestor));
 
         }
 

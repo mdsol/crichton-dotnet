@@ -18,12 +18,14 @@ namespace Crichton.Client.Tests.QuerySteps
         }
 
         [Test]
+        [ExpectedException(typeof(ArgumentNullException))]
         public void CTOR_SetsNullRel()
         {
             var sut = new NavigateToTransitionQueryStep((string)null);
         }
 
         [Test]
+        [ExpectedException(typeof(ArgumentNullException))]
         public void CTOR_SetsNullFunc()
         {
             var sut = new NavigateToTransitionQueryStep((Func<CrichtonTransition, bool>)null);

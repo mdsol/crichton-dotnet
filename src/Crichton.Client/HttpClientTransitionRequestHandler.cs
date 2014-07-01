@@ -20,7 +20,7 @@ namespace Crichton.Client
         {
             if (client == null) { throw new ArgumentNullException("client"); }
             if (client.BaseAddress == null) { throw new ArgumentException("BaseAddress must be set on HttpClient."); }
-            if (serializer == null) { throw new ArgumentException("serializer"); }
+            if (serializer == null) { throw new ArgumentNullException("serializer"); }
 
             HttpClient = client;
             Serializer = serializer;
@@ -37,7 +37,7 @@ namespace Crichton.Client
 
         public async Task<CrichtonRepresentor> RequestTransitionAsync(CrichtonTransition transition, object toSerializeToJson = null)
         {
-            if (transition == null) { throw new ArgumentException("transition"); }
+            if (transition == null) { throw new ArgumentNullException("transition"); }
 
             var requestMessage = new HttpRequestMessage
             {

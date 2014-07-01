@@ -12,6 +12,7 @@ namespace Crichton.Client.Tests.QuerySteps
     {
         private NavigateToRepresentorQueryStep sut;
         private CrichtonRepresentor representor;
+        private ITransitionRequestHandler requestor;
 
         [SetUp]
         public void Init()
@@ -19,6 +20,7 @@ namespace Crichton.Client.Tests.QuerySteps
             Fixture = GetFixture();
             representor = Fixture.Create<CrichtonRepresentor>();
             sut = new NavigateToRepresentorQueryStep(representor);
+            requestor = MockRepository.GenerateMock<ITransitionRequestHandler>();
         }
 
         [Test]
@@ -31,7 +33,7 @@ namespace Crichton.Client.Tests.QuerySteps
         [Test]
         public async Task ExecuteAsync_ReturnsConstructorSetRepresentor()
         {
-            var result = await sut.ExecuteAsync(null, null);
+            var result = await sut.ExecuteAsync(representor, requestor);
 
             Assert.AreEqual(result, representor);
         }
@@ -40,8 +42,6 @@ namespace Crichton.Client.Tests.QuerySteps
         [ExpectedException(typeof(ArgumentNullException))]
         public async Task ExecuteAsync_SetsNullRepresentor()
         {
-            var requestor = MockRepository.GenerateMock<ITransitionRequestHandler>();
-
             var result = await sut.ExecuteAsync(null, requestor);
         }
 
