@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using Crichton.Representors;
 using Crichton.Representors.Serializers;
@@ -19,9 +19,10 @@ namespace Crichton.Client
 
         public HttpClientTransitionRequestHandler(HttpClient client, ISerializer serializer)
         {
-            Contract.Requires(client != null, "client must not be null");
-            Contract.Requires(client.BaseAddress != null, "client.BaseAddress must not be null");
-            Contract.Requires(serializer != null, "serializer must not be null");
+            if (client.BaseAddress == null)
+            {
+                throw new InvalidOperationException("BaseAddress must be set on HttpClient.");
+            }
 
             HttpClient = client;
             Serializer = serializer;
@@ -31,6 +32,8 @@ namespace Crichton.Client
 
         public void AddRequestFilter(ITransitionRequestFilter filter)
         {
+            if (filter == null) throw new ArgumentNullException("filter");
+
             filters.Add(filter);
         }
 

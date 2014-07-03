@@ -1,4 +1,7 @@
-﻿using System.Diagnostics.Contracts;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Crichton.Representors;
 
@@ -10,8 +13,6 @@ namespace Crichton.Client.QuerySteps
 
         public NavigateToRelativeUrlQueryStep(string url)
         {
-            Contract.Requires(url != null, "url must not be null");
-
             this.Url = url;
         }
 
