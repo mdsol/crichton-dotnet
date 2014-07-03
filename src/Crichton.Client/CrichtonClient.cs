@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.Contracts;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Crichton.Client.QuerySteps;
