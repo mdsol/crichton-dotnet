@@ -1,4 +1,7 @@
-﻿using System.Diagnostics.Contracts;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Crichton.Representors;
 
@@ -10,8 +13,6 @@ namespace Crichton.Client.QuerySteps
 
         public NavigateToRepresentorQueryStep(CrichtonRepresentor representor)
         {
-            Contract.Requires(representor != null, "representor must not be null"); 
-
             this.Representor = representor;
         }
 

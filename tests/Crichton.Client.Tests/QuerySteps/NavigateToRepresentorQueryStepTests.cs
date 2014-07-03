@@ -1,9 +1,12 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using Crichton.Client.QuerySteps;
 using Crichton.Representors;
 using NUnit.Framework;
 using Ploeh.AutoFixture;
-using Rhino.Mocks;
 
 namespace Crichton.Client.Tests.QuerySteps
 {
@@ -11,7 +14,6 @@ namespace Crichton.Client.Tests.QuerySteps
     {
         private NavigateToRepresentorQueryStep sut;
         private CrichtonRepresentor representor;
-        private ITransitionRequestHandler requestor;
 
         [SetUp]
         public void Init()
@@ -19,13 +21,12 @@ namespace Crichton.Client.Tests.QuerySteps
             Fixture = GetFixture();
             representor = Fixture.Create<CrichtonRepresentor>();
             sut = new NavigateToRepresentorQueryStep(representor);
-            requestor = MockRepository.GenerateMock<ITransitionRequestHandler>();
         }
 
         [Test]
         public async Task ExecuteAsync_ReturnsConstructorSetRepresentor()
         {
-            var result = await sut.ExecuteAsync(representor, requestor);
+            var result = await sut.ExecuteAsync(null, null);
 
             Assert.AreEqual(result, representor);
         }

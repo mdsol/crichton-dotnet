@@ -1,6 +1,7 @@
 ﻿using System;
-using System.Diagnostics.Contracts;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Crichton.Representors;
 
@@ -12,19 +13,15 @@ namespace Crichton.Client.QuerySteps
 
         public NavigateToTransitionQueryStep(string rel)
         {
-            Contract.Requires(rel != null, "rel must not be null");
-
             selectionFunc = transition => transition.Rel == rel;
         }
 
         public NavigateToTransitionQueryStep(Func<CrichtonTransition, bool> transitionSelectionFunc)
         {
-            Contract.Requires(transitionSelectionFunc != null, "transitionSelectionFunc must not be null");
-
             selectionFunc = transitionSelectionFunc;
         }
 
-        public virtual Task<CrichtonRepresentor> ExecuteAsync(CrichtonRepresentor currentRepresentor, ITransitionRequestHandler transitionRequestHandler)
+        public Task<CrichtonRepresentor> ExecuteAsync(CrichtonRepresentor currentRepresentor, ITransitionRequestHandler transitionRequestHandler)
         {
             var transition = LocateTransition(currentRepresentor);
 
@@ -33,8 +30,6 @@ namespace Crichton.Client.QuerySteps
 
         public CrichtonTransition LocateTransition(CrichtonRepresentor currentRepresentor)
         {
-            Contract.Requires(currentRepresentor != null, "currentRepresentor must not be null");
-
             var transition = currentRepresentor.Transitions.Single(selectionFunc);
             return transition;
         }

@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Crichton.Client.QuerySteps;
 using Crichton.Representors;
@@ -10,8 +12,9 @@ namespace Crichton.Client
     {
         public IList<IQueryStep> Steps { get; private set; }
 
-        public HypermediaQuery() : this(new List<IQueryStep>())
+        public HypermediaQuery()
         {
+            Steps = new List<IQueryStep>();
         }
 
         private HypermediaQuery(IEnumerable<IQueryStep> steps)

@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Crichton.Client.QuerySteps;
 using Crichton.Representors;
 using Crichton.Representors.Serializers;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using Ploeh.AutoFixture;
 using Rhino.Mocks;
@@ -67,19 +69,6 @@ namespace Crichton.Client.Tests
         }
 
         [Test]
-        public async Task CreateQuery_SetsFirstStepAsNavigateToRepresentorQueryStep()
-        {
-            var representor = Fixture.Create<CrichtonRepresentor>();
-            var result = sut.CreateQuery(representor);
-            var requestor = MockRepository.GenerateMock<ITransitionRequestHandler>();
-
-            var step = (NavigateToRepresentorQueryStep)result.Steps.Single();
-
-            Assert.AreEqual(representor, await step.ExecuteAsync(representor, requestor));
-
-        }
-
-        [Test]
         public async Task ExecuteQueryAsync_ExecutesTheQueryAndReturnsTheResult()
         {
             var query = MockRepository.GenerateMock<IHypermediaQuery>();
@@ -91,5 +80,18 @@ namespace Crichton.Client.Tests
 
             Assert.AreEqual(representor, result);
         }
+
+        [Test]
+        public async Task CreateQuery_SetsFirstStepAsNavigateToRepresentorQueryStep()
+        {
+            var representor = Fixture.Create<CrichtonRepresentor>();
+            var result = sut.CreateQuery(representor);
+
+            var step = (NavigateToRepresentorQueryStep)result.Steps.Single();
+
+            Assert.AreEqual(representor, await step.ExecuteAsync(null,null));
+            
+        }
+
     }
 }
