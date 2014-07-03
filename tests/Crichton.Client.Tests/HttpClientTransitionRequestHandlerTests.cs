@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Text;
 using System.Threading.Tasks;
 using Crichton.Representors;
 using Crichton.Representors.Serializers;
@@ -12,7 +9,6 @@ using Newtonsoft.Json;
 using NUnit.Framework;
 using Ploeh.AutoFixture;
 using Rhino.Mocks;
-using Rhino.Mocks.Constraints;
 
 namespace Crichton.Client.Tests
 {
@@ -37,14 +33,6 @@ namespace Crichton.Client.Tests
 
             sut = new HttpClientTransitionRequestHandler(client, serializer);
             Fixture = GetFixture();
-        }
-
-        [Test]
-        [ExpectedException(typeof(InvalidOperationException))]
-        public void CTOR_ThrowsInvalidOperationExceptionWhenBaseAddressIsNotSetInHttpClient()
-        {
-            client.BaseAddress = null;
-            sut = new HttpClientTransitionRequestHandler(client, serializer);
         }
 
         [Test]
@@ -243,13 +231,6 @@ namespace Crichton.Client.Tests
             var message = (HttpRequestMessage)(requestFilter.GetArgumentsForCallsMadeOn(r => r.Execute(Arg<HttpRequestMessage>.Is.Anything))[0][0]);
             // make sure the second filter was called with the same message as the first
             requestFilter2.AssertWasCalled(r => r.Execute(message));
-        }
-
-        [Test]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void AddRequestFilter_ThrowsArgumentNullExceptionForNull()
-        {
-            sut.AddRequestFilter(null);
         }
     }
 }

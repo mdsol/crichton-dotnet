@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Diagnostics.Contracts;
 using System.Net.Http;
-using System.Text;
 
 namespace Crichton.Client
 {
+    [ContractClass(typeof(ITransitionRequestFilterContracts))]
     public interface ITransitionRequestFilter
     {
         void Execute(HttpRequestMessage httpRequestMessage);
