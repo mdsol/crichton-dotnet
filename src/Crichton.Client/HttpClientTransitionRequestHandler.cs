@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using Crichton.Representors;
 using Crichton.Representors.Serializers;
@@ -46,7 +47,7 @@ namespace Crichton.Client
 
             if (toSerializeToJson != null)
             {
-                requestMessage.Content = new StringContent(JsonConvert.SerializeObject(toSerializeToJson));
+                requestMessage.Content = new StringContent(JsonConvert.SerializeObject(toSerializeToJson), Encoding.UTF8, "application/json");
             }
 
             // select HttpMethod based on if there is data to serialize or not
