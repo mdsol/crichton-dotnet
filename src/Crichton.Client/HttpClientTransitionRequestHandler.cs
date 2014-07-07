@@ -19,10 +19,9 @@ namespace Crichton.Client
 
         public HttpClientTransitionRequestHandler(HttpClient client, ISerializer serializer)
         {
-            if (client.BaseAddress == null)
-            {
-                throw new InvalidOperationException("BaseAddress must be set on HttpClient.");
-            }
+            if (client == null) { throw new ArgumentNullException("client"); }
+            if (client.BaseAddress == null) { throw new ArgumentException("BaseAddress must be set on HttpClient."); }
+            if (serializer == null) { throw new ArgumentNullException("serializer"); }
 
             HttpClient = client;
             Serializer = serializer;
@@ -39,6 +38,8 @@ namespace Crichton.Client
 
         public async Task<CrichtonRepresentor> RequestTransitionAsync(CrichtonTransition transition, object toSerializeToJson = null)
         {
+            if (transition == null) { throw new ArgumentNullException("transition"); }
+
             var requestMessage = new HttpRequestMessage
             {
                 RequestUri = new Uri(transition.Uri, UriKind.RelativeOrAbsolute)
@@ -46,7 +47,7 @@ namespace Crichton.Client
 
             if (toSerializeToJson != null)
             {
-                requestMessage.Content = new StringContent(JsonConvert.SerializeObject(toSerializeToJson));
+                requestMessage.Content = new StringContent(JsonConvert.SerializeObject(toSerializeToJson), Encoding.UTF8, "application/json");
             }
 
             // select HttpMethod based on if there is data to serialize or not

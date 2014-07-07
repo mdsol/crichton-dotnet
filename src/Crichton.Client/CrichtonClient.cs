@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using Crichton.Client.QuerySteps;
 using Crichton.Representors;
 using Crichton.Representors.Serializers;
-using Newtonsoft.Json;
 
 namespace Crichton.Client
 {
@@ -17,34 +13,41 @@ namespace Crichton.Client
 
         public CrichtonClient(ITransitionRequestHandler transitionRequestHandler)
         {
+            
+            if (transitionRequestHandler == null) { throw new ArgumentNullException("transitionRequestHandler"); }
+
             TransitionRequestHandler = transitionRequestHandler;
         }
 
-        public CrichtonClient(Uri baseAddress, ISerializer serializer)
+        public CrichtonClient(Uri baseAddress, ISerializer serializer) : this(new HttpClient{BaseAddress = baseAddress}, serializer)
         {
-            var httpClient = new HttpClient {BaseAddress = baseAddress};
-            TransitionRequestHandler = new HttpClientTransitionRequestHandler(httpClient, serializer);
         }
 
         public CrichtonClient(HttpClient client, ISerializer serializer)
         {
+            if (client == null) { throw new ArgumentNullException("client"); }
+            if (client.BaseAddress == null) { throw new ArgumentException("HttpClient.BaseAddress must not be null."); }
+            if (serializer == null) { throw new ArgumentNullException("serializer"); }
+
             TransitionRequestHandler = new HttpClientTransitionRequestHandler(client, serializer);
         }
 
-        public IHypermediaQuery CreateQuery()
-        {
-            return new HypermediaQuery();
-        }
-
-        public IHypermediaQuery CreateQuery(CrichtonRepresentor representor)
+        public IHypermediaQuery CreateQuery(CrichtonRepresentor representor = null)
         {
             var query = new HypermediaQuery();
+            if (representor == null)
+            {
+                return query;
+            }
+
             query.AddStep(new NavigateToRepresentorQueryStep(representor));
             return query;
         }
 
         public Task<CrichtonRepresentor> ExecuteQueryAsync(IHypermediaQuery query)
         {
+            if (query == null) { throw new ArgumentNullException("query"); }
+
             return query.ExecuteAsync(TransitionRequestHandler);
         }
     }

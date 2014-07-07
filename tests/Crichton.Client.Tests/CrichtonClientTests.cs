@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Crichton.Client.QuerySteps;
 using Crichton.Representors;
 using Crichton.Representors.Serializers;
-using Newtonsoft.Json;
 using NUnit.Framework;
 using Ploeh.AutoFixture;
 using Rhino.Mocks;
@@ -61,11 +59,52 @@ namespace Crichton.Client.Tests
         }
 
         [Test]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void CTOR_SetsNullHandler()
+        {
+            sut = new CrichtonClient(null);
+        }
+
+        [Test]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void CTOR_SetsNullSerializer()
+        {
+            sut = new CrichtonClient(baseUri, null);
+        }
+
+        [Test]
+        [ExpectedException(typeof(ArgumentException))]
+        public void CTOR_SetsNullBaseAddress()
+        {
+            sut = new CrichtonClient((Uri)null, serializer);
+        }
+
+        [Test]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void CTOR_SetsNullHttpClient()
+        {
+            sut = new CrichtonClient((HttpClient)null, serializer);
+        }
+
+        [Test]
         public void CreateQuery_ReturnsNewInstanceOfHypermediaQuery()
         {
             var result = sut.CreateQuery();
 
             Assert.IsInstanceOf<HypermediaQuery>(result);
+        }
+
+        [Test]
+        public async Task CreateQuery_SetsFirstStepAsNavigateToRepresentorQueryStep()
+        {
+            var representor = Fixture.Create<CrichtonRepresentor>();
+            var result = sut.CreateQuery(representor);
+            var requestor = MockRepository.GenerateMock<ITransitionRequestHandler>();
+
+            var step = (NavigateToRepresentorQueryStep)result.Steps.Single();
+
+            Assert.AreEqual(representor, await step.ExecuteAsync(representor, requestor));
+
         }
 
         [Test]
@@ -82,16 +121,10 @@ namespace Crichton.Client.Tests
         }
 
         [Test]
-        public async Task CreateQuery_SetsFirstStepAsNavigateToRepresentorQueryStep()
+        [ExpectedException(typeof(ArgumentNullException))]
+        public async Task ExecuteQueryAsync_SetsNullQuery()
         {
-            var representor = Fixture.Create<CrichtonRepresentor>();
-            var result = sut.CreateQuery(representor);
-
-            var step = (NavigateToRepresentorQueryStep)result.Steps.Single();
-
-            Assert.AreEqual(representor, await step.ExecuteAsync(null,null));
-            
+            var result = await sut.ExecuteQueryAsync(null);
         }
-
     }
 }

@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Crichton.Client.QuerySteps;
 using Crichton.Representors;
@@ -39,6 +36,13 @@ namespace Crichton.Client.Tests
         }
 
         [Test]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void AddStep_SetsNullSteps()
+        {
+            sut.AddStep(null);
+        }
+
+        [Test]
         public async Task ExecuteAsync_ReturnsResultOfChainedCallsToSteps()
         {
             var requestor = Fixture.Create<ITransitionRequestHandler>();
@@ -56,6 +60,13 @@ namespace Crichton.Client.Tests
             var result = await sut.ExecuteAsync(requestor);
 
             Assert.AreEqual(step2Result, result);
+        }
+
+        [Test]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public async Task ExecuteAsync_SetsNullHandler()
+        {
+            var result = await sut.ExecuteAsync(null);
         }
 
         [Test]

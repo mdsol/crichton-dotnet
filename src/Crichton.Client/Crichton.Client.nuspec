@@ -3,7 +3,7 @@
   <metadata>
     <id>Crichton.Client</id>
     <title>Crichton Hypermedia API Client library</title>
-    <version>0.2.0-alpha</version> <!-- why not just use $version$? Because NuGet 2.8.1 has a bug with PCLs: https://nuget.codeplex.com/workitem/4013 -->
+    <version>0.2.1-alpha</version> <!-- why not just use $version$? Because NuGet 2.8.1 has a bug with PCLs: https://nuget.codeplex.com/workitem/4013 -->
     <authors>Ed Andersen</authors>
     <copyright>Medidata Solutions</copyright>
     <licenseUrl>https://github.com/mdsol/crichton-dotnet/blob/develop/LICENSE.md</licenseUrl>
@@ -15,7 +15,7 @@
     <dependencies>
       <dependency id="Newtonsoft.Json" version="6.0.2" />
       <dependency id="Microsoft.Net.Http" version="2.2.22" />
-      <dependency id="Crichton.Representors" version="0.2.0-alpha" />
+      <dependency id="Crichton.Representors" version="0.2.1-alpha" />
     </dependencies>
   </metadata>
   <files>

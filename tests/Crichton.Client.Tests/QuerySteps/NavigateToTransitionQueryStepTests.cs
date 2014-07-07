@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Crichton.Client.QuerySteps;
 using Crichton.Representors;
@@ -17,6 +15,20 @@ namespace Crichton.Client.Tests.QuerySteps
         public void Init()
         {
             Fixture = GetFixture();
+        }
+
+        [Test]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void CTOR_SetsNullRel()
+        {
+            var sut = new NavigateToTransitionQueryStep((string)null);
+        }
+
+        [Test]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void CTOR_SetsNullFunc()
+        {
+            var sut = new NavigateToTransitionQueryStep((Func<CrichtonTransition, bool>)null);
         }
 
         [Test]
@@ -57,6 +69,51 @@ namespace Crichton.Client.Tests.QuerySteps
             var result = await sut.ExecuteAsync(representor, requestor);
 
             Assert.AreEqual(expected, result);
+        }
+
+        [Test]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public async Task ExecuteAsync_SetsNullRepresentor()
+        {
+            var representor = Fixture.Create<CrichtonRepresentor>();
+            var transition = representor.Transitions.First();
+            var rel = transition.Rel;
+
+            var requestor = MockRepository.GenerateMock<ITransitionRequestHandler>();
+
+            var sut = new NavigateToTransitionQueryStep(rel);
+
+            var result = await sut.ExecuteAsync(null, requestor);
+        }
+
+        [Test]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public async Task ExecuteAsync_SetsNullHandler()
+        {
+            var representor = Fixture.Create<CrichtonRepresentor>();
+            var transition = representor.Transitions.First();
+            var rel = Fixture.Create<string>();
+            var name = Fixture.Create<string>();
+            transition.Rel = rel;
+            transition.Name = name;
+
+            var requestor = MockRepository.GenerateMock<ITransitionRequestHandler>();
+
+            var sut = new NavigateToTransitionQueryStep(t => t.Rel == rel && t.Name == name);
+
+            var result = await sut.ExecuteAsync(representor, null);
+        }
+
+        [Test]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void LocateTransition_SetsNull()
+        {
+            var representor = Fixture.Create<CrichtonRepresentor>();
+            var transition = representor.Transitions.First();
+            var rel = transition.Rel;
+
+            var sut = new NavigateToTransitionQueryStep(rel);
+            sut.LocateTransition(null);
         }
     }
 }
