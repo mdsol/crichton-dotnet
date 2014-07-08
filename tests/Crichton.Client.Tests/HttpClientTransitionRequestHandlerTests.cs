@@ -44,14 +44,6 @@ namespace Crichton.Client.Tests
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentException))]
-        public void CTOR_ThrowsInvalidOperationExceptionWhenBaseAddressIsNotAbsoluteUri()
-        {
-            client.BaseAddress = new Uri(string.Format("./{0}", Fixture.Create<string>()), UriKind.Relative);
-            sut = new HttpClientTransitionRequestHandler(client, serializer);
-        }
-
-        [Test]
         [ExpectedException(typeof(ArgumentNullException))]
         public void CTOR_SetsNullHttpClient()
         {

@@ -21,7 +21,6 @@ namespace Crichton.Client
         {
             if (client == null) { throw new ArgumentNullException("client"); }
             if (client.BaseAddress == null) { throw new ArgumentException("BaseAddress must be set on HttpClient."); }
-            if (!client.BaseAddress.IsAbsoluteUri) { throw new ArgumentException("BaseAddress must be absolute uri."); }
             if (serializer == null) { throw new ArgumentNullException("serializer"); }
 
             HttpClient = client;
@@ -43,7 +42,7 @@ namespace Crichton.Client
 
             var requestMessage = new HttpRequestMessage
             {
-                RequestUri = CreateRequestUri(HttpClient.BaseAddress, transition.Uri)
+                RequestUri = transition.Uri != null ? new Uri(transition.Uri, UriKind.RelativeOrAbsolute) : null,
             };
 
             if (toSerializeToJson != null)
@@ -87,23 +86,6 @@ namespace Crichton.Client
             var builder = Serializer.DeserializeToNewBuilder(resultContentString, () => new RepresentorBuilder());
 
             return builder.ToRepresentor();
-        }
-
-        private static Uri CreateRequestUri(Uri baseUri, string transitionUriString)
-        {
-            if (string.IsNullOrWhiteSpace(transitionUriString))
-            {
-                return baseUri;
-            }
-
-            var transitionUri = new Uri(transitionUriString, UriKind.RelativeOrAbsolute);
-
-            if (transitionUri.IsAbsoluteUri)
-            {
-                return transitionUri;
-            }
-
-            return new Uri(baseUri, transitionUri);
         }
     }
 }
