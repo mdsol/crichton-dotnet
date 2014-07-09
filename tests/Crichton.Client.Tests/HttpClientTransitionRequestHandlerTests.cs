@@ -86,6 +86,59 @@ namespace Crichton.Client.Tests
         }
 
         [Test]
+        public async Task RequestTransitionAsync_WithNullTransitionUrl()
+        {
+            var transition = new CrichtonTransition { Uri = null };
+            var representorResult = Fixture.Create<CrichtonRepresentor>();
+            var representorAsJson = Fixture.Create<string>();
+            var representorBuilder = MockRepository.GenerateMock<IRepresentorBuilder>();
+            representorBuilder.Stub(r => r.ToRepresentor()).Return(representorResult);
+            serializer.Stub(s => s.ContentType).Return(DefaultMediaType);
+            serializer.Stub(
+                s =>
+                    s.DeserializeToNewBuilder(Arg<string>.Is.Equal(representorAsJson),
+                        Arg<Func<IRepresentorBuilder>>.Matches(m => m().GetType() == typeof(RepresentorBuilder))))
+                        .Return(representorBuilder);
+
+            var combinedUrl = baseUri;
+
+            messageHandler.Condition = m => m.Method == HttpMethod.Get && m.RequestUri == combinedUrl;
+            messageHandler.Response = representorAsJson;
+            messageHandler.ResponseStatusCode = HttpStatusCode.OK;
+            messageHandler.ContentType = DefaultMediaType;
+
+            var result = await sut.RequestTransitionAsync(transition);
+
+            Assert.AreEqual(representorResult, result);
+        }
+
+        [Test]
+        public async Task RequestTransitionAsync_WithRelativeUriWhichIsAbsoluteUri()
+        {
+            var absoluteUri = "http://google.com";
+            var transition = new CrichtonTransition { Uri = absoluteUri };
+            var representorResult = Fixture.Create<CrichtonRepresentor>();
+            var representorAsJson = Fixture.Create<string>();
+            var representorBuilder = MockRepository.GenerateMock<IRepresentorBuilder>();
+            representorBuilder.Stub(r => r.ToRepresentor()).Return(representorResult);
+            serializer.Stub(s => s.ContentType).Return(DefaultMediaType);
+            serializer.Stub(
+                s =>
+                    s.DeserializeToNewBuilder(Arg<string>.Is.Equal(representorAsJson),
+                        Arg<Func<IRepresentorBuilder>>.Matches(m => m().GetType() == typeof(RepresentorBuilder))))
+                        .Return(representorBuilder);
+
+            messageHandler.Condition = m => m.Method == HttpMethod.Get && m.RequestUri == new Uri(absoluteUri, UriKind.Absolute);
+            messageHandler.Response = representorAsJson;
+            messageHandler.ResponseStatusCode = HttpStatusCode.OK;
+            messageHandler.ContentType = DefaultMediaType;
+
+            var result = await sut.RequestTransitionAsync(transition);
+
+            Assert.AreEqual(representorResult, result);
+        }
+
+        [Test]
         [ExpectedException(typeof(HttpRequestException))]
         public async Task RequestTransitionAsync_ThrowsHttpExceptionForNonHttpSuccessCode()
         {
