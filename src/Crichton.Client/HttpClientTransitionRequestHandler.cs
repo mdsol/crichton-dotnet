@@ -42,7 +42,7 @@ namespace Crichton.Client
 
             var requestMessage = new HttpRequestMessage
             {
-                RequestUri = new Uri(transition.Uri, UriKind.RelativeOrAbsolute)
+                RequestUri = transition.Uri != null ? new Uri(transition.Uri, UriKind.RelativeOrAbsolute) : null,
             };
 
             if (toSerializeToJson != null)
