@@ -5,13 +5,24 @@ using Newtonsoft.Json.Linq;
 
 namespace Crichton.Representors.Serializers
 {
+    /// <summary>
+    /// HalSerializer class
+    /// </summary>
     public class HalSerializer : JsonSerializer
     {
-        public override IEnumerable<string> IgnoredAttributes { get { return new string[] { "_links", "_embedded" }; } }
         private static readonly string[] ReservedLinkRels = { "self" };
 
+        /// <summary>Gets the IgnoredAttributes</summary>
+        public override IEnumerable<string> IgnoredAttributes { get { return new string[] { "_links", "_embedded" }; } }
+
+        /// <summary>Gets the ContentType</summary>
         public override string ContentType { get { return "application/hal+json"; } }
 
+        /// <summary>
+        /// Serializes the representor
+        /// </summary>
+        /// <param name="representor">the representor</param>
+        /// <returns>serialized string</returns>
         public override string Serialize(CrichtonRepresentor representor)
         {
             if (representor == null)
@@ -22,6 +33,31 @@ namespace Crichton.Representors.Serializers
             var jObject = CreateJObjectForRepresentor(representor);
 
             return jObject.ToString();
+        }
+
+        /// <summary>
+        /// Deserializes to new builder
+        /// </summary>
+        /// <param name="message">the message</param>
+        /// <param name="builderFactoryMethod">the builderFactoryMethod</param>
+        /// <returns>a builder</returns>
+        public override IRepresentorBuilder DeserializeToNewBuilder(string message, Func<IRepresentorBuilder> builderFactoryMethod)
+        {
+            if (message == null)
+            {
+                throw new ArgumentNullException("message");
+            }
+
+            if (builderFactoryMethod == null)
+            {
+                throw new ArgumentNullException("builderFactoryMethod");
+            }
+
+            var document = JObject.Parse(message);
+
+            var builder = BuildRepresentorBuilderFromJObject(builderFactoryMethod, document);
+
+            return builder;
         }
 
         private JObject CreateJObjectForRepresentor(CrichtonRepresentor representor)
@@ -107,25 +143,6 @@ namespace Crichton.Representors.Serializers
             if (!String.IsNullOrWhiteSpace(transition.LanguageTag)) linkObject["hreflang"] = transition.LanguageTag;
 
             return linkObject;
-        }
-
-        public override IRepresentorBuilder DeserializeToNewBuilder(string message, Func<IRepresentorBuilder> builderFactoryMethod)
-        {
-            if (message == null)
-            {
-                throw new ArgumentNullException("message");
-            }
-
-            if (builderFactoryMethod == null)
-            {
-                throw new ArgumentNullException("builderFactoryMethod");
-            }
-
-            var document = JObject.Parse(message);
-
-            var builder = BuildRepresentorBuilderFromJObject(builderFactoryMethod, document);
-
-            return builder;
         }
 
         private IRepresentorBuilder BuildRepresentorBuilderFromJObject(Func<IRepresentorBuilder> builderFactoryMethod, JObject document)
