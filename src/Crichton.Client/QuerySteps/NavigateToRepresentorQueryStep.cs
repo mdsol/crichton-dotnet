@@ -33,9 +33,6 @@ namespace Crichton.Client.QuerySteps
         /// <returns>crichton representor</returns>
         public async Task<CrichtonRepresentor> ExecuteAsync(CrichtonRepresentor currentRepresentor, ITransitionRequestHandler transitionRequestHandler)
         {
-            if (currentRepresentor == null) { throw new ArgumentNullException("currentRepresentor"); }
-            if (transitionRequestHandler == null) { throw new ArgumentNullException("transitionRequestHandler"); }
-
             return Representor;
         }
     }
