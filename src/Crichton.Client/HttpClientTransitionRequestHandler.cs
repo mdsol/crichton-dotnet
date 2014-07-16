@@ -10,13 +10,29 @@ using Newtonsoft.Json;
 
 namespace Crichton.Client
 {
+    /// <summary>
+    /// HttpClientTransitionRequestHandler class
+    /// </summary>
     public class HttpClientTransitionRequestHandler : ITransitionRequestHandler
     {
+        private static readonly string[] ValidHttpMethods = new[] { "get", "post", "put", "options", "head", "delete", "trace" };
+        private readonly IList<ITransitionRequestFilter> filters = new List<ITransitionRequestFilter>();
+
+        /// <summary>
+        /// Gets the HttpClient
+        /// </summary>
         public HttpClient HttpClient { get; private set; }
+
+        /// <summary>
+        /// Gets the Serializer
+        /// </summary>
         public ISerializer Serializer { get; private set; }
 
-        private readonly IList<ITransitionRequestFilter> filters = new List<ITransitionRequestFilter>(); 
-
+        /// <summary>
+        /// Initializes a new instance of the HttpClientTransitionRequestHandler class.
+        /// </summary>
+        /// <param name="client">the HttpClient</param>
+        /// <param name="serializer">the serializer</param>
         public HttpClientTransitionRequestHandler(HttpClient client, ISerializer serializer)
         {
             if (client == null) { throw new ArgumentNullException("client"); }
@@ -27,8 +43,10 @@ namespace Crichton.Client
             Serializer = serializer;
         }
 
-        private static readonly string[] ValidHttpMethods = new[] { "get", "post", "put", "options", "head", "delete", "trace" };
-
+        /// <summary>
+        /// Adds a RequestFilter
+        /// </summary>
+        /// <param name="filter">the filter</param>
         public void AddRequestFilter(ITransitionRequestFilter filter)
         {
             if (filter == null) throw new ArgumentNullException("filter");
@@ -36,6 +54,12 @@ namespace Crichton.Client
             filters.Add(filter);
         }
 
+        /// <summary>
+        /// Requests the transition
+        /// </summary>
+        /// <param name="transition">the transition</param>
+        /// <param name="toSerializeToJson">the object to be posted</param>
+        /// <returns>task including a CrichtonRepresentor</returns>
         public async Task<CrichtonRepresentor> RequestTransitionAsync(CrichtonTransition transition, object toSerializeToJson = null)
         {
             if (transition == null) { throw new ArgumentNullException("transition"); }

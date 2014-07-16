@@ -4,6 +4,9 @@ using Newtonsoft.Json.Linq;
 
 namespace Crichton.Representors
 {
+    /// <summary>
+    /// IRepresentorBuilder interface
+    /// </summary>
     public interface IRepresentorBuilder
     {
         /// <summary>
