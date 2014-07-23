@@ -39,6 +39,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crichton.Client", "src\Cric
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crichton.Client.Tests", "tests\Crichton.Client.Tests\Crichton.Client.Tests.csproj", "{09B73237-4871-43A8-9335-C47288163F74}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleApp", "sample\SampleApp\SampleApp.csproj", "{A8AE73E1-397D-4913-A10F-22E6F1BB88EE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sample", "sample", "{9CE6AE59-0931-4864-B87E-7C36FA636703}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -65,11 +69,16 @@ Global
 		{09B73237-4871-43A8-9335-C47288163F74}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{09B73237-4871-43A8-9335-C47288163F74}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{09B73237-4871-43A8-9335-C47288163F74}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A8AE73E1-397D-4913-A10F-22E6F1BB88EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A8AE73E1-397D-4913-A10F-22E6F1BB88EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A8AE73E1-397D-4913-A10F-22E6F1BB88EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A8AE73E1-397D-4913-A10F-22E6F1BB88EE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{301AA1A7-7891-4794-9EC4-6F915740BE47} = {305C89FD-C818-492E-B304-206871804593}
+		{A8AE73E1-397D-4913-A10F-22E6F1BB88EE} = {9CE6AE59-0931-4864-B87E-7C36FA636703}
 	EndGlobalSection
 EndGlobal

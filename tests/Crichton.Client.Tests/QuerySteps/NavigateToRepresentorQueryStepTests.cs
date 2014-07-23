@@ -37,19 +37,5 @@ namespace Crichton.Client.Tests.QuerySteps
 
             Assert.AreEqual(result, representor);
         }
-
-        [Test]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public async Task ExecuteAsync_SetsNullRepresentor()
-        {
-            var result = await sut.ExecuteAsync(null, requestor);
-        }
-
-        [Test]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public async Task ExecuteAsync_SetsNullHandler()
-        {
-            var result = await sut.ExecuteAsync(representor, null);
-        }
     }
 }
