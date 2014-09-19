@@ -18,6 +18,16 @@ namespace Crichton.Representors
     }
 
     /// <summary>
+    /// ServiceLevelTarget class
+    /// </summary>
+    public class ServiceLevelTarget
+    {
+        public int NinetyNinethPercentileMs { get; set; }
+        public int StandardDeviationMs { get; set; }
+        public int RequestsPerSecond { get; set; }
+    }
+
+    /// <summary>
     /// CrichtonTransition class
     /// </summary>
     public class CrichtonTransition : IAttributesContainer
@@ -63,6 +73,9 @@ namespace Crichton.Representors
 
         /// <summary>Gets or sets the Target</summary>
         public string Target { get; set; }
+
+        /// <summary>Gets or sets the ServiceLevelTarget</summary>
+        public ServiceLevelTarget ServiceLevelTarget { get; set; }
 
         /// <summary>Gets or sets the Attributes</summary>
         public IDictionary<string, CrichtonTransitionAttribute> Attributes { get; set; }
