@@ -4,8 +4,16 @@ using Crichton.Representors;
 
 namespace Crichton.Client
 {
+    /// <summary>
+    /// HypermediaQueryExtensions
+    /// </summary>
     public static class HypermediaQueryExtensions
     {
+        /// <summary>
+        /// Returns a new query being added a NavigateToSelfLinkQueryStep.
+        /// </summary>
+        /// <param name="hypermediaQuery">this IHypermediaQuery</param>
+        /// <returns>the query</returns>
         public static IHypermediaQuery FollowSelf(this IHypermediaQuery hypermediaQuery)
         {
             var query = hypermediaQuery.Clone();
@@ -13,6 +21,12 @@ namespace Crichton.Client
             return query;
         }
 
+        /// <summary>
+        /// Returns a new query being added a NavigateToTransitionQueryStep.
+        /// </summary>
+        /// <param name="hypermediaQuery">this IHypermediaQuery</param>
+        /// <param name="rel">the rel</param>
+        /// <returns>the query</returns>
         public static IHypermediaQuery Follow(this IHypermediaQuery hypermediaQuery, string rel)
         {
             if (rel == null) { throw new ArgumentNullException("rel"); }
@@ -22,6 +36,13 @@ namespace Crichton.Client
             return query;
         }
 
+        /// <summary>
+        /// Returns a new query being added a PostToTransitionQueryStep.
+        /// </summary>
+        /// <param name="hypermediaQuery">this IHypermediaQuery</param>
+        /// <param name="rel">the rel</param>
+        /// <param name="data">the data</param>
+        /// <returns>the query</returns>
         public static IHypermediaQuery FollowWithData(this IHypermediaQuery hypermediaQuery, string rel, object data)
         {
             if (rel == null) { throw new ArgumentNullException("rel"); }
@@ -32,6 +53,12 @@ namespace Crichton.Client
             return query;
         }
 
+        /// <summary>
+        /// Returns a new query being added a NavigateToRelativeUrlQueryStep.
+        /// </summary>
+        /// <param name="hypermediaQuery">this IHypermediaQuery</param>
+        /// <param name="url">the url</param>
+        /// <returns>the query</returns>
         public static IHypermediaQuery WithUrl(this IHypermediaQuery hypermediaQuery, string url)
         {
             if (url == null) { throw new ArgumentNullException("url"); }
@@ -41,6 +68,12 @@ namespace Crichton.Client
             return query;
         }
 
+        /// <summary>
+        /// Returns a new query being added a NavigateToRepresentorQueryStep.
+        /// </summary>
+        /// <param name="hypermediaQuery">this IHypermediaQuery</param>
+        /// <param name="representor">the representor</param>
+        /// <returns>the query</returns>
         public static IHypermediaQuery WithRepresentor(this IHypermediaQuery hypermediaQuery,
             CrichtonRepresentor representor)
         {

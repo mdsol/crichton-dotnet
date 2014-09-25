@@ -1,4 +1,4 @@
-﻿# Crichton.NET [![Build Status](http://crichton-dn-ci.cloudapp.net/app/rest/builds/buildType:\(id:CrichtonDotnet_Develop\)/statusIcon)](http://crichton-dn-ci.cloudapp.net/?guest=1)
+﻿# Crichton.NET [![Build Status](http://ci-kenyamat.cloudapp.net/app/rest/builds/buildType:\(id:CrichtonDotnet_Develop\)/statusIcon)](http://ci-kenyamat.cloudapp.net/?guest=1)
 Crichton is a library to simplify generating and consuming Hypermedia API responses. It has the knowledge of Hypermedia
 from the Ancients.
 
@@ -81,7 +81,7 @@ Spec | Support
 7.1.1.1. String values | ❌
 7.1.1.2. Link Object values | ❌
 
-The HALE+JSON Serializer is not complete. Likely 5.2 Constraint Properties will be implemented next.
+The HALE+JSON Serializer is not complete.
 
 ##### Other formats
 

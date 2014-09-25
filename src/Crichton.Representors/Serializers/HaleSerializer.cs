@@ -6,11 +6,15 @@ using Newtonsoft.Json.Linq;
 
 namespace Crichton.Representors.Serializers
 {
+    /// <summary>
+    /// HaleSerializer class
+    /// </summary>
     public class HaleSerializer : HalSerializer
     {
         private static readonly Dictionary<TransitionRenderMethod, string>
             RenderMethodMappings = new Dictionary<TransitionRenderMethod, string> { { TransitionRenderMethod.Resource, "resource" }, { TransitionRenderMethod.Embed, "embed" } };
 
+        /// <summary>Gets the ContentType</summary>
         public override string ContentType { get { return "application/vnd.hale+json"; } }
 
         protected override JObject CreateLinkObjectFromTransition(CrichtonTransition transition)
