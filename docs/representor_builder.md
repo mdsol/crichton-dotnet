@@ -81,6 +81,7 @@ depreciationUri | If the transition has been deprecated, a link to a Uri explain
 name | The name of the transition. Can be used as an alternative or subcategory of title. 
 profileUri | Uri to an http://alps.io/ or similar profile. 
 languageTag | Language of the transition, as per RFC 5988 http://tools.ietf.org/html/rfc5988 
+serviceLevelTarget | SLT of the endpoint. contains the following data: 99thPercentile in ms, StandardDeviation in ms, RequestsPersSecond 
 
 
 ### ```void AddEmbeddedResource(string key, CrichtonRepresentor resource)```
