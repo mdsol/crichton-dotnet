@@ -15,9 +15,13 @@ _NCrunch_Crichton/
 *.ncrunchsolution
 *.ncrunchproject
 *.ncrunchsolution.user
-samples/*
 tools*/bin/*
 docs/*.html
 tools/*/bin/*
 tools/*/obj/*
 TestResults/*
+sample/SampleApp/bin/*
+sample/SampleApp/obj/*
+.vs/*
+*.nupkg
+packages/

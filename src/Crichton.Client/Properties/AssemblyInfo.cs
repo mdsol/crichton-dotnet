@@ -11,7 +11,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("Crichton.Client")]
-[assembly: AssemblyCopyright("Copyright © Medidata Solutions 2014")]
+[assembly: AssemblyCopyright("Copyright © Medidata Solutions 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: NeutralResourcesLanguage("en")]
@@ -26,6 +26,6 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("0.2.3")]
-[assembly: AssemblyFileVersionAttribute("0.2.3")]
-[assembly: AssemblyInformationalVersion("0.2.3-alpha")]
+[assembly: AssemblyVersion("1.0.0")]
+[assembly: AssemblyFileVersionAttribute("1.0.0")]
+[assembly: AssemblyInformationalVersion("1.0.0")]

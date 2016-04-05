@@ -1,10 +1,8 @@
-﻿# Crichton.NET [![Build Status](http://ci-kenyamat.cloudapp.net/app/rest/builds/buildType:\(id:CrichtonDotnet_Develop\)/statusIcon)](http://ci-kenyamat.cloudapp.net/?guest=1)
+# Crichton.NET
 Crichton is a library to simplify generating and consuming Hypermedia API responses. It has the knowledge of Hypermedia
 from the Ancients.
 
 This is a .NET/C# port of the Ruby library at http://www.github.com/mdsol/crichton.
-
-NOTE: THIS IS UNDER HEAVY DEV AND IS NOT READY TO BE USED YET
 
 ## Components
 
@@ -91,7 +89,7 @@ We hope to support other formats such as Collection+JSON, Siren etc in the futur
 See [CONTRIBUTING][] for details.
 
 ## Copyright
-Copyright (c) 2014 Medidata Solutions Worldwide. Licensed under MIT. See [LICENSE][] for details.
+Copyright (c) 2016 Medidata Solutions Worldwide. Licensed under MIT. See [LICENSE][] for details.
 
 ## Authors
 

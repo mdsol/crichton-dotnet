@@ -13,7 +13,7 @@ using System.Security;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("Crichton.Representors")]
-[assembly: AssemblyCopyright("Copyright © Medidata Solutions 2014")]
+[assembly: AssemblyCopyright("Copyright © Medidata Solutions 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: NeutralResourcesLanguage("en")]
@@ -28,6 +28,6 @@ using System.Security;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("0.2.4")]
-[assembly: AssemblyFileVersionAttribute("0.2.4")]
-[assembly: AssemblyInformationalVersion("0.2.4-alpha")]
+[assembly: AssemblyVersion("1.0.0")]
+[assembly: AssemblyFileVersionAttribute("1.0.0")]
+[assembly: AssemblyInformationalVersion("1.0.0")]
